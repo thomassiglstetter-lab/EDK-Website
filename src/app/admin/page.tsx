@@ -109,6 +109,7 @@ export interface Sponsor {
   url?: string;
   logo?: string;
   fit?: "cover" | "contain";
+  scale?: number;
 }
 
 export interface ContactCategory {
@@ -295,12 +296,14 @@ export default function AdminPage() {
     url: string;
     logo: string;
     fit?: "cover" | "contain";
+    scale?: number;
   }>({
     name: "",
     tier: "partner",
     url: "",
     logo: "",
     fit: "cover",
+    scale: 1.0,
   });
   const sponsorFormDataRef = React.useRef(sponsorFormData);
   useEffect(() => {
@@ -438,12 +441,25 @@ export default function AdminPage() {
       });
 
     // Fetch Sponsors
+    let deletedSponsorsList: string[] = [];
+    try {
+      const delRaw = localStorage.getItem("edk_deleted_sponsors");
+      if (delRaw) deletedSponsorsList = JSON.parse(delRaw);
+    } catch {}
+
+    const isDeletedSponsor = (s: { id?: string; name?: string }) => {
+      if (s.id && deletedSponsorsList.includes(s.id)) return true;
+      if (s.name && deletedSponsorsList.includes(s.name.toLowerCase().trim())) return true;
+      return false;
+    };
+
     try {
       const cached = localStorage.getItem("edk_sponsors_cache");
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setSponsors(parsed);
+          const filtered = parsed.filter((s: Sponsor) => !isDeletedSponsor(s));
+          setSponsors(filtered);
           setSponsorsLoading(false);
         }
       }
@@ -453,18 +469,20 @@ export default function AdminPage() {
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
-          let merged = data;
+          const serverValid = data.filter((s: Sponsor) => !isDeletedSponsor(s));
+          let merged = serverValid;
           try {
             const cachedRaw = localStorage.getItem("edk_sponsors_cache");
             if (cachedRaw) {
               const cachedArr: Sponsor[] = JSON.parse(cachedRaw);
               if (Array.isArray(cachedArr) && cachedArr.length > 0) {
+                const validCachedArr = cachedArr.filter((c: Sponsor) => !isDeletedSponsor(c));
                 const cachedMap = new Map<string, Sponsor>();
-                cachedArr.forEach((c) => {
+                validCachedArr.forEach((c) => {
                   if (c.id) cachedMap.set(c.id, c);
                   else if (c.name) cachedMap.set(c.name.toLowerCase().trim(), c);
                 });
-                merged = data.map((server) => {
+                merged = serverValid.map((server) => {
                   const cached = cachedMap.get(server.id) || cachedMap.get(server.name.toLowerCase().trim());
                   if (!cached) return server;
                   return {
@@ -472,12 +490,17 @@ export default function AdminPage() {
                     tier: cached.tier || server.tier,
                     logo: cached.logo || server.logo,
                     fit: cached.fit || server.fit,
+                    scale: cached.scale !== undefined ? cached.scale : server.scale,
                     url: cached.url !== undefined ? cached.url : server.url,
                   };
                 });
-                cachedArr.forEach((c) => {
-                  const exists = merged.some((m) => m.id === c.id || m.name.toLowerCase().trim() === c.name.toLowerCase().trim());
-                  if (!exists) merged.push(c);
+                validCachedArr.forEach((c) => {
+                  const exists = merged.some(
+                    (m) =>
+                      (m.id && c.id && m.id === c.id) ||
+                      (m.name && c.name && m.name.toLowerCase().trim() === c.name.toLowerCase().trim())
+                  );
+                  if (!exists && !isDeletedSponsor(c)) merged.push(c);
                 });
               }
             }
@@ -1044,6 +1067,7 @@ export default function AdminPage() {
       url: "",
       logo: "",
       fit: "cover",
+      scale: 1.0,
     });
     setSponsorFormError("");
     setSponsorModalOpen(true);
@@ -1058,6 +1082,7 @@ export default function AdminPage() {
       url: sponsor.url || "",
       logo: sponsor.logo || "",
       fit: initialFit,
+      scale: sponsor.scale !== undefined ? sponsor.scale : 1.0,
     });
     setSponsorFormError("");
     setSponsorModalOpen(true);
@@ -1066,17 +1091,20 @@ export default function AdminPage() {
   const persistSponsorLogo = async (newUrl: string) => {
     const currentForm = sponsorFormDataRef.current;
     const determinedFit = currentForm.fit || (newUrl.toLowerCase().endsWith(".svg") ? "contain" : "cover");
-    setSponsorFormData((prev) => ({ ...prev, logo: newUrl, fit: determinedFit }));
+    const determinedScale = currentForm.scale || 1.0;
+    setSponsorFormData((prev) => ({ ...prev, logo: newUrl, fit: determinedFit, scale: determinedScale }));
     if (editingSponsor) {
+      const payload = {
+        id: editingSponsor.id,
+        name: currentForm.name || editingSponsor.name,
+        tier: currentForm.tier || editingSponsor.tier,
+        url: currentForm.url !== undefined ? currentForm.url : (editingSponsor.url || ""),
+        logo: newUrl,
+        fit: determinedFit,
+        scale: determinedScale,
+      };
+
       try {
-        const payload = {
-          id: editingSponsor.id,
-          name: currentForm.name || editingSponsor.name,
-          tier: currentForm.tier || editingSponsor.tier,
-          url: currentForm.url !== undefined ? currentForm.url : (editingSponsor.url || ""),
-          logo: newUrl,
-          fit: determinedFit,
-        };
         const res = await fetch("/api/sponsors", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -1092,14 +1120,21 @@ export default function AdminPage() {
           setEditingSponsor(updated);
           showToast("Logo & Partner-Stufe erfolgreich gespeichert!");
           return;
-        } else {
-          throw new Error("Aktualisierung fehlgeschlagen.");
         }
       } catch (err) {
-        console.error("Auto-save sponsor logo failed:", err);
-        showToast("Logo übernommen. Bitte unten auf 'Änderungen speichern' klicken.");
-        return;
+        console.warn("PUT /api/sponsors failed, fallback to local cache:", err);
       }
+
+      // Fallback if backend failed (e.g. read-only filesystem)
+      const localUpdated = { ...editingSponsor, ...payload };
+      setSponsors((prev) => {
+        const next = prev.map((s) => (s.id === localUpdated.id ? localUpdated : s));
+        updateSponsorsCacheAndNotify(next);
+        return next;
+      });
+      setEditingSponsor(localUpdated);
+      showToast("Logo übernommen & Vorschau aktualisiert!");
+      return;
     }
     showToast("Logo zugeschnitten! Bitte unten auf 'Partner anlegen' klicken.");
   };
@@ -1177,41 +1212,101 @@ export default function AdminPage() {
     setSponsorSaving(true);
     setSponsorFormError("");
 
+    // If this sponsor name or ID was in edk_deleted_sponsors, remove it so it's not hidden
+    try {
+      const delRaw = localStorage.getItem("edk_deleted_sponsors");
+      if (delRaw) {
+        const delList: string[] = JSON.parse(delRaw);
+        const nextDel = delList.filter(
+          (d) =>
+            d !== sponsorFormData.name.toLowerCase().trim() &&
+            (!editingSponsor || d !== editingSponsor.id)
+        );
+        localStorage.setItem("edk_deleted_sponsors", JSON.stringify(nextDel));
+      }
+    } catch {}
+
     try {
       if (editingSponsor) {
         // Update existing sponsor
-        const res = await fetch("/api/sponsors", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: editingSponsor.id,
-            name: sponsorFormData.name,
-            tier: sponsorFormData.tier,
-            url: sponsorFormData.url || "",
-            logo: sponsorFormData.logo || "",
-            fit: sponsorFormData.fit || (sponsorFormData.logo?.toLowerCase().endsWith(".svg") ? "contain" : "cover"),
-          }),
-        });
-        if (!res.ok) throw new Error("Aktualisierung fehlgeschlagen.");
-        const updated = await res.json();
+        const payload = {
+          id: editingSponsor.id,
+          name: sponsorFormData.name,
+          tier: sponsorFormData.tier,
+          url: sponsorFormData.url || "",
+          logo: sponsorFormData.logo || "",
+          fit: sponsorFormData.fit || (sponsorFormData.logo?.toLowerCase().endsWith(".svg") ? "contain" : "cover"),
+          scale: sponsorFormData.scale !== undefined ? sponsorFormData.scale : 1.0,
+        };
+
+        try {
+          const res = await fetch("/api/sponsors", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (res.ok) {
+            const updated = await res.json();
+            setSponsors((prev) => {
+              const next = prev.map((s) => (s.id === updated.id ? updated : s));
+              updateSponsorsCacheAndNotify(next);
+              return next;
+            });
+            setEditingSponsor(updated);
+            showToast("Sponsor erfolgreich aktualisiert!");
+            setSponsorModalOpen(false);
+            return;
+          }
+        } catch (apiErr) {
+          console.warn("PUT /api/sponsors failed, fallback to local cache:", apiErr);
+        }
+
+        // Fallback update
+        const localUpdated = { ...editingSponsor, ...payload };
         setSponsors((prev) => {
-          const next = prev.map((s) => (s.id === updated.id ? updated : s));
+          const next = prev.map((s) => (s.id === localUpdated.id ? localUpdated : s));
           updateSponsorsCacheAndNotify(next);
           return next;
         });
-        setEditingSponsor(updated);
+        setEditingSponsor(localUpdated);
         showToast("Sponsor erfolgreich aktualisiert!");
       } else {
         // Create new sponsor
-        const res = await fetch("/api/sponsors", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(sponsorFormData),
-        });
-        if (!res.ok) throw new Error("Erstellung fehlgeschlagen.");
-        const created = await res.json();
+        const newId = "sp-" + Date.now().toString();
+        const payload: Sponsor = {
+          id: newId,
+          name: sponsorFormData.name,
+          tier: sponsorFormData.tier,
+          url: sponsorFormData.url || "",
+          logo: sponsorFormData.logo || "",
+          fit: sponsorFormData.fit || (sponsorFormData.logo?.toLowerCase().endsWith(".svg") ? "contain" : "cover"),
+          scale: sponsorFormData.scale !== undefined ? sponsorFormData.scale : 1.0,
+        };
+
+        try {
+          const res = await fetch("/api/sponsors", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (res.ok) {
+            const created = await res.json();
+            setSponsors((prev) => {
+              const next = [...prev, created];
+              updateSponsorsCacheAndNotify(next);
+              return next;
+            });
+            showToast("Neuer Partner erfolgreich angelegt!");
+            setSponsorModalOpen(false);
+            return;
+          }
+        } catch (apiErr) {
+          console.warn("POST /api/sponsors failed, fallback to local cache:", apiErr);
+        }
+
+        // Fallback create
         setSponsors((prev) => {
-          const next = [...prev, created];
+          const next = [...prev, payload];
           updateSponsorsCacheAndNotify(next);
           return next;
         });
@@ -1251,23 +1346,38 @@ export default function AdminPage() {
 
   const handleDeleteSponsor = async () => {
     if (!sponsorToDelete) return;
+    const targetId = sponsorToDelete.id;
+    const targetName = sponsorToDelete.name;
     setDeletingSponsor(true);
+
+    // 1. Immediately record in edk_deleted_sponsors in localStorage
     try {
-      const res = await fetch(`/api/sponsors?id=${sponsorToDelete.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Löschen fehlgeschlagen.");
-      setSponsors((prev) => {
-        const next = prev.filter((s) => s.id !== sponsorToDelete.id);
-        updateSponsorsCacheAndNotify(next);
-        return next;
-      });
-      showToast("Partner entfernt.", "success");
-      setSponsorToDelete(null);
-    } catch (err) {
-      console.error(err);
-      showToast("Fehler beim Löschen des Partners.", "error");
-    } finally {
-      setDeletingSponsor(false);
+      const delRaw = localStorage.getItem("edk_deleted_sponsors");
+      const delList: string[] = delRaw ? JSON.parse(delRaw) : [];
+      if (targetId && !delList.includes(targetId)) delList.push(targetId);
+      if (targetName && !delList.includes(targetName.toLowerCase().trim())) {
+        delList.push(targetName.toLowerCase().trim());
+      }
+      localStorage.setItem("edk_deleted_sponsors", JSON.stringify(delList));
+    } catch {}
+
+    // 2. Immediately update state and notify all listeners
+    setSponsors((prev) => {
+      const next = prev.filter((s) => s.id !== targetId && s.name.toLowerCase().trim() !== targetName.toLowerCase().trim());
+      updateSponsorsCacheAndNotify(next);
+      return next;
+    });
+
+    // 3. Attempt server deletion (catch non-fatally on read-only environments)
+    try {
+      await fetch(`/api/sponsors?id=${targetId}`, { method: "DELETE" });
+    } catch (apiErr) {
+      console.warn("DELETE /api/sponsors failed, local removal preserved:", apiErr);
     }
+
+    showToast("Partner entfernt.", "success");
+    setSponsorToDelete(null);
+    setDeletingSponsor(false);
   };
 
   // ==========================================
@@ -6665,6 +6775,7 @@ export default function AdminPage() {
                           width: "100%",
                           height: "100%",
                           objectFit: sponsorFormData.fit === "cover" ? "cover" : "contain",
+                          transform: sponsorFormData.fit !== "cover" && sponsorFormData.scale && sponsorFormData.scale !== 1 ? `scale(${sponsorFormData.scale})` : undefined,
                         }}
                         onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/logo-dark.png"; }}
                       />
@@ -6817,6 +6928,45 @@ export default function AdminPage() {
                         ? "Vollflächig (Cover): Das Banner/Logo füllt den durchlaufenden Platzhalter komplett randlos und bündig aus."
                         : "Eingepasst (Contain): Das Logo wird mit Innenabstand proportional zentriert (ideal für freigestellte Grafiken/SVGs)."}
                     </span>
+
+                    {/* Scale selector for contained logos */}
+                    {sponsorFormData.fit !== "cover" && (
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", marginTop: "6px", paddingTop: "8px", borderTop: "1px solid rgba(255, 255, 255, 0.08)" }}>
+                        <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#FFFFFF" }}>
+                          Logo-Größe / Skalierung:
+                        </span>
+                        <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+                          {[
+                            { label: "Kompakt (85%)", value: 0.85 },
+                            { label: "Standard (100%)", value: 1.0 },
+                            { label: "Groß (120%)", value: 1.2 },
+                            { label: "Maximal (140%)", value: 1.4 },
+                          ].map((sz) => {
+                            const isSelected = (sponsorFormData.scale || 1.0) === sz.value;
+                            return (
+                              <button
+                                key={sz.value}
+                                type="button"
+                                onClick={() => setSponsorFormData((prev) => ({ ...prev, scale: sz.value }))}
+                                style={{
+                                  padding: "4px 10px",
+                                  borderRadius: "6px",
+                                  fontSize: "0.75rem",
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                  border: "1px solid",
+                                  borderColor: isSelected ? "#F59E0B" : "rgba(255, 255, 255, 0.15)",
+                                  background: isSelected ? "rgba(245, 158, 11, 0.25)" : "rgba(255, 255, 255, 0.04)",
+                                  color: isSelected ? "#FBBF24" : "#94A3B8",
+                                }}
+                              >
+                                {sz.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

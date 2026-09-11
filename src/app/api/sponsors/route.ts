@@ -14,6 +14,7 @@ export interface Sponsor {
   url?: string;
   logo?: string;
   fit?: "cover" | "contain";
+  scale?: number;
 }
 
 async function getSponsors(): Promise<Sponsor[]> {
@@ -21,7 +22,7 @@ async function getSponsors(): Promise<Sponsor[]> {
   try {
     const tmpRaw = await fs.readFile(TMP_DATA_FILE, "utf8");
     const parsed = JSON.parse(tmpRaw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
+    if (Array.isArray(parsed)) {
       return parsed;
     }
   } catch {
@@ -79,7 +80,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, tier, url, logo, fit } = body;
+    const { name, tier, url, logo, fit, scale } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -97,6 +98,7 @@ export async function POST(req: NextRequest) {
       url: url ? url.trim() : "",
       logo: logo ? logo.trim() : "",
       fit: fit || (logo && !logo.endsWith(".svg") ? "cover" : "contain"),
+      scale: typeof scale === "number" ? scale : 1.0,
     };
 
     sponsors.push(newSponsor);
@@ -113,7 +115,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, name, tier, url, logo, fit } = body;
+    const { id, name, tier, url, logo, fit, scale } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Sponsor-ID fehlt." }, { status: 400 });
@@ -133,6 +135,7 @@ export async function PUT(req: NextRequest) {
       url: url !== undefined ? url.trim() : sponsors[index].url,
       logo: logo !== undefined ? logo.trim() : sponsors[index].logo,
       fit: fit !== undefined ? fit : sponsors[index].fit || (logo && !logo.endsWith(".svg") ? "cover" : "contain"),
+      scale: scale !== undefined ? scale : sponsors[index].scale || 1.0,
     };
 
     sponsors[index] = updated;
@@ -157,10 +160,6 @@ export async function DELETE(req: NextRequest) {
 
     const sponsors = await getSponsors();
     const filtered = sponsors.filter((s) => s.id !== id);
-
-    if (filtered.length === sponsors.length) {
-      return NextResponse.json({ error: "Sponsor nicht gefunden." }, { status: 404 });
-    }
 
     await saveSponsors(filtered);
     return NextResponse.json({ success: true, deletedId: id });

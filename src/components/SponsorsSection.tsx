@@ -11,6 +11,7 @@ interface Sponsor {
   url?: string;
   logo?: string;
   fit?: "cover" | "contain";
+  scale?: number;
 }
 
 const initialSponsors: Sponsor[] = [
@@ -80,14 +81,6 @@ const initialSponsors: Sponsor[] = [
     logo: "/sponsors/dachau-sports-nutrition.svg",
     fit: "contain",
   },
-  {
-    id: "sp-1789053571188",
-    name: "Tommy Tronic",
-    tier: "none",
-    url: "",
-    logo: "/uploads/sponsors/tommy-tronic-cropped-1789056316291.png",
-    fit: "contain",
-  },
 ];
 
 export default function SponsorsSection() {
@@ -95,15 +88,35 @@ export default function SponsorsSection() {
   const { ref: sectionRef, isRevealed } = useScrollReveal({ threshold: 0.1 });
 
   useEffect(() => {
+    const getDeletedSponsors = (): string[] => {
+      try {
+        const raw = localStorage.getItem("edk_deleted_sponsors");
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const isDeleted = (s: Sponsor, deletedList: string[]) => {
+      if (s.id && deletedList.includes(s.id)) return true;
+      if (s.name && deletedList.includes(s.name.toLowerCase().trim())) return true;
+      return false;
+    };
+
     const loadFromCache = () => {
       try {
+        const deletedList = getDeletedSponsors();
         const cached = localStorage.getItem("edk_sponsors_cache");
         if (cached) {
           const parsed = JSON.parse(cached);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setSponsorsList(parsed);
+            const filtered = parsed.filter((s) => !isDeleted(s, deletedList));
+            setSponsorsList(filtered);
+            return;
           }
         }
+        // Fallback to initialSponsors without deleted
+        setSponsorsList(initialSponsors.filter((s) => !isDeleted(s, deletedList)));
       } catch {}
     };
 
@@ -117,19 +130,22 @@ export default function SponsorsSection() {
           throw new Error("Failed to fetch sponsors");
         })
         .then((data) => {
-          if (Array.isArray(data) && data.length > 0) {
-            let merged = data;
+          if (Array.isArray(data)) {
+            const deletedList = getDeletedSponsors();
+            const validData = data.filter((s: Sponsor) => !isDeleted(s, deletedList));
+            let merged = validData;
             try {
               const cachedRaw = localStorage.getItem("edk_sponsors_cache");
               if (cachedRaw) {
                 const cachedArr: Sponsor[] = JSON.parse(cachedRaw);
                 if (Array.isArray(cachedArr) && cachedArr.length > 0) {
+                  const validCachedArr = cachedArr.filter((c: Sponsor) => !isDeleted(c, deletedList));
                   const cachedMap = new Map<string, Sponsor>();
-                  cachedArr.forEach((c) => {
+                  validCachedArr.forEach((c) => {
                     if (c.id) cachedMap.set(c.id, c);
                     else if (c.name) cachedMap.set(c.name.toLowerCase().trim(), c);
                   });
-                  merged = data.map((server) => {
+                  merged = validData.map((server) => {
                     const cached = cachedMap.get(server.id) || cachedMap.get(server.name.toLowerCase().trim());
                     if (!cached) return server;
                     return {
@@ -137,12 +153,17 @@ export default function SponsorsSection() {
                       tier: cached.tier || server.tier,
                       logo: cached.logo || server.logo,
                       fit: cached.fit || server.fit,
+                      scale: cached.scale !== undefined ? cached.scale : server.scale,
                       url: cached.url !== undefined ? cached.url : server.url,
                     };
                   });
-                  cachedArr.forEach((c) => {
-                    const exists = merged.some((m) => m.id === c.id || m.name.toLowerCase().trim() === c.name.toLowerCase().trim());
-                    if (!exists) merged.push(c);
+                  validCachedArr.forEach((c) => {
+                    const exists = merged.some(
+                      (m) =>
+                        (m.id && c.id && m.id === c.id) ||
+                        (m.name && c.name && m.name.toLowerCase().trim() === c.name.toLowerCase().trim())
+                    );
+                    if (!exists && !isDeleted(c, deletedList)) merged.push(c);
                   });
                 }
               }
@@ -376,6 +397,14 @@ export default function SponsorsSection() {
                       src={sponsor.logo}
                       alt={sponsor.name}
                       className="sponsor-logo"
+                      style={
+                        sponsor.fit !== "cover" && sponsor.scale && sponsor.scale !== 1
+                          ? {
+                              transform: `scale(${sponsor.scale})`,
+                              maxHeight: `${Math.min(84, Math.round(72 * sponsor.scale))}px`,
+                            }
+                          : undefined
+                      }
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = "/logo-dark.png";
                       }}
@@ -484,10 +513,12 @@ export default function SponsorsSection() {
           width: 100%;
           overflow: hidden;
           border-radius: 6px;
+          position: relative;
         }
 
         .sponsor-logo-container.is-cover {
-          padding: 2px 4px;
+          padding: 0;
+          background: rgba(0, 0, 0, 0.2);
         }
 
         .sponsor-logo-container.is-contain {
@@ -505,7 +536,26 @@ export default function SponsorsSection() {
           filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
         }
 
+        .sponsor-logo-container.is-cover .sponsor-logo {
+          width: 100% !important;
+          height: 100% !important;
+          max-width: 100% !important;
+          max-height: 100% !important;
+          object-fit: cover !important;
+          border-radius: 4px;
+        }
+
+        .sponsor-logo-container.is-contain .sponsor-logo {
+          max-width: 100%;
+          max-height: 72px;
+          object-fit: contain !important;
+        }
+
         .sponsor-card:hover .sponsor-logo {
+          transform: scale(1.05);
+        }
+
+        .sponsor-card:hover .sponsor-logo-container.is-cover .sponsor-logo {
           transform: scale(1.04);
         }
 
