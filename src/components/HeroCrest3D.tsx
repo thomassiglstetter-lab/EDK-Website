@@ -8,10 +8,19 @@ const OFFICIAL_DARK_WAPPEN_SVG = "<?xml version='1.0' encoding='utf-8'?>\n<svg x
 export default function HeroCrest3D() {
   const mountRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasWebGLError, setHasWebGLError] = useState(false);
 
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
+
+    // Test WebGL availability before attempting initialization
+    const testCanvas = document.createElement("canvas");
+    const gl = testCanvas.getContext("webgl") || testCanvas.getContext("experimental-webgl");
+    if (!gl) {
+      setHasWebGLError(true);
+      return;
+    }
 
     const initialWidth = container.clientWidth || 500;
     const initialHeight = container.clientHeight || 480;
@@ -27,17 +36,25 @@ export default function HeroCrest3D() {
     );
     camera.position.set(0, 0, 4.35);
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      powerPreference: "high-performance",
-    });
-    renderer.setSize(initialWidth, initialHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    container.appendChild(renderer.domElement);
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: "high-performance",
+        failIfMajorPerformanceCaveat: false,
+      });
+      renderer.setSize(initialWidth, initialHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      container.appendChild(renderer.domElement);
+    } catch (e) {
+      console.warn("HeroCrest3D: WebGL unavailable or blocked:", e);
+      setHasWebGLError(true);
+      return;
+    }
 
     // 2. Dynamic Lighting Rig for Dark Obsidian Enamel & Metallic Facets
     // Dynamic Key Light: Follows mouse cursor, casting a gleaming specular highlight
@@ -262,8 +279,11 @@ export default function HeroCrest3D() {
       cancelAnimationFrame(animationId);
       ro.disconnect();
       window.removeEventListener("mousemove", handleMouseMove);
-      if (renderer.domElement.parentElement === container) {
-        container.removeChild(renderer.domElement);
+      if (renderer) {
+        if (renderer.domElement.parentElement === container) {
+          container.removeChild(renderer.domElement);
+        }
+        renderer.dispose();
       }
       chassisGeo.dispose();
       chassisMat.dispose();
@@ -272,9 +292,37 @@ export default function HeroCrest3D() {
       shadowGeo.dispose();
       shadowMat.dispose();
       shadowTex.dispose();
-      renderer.dispose();
     };
   }, []);
+
+  if (hasWebGLError) {
+    return (
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          maxWidth: "540px",
+          height: "480px",
+          minHeight: "480px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "auto",
+        }}
+      >
+        <img
+          src="/logo-dark-hd.png"
+          alt="Eintracht Dachau-Karlsfeld Wappen"
+          style={{
+            maxWidth: "340px",
+            width: "82%",
+            height: "auto",
+            filter: "drop-shadow(0 20px 48px rgba(0, 0, 0, 0.8))",
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div

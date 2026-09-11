@@ -11,8 +11,28 @@ export default function Handball3D() {
     if (!container) return;
 
     // 1. Three.js Scene, Camera & Transparent Renderer
-    const scene = new THREE.Scene();
+    let renderer: THREE.WebGLRenderer;
+    try {
+      const testCanvas = document.createElement("canvas");
+      const gl = testCanvas.getContext("webgl") || testCanvas.getContext("experimental-webgl");
+      if (!gl) return;
 
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: "high-performance",
+        failIfMajorPerformanceCaveat: false,
+      });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setClearColor(0x000000, 0);
+      container.appendChild(renderer.domElement);
+    } catch (e) {
+      console.warn("Handball3D: WebGL not available or blocked:", e);
+      return;
+    }
+
+    const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       45,
       container.clientWidth / container.clientHeight,
@@ -21,16 +41,6 @@ export default function Handball3D() {
     );
     camera.position.set(0, 1.1, 4.5);
     camera.lookAt(0.6, 0, 0);
-
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      powerPreference: "high-performance",
-    });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
-    container.appendChild(renderer.domElement);
 
     // 2. Ultra-Subtle Particle Atmosphere (Very faint, non-intrusive)
     const cols = 100;
