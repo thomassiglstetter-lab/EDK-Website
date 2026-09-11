@@ -27,7 +27,8 @@ export default function HeroContent() {
         zIndex: 10,
         maxWidth: "1320px",
         margin: "0 auto",
-        padding: "110px 28px 60px 28px",
+        width: "100%",
+        padding: "110px 28px 100px 28px",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
@@ -384,6 +385,9 @@ export default function HeroContent() {
         }
 
         @media (max-width: 1024px) {
+          .apple-scroll-cue {
+            display: none !important;
+          }
           .hero-stage-grid {
             grid-template-columns: 1fr;
             gap: 28px;
@@ -412,9 +416,15 @@ export default function HeroContent() {
           }
         }
 
-        @media (max-width: 640px) {
+        @media (max-height: 820px) {
           .apple-scroll-cue {
-            bottom: 18px;
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .hero-wrapper {
+            padding: 90px 18px 40px 18px !important;
           }
         }
 
