@@ -137,7 +137,7 @@ export default function ScrollBackground() {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(180deg, rgba(143, 24, 56, 0.26) 0%, rgba(95, 15, 36, 0.14) 40%, rgba(15, 7, 10, 0) 75%)",
+              "linear-gradient(180deg, rgba(185, 28, 71, 0.38) 0%, rgba(143, 24, 56, 0.22) 40%, rgba(15, 7, 10, 0) 75%)",
           }}
         />
 
@@ -146,11 +146,11 @@ export default function ScrollBackground() {
           style={{
             position: "absolute",
             top: "-10%",
-            left: "25%",
-            width: "55%",
-            height: "65%",
+            left: "22%",
+            width: "58%",
+            height: "68%",
             background:
-              "radial-gradient(ellipse at center, rgba(166, 29, 67, 0.32) 0%, rgba(143, 24, 56, 0.14) 45%, transparent 75%)",
+              "radial-gradient(ellipse at center, rgba(225, 29, 72, 0.44) 0%, rgba(185, 28, 71, 0.22) 45%, transparent 75%)",
             filter: "blur(60px)",
           }}
         />
@@ -164,7 +164,7 @@ export default function ScrollBackground() {
             width: "45%",
             height: "55%",
             background:
-              "radial-gradient(circle at center, rgba(180, 30, 75, 0.22) 0%, rgba(120, 16, 42, 0.08) 50%, transparent 70%)",
+              "radial-gradient(circle at center, rgba(244, 63, 94, 0.32) 0%, rgba(185, 28, 71, 0.14) 50%, transparent 70%)",
             filter: "blur(70px)",
           }}
         />
@@ -178,7 +178,7 @@ export default function ScrollBackground() {
             width: "40%",
             height: "50%",
             background:
-              "radial-gradient(circle at center, rgba(143, 24, 56, 0.16) 0%, transparent 65%)",
+              "radial-gradient(circle at center, rgba(225, 29, 72, 0.25) 0%, transparent 65%)",
             filter: "blur(80px)",
           }}
         />

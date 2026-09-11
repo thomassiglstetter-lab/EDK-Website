@@ -1,10 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
 :root {
-  --color-crimson: #8F1838;
-  --color-crimson-bright: #A61D43;
-  --color-crimson-glow: rgba(143, 24, 56, 0.35);
-  --color-crimson-subtle: rgba(143, 24, 56, 0.12);
+  --color-crimson: #B91C47;
+  --color-crimson-bright: #F43F5E;
+  --color-crimson-glow: rgba(225, 29, 72, 0.45);
+  --color-crimson-subtle: rgba(225, 29, 72, 0.18);
   
   --color-azure: #489CD8;
   --color-azure-bright: #5EB2EE;
