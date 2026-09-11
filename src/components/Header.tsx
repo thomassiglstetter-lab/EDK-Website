@@ -9,6 +9,7 @@ import {
   Instagram,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   Users,
   Shield,
   Calendar,
@@ -44,8 +45,8 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: "start", label: "Start", href: "/#uebersicht" },
-  { id: "news", label: "News", href: "/#news" },
+  { id: "uebersicht", label: "Übersicht", href: "/#uebersicht" },
+  { id: "news", label: "Aktuelles", href: "/#news" },
   {
     id: "verein",
     label: "Verein",
@@ -55,18 +56,13 @@ const navItems: NavItem[] = [
         name: "Vereinsleben & Werte",
         items: [
           {
-            title: "Werte & Philosophie",
-            subtitle: "Gemeinschaft, Respekt & Leistungsbereitschaft",
-            href: "/verein#werte",
+            title: "Philosophie & Gemeinschaft",
+            subtitle: "Teamgeist, Respekt & Leidenschaft seit 1996",
+            href: "/verein",
           },
           {
-            title: "Vereinsgeschichte",
-            subtitle: "Tradition im Dachauer Land seit 1865",
-            href: "/verein#historie",
-          },
-          {
-            title: "Stammvereine",
-            subtitle: "TSV Dachau 1865 e.V. & TSV Eintracht Karlsfeld e.V.",
+            title: "Stammvereine Dachau & Karlsfeld",
+            subtitle: "Starke Partnerschaft zwischen TSV Dachau & TSV Eintracht Karlsfeld",
             href: "/verein#stammvereine",
           },
         ],
@@ -78,8 +74,6 @@ const navItems: NavItem[] = [
             title: "Hallen & Anfahrtswege",
             subtitle: "5 moderne Hallen mit Hallennummern & Adressen",
             href: "/hallen",
-            badge: "5 Hallen",
-            badgeType: "azure",
           },
           {
             title: "Vereinsübersicht",
@@ -106,15 +100,11 @@ const navItems: NavItem[] = [
             title: "Herren 1",
             subtitle: "Bezirksliga Männer West",
             href: "/teams/herren-1",
-            badge: "BL West",
-            badgeType: "crimson",
           },
           {
             title: "Herren 2",
             subtitle: "Bezirksklasse Männer",
             href: "/teams/herren-2",
-            badge: "BK",
-            badgeType: "crimson",
           },
         ],
       },
@@ -125,15 +115,11 @@ const navItems: NavItem[] = [
             title: "Damen 1",
             subtitle: "Bezirksoberliga Frauen",
             href: "/teams/damen-1",
-            badge: "BOL",
-            badgeType: "azure",
           },
           {
             title: "Damen 2",
             subtitle: "Bezirksklasse Frauen West",
             href: "/teams/damen-2",
-            badge: "BK West",
-            badgeType: "azure",
           },
         ],
       },
@@ -144,25 +130,21 @@ const navItems: NavItem[] = [
             title: "Männliche B-Jugend",
             subtitle: "BL männl. B-Jugend",
             href: "/teams/m-b1",
-            badge: "mB",
           },
           {
             title: "Männliche C-Jugend",
             subtitle: "BL männl. C-Jugend",
             href: "/teams/m-c1",
-            badge: "mC",
           },
           {
             title: "Weibliche C-Jugend",
             subtitle: "Oberliga weibl. C-Jugend",
             href: "/teams/w-c1",
-            badge: "wC",
           },
           {
             title: "Weibliche B-Jugend",
             subtitle: "BL weibl. B-Jugend",
             href: "/teams/w-b1",
-            badge: "wB",
           },
         ],
       },
@@ -173,8 +155,6 @@ const navItems: NavItem[] = [
             title: "Minis & Ballschule",
             subtitle: "Spiel & Spaß ab 5 Jahren",
             href: "/teams/minis",
-            badge: "Gemischt",
-            badgeType: "gold",
           },
         ],
       },
@@ -196,14 +176,11 @@ const navItems: NavItem[] = [
             title: "Aktueller Spielplan",
             subtitle: "Nächste Spiele & Heimpieltage aller Teams",
             href: "/#spielplan",
-            badge: "nuLiga Live",
-            badgeType: "azure",
           },
           {
             title: "nuLiga Verbandsportal",
             subtitle: "Offizielle Tabellen, Bilanzen & Spielberichte",
             href: "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/clubInfoDisplay?club=105665",
-            isExternal: true,
           },
         ],
       },
@@ -232,11 +209,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("/#uebersicht");
   const [activeFlyout, setActiveFlyout] = useState<string | null>(null);
-  const [mobileExpanded, setMobileExpanded] = useState<Record<string, boolean>>({
-    teams: true,
-    verein: false,
-    spielplan: false,
-  });
+  const [mobileSubmenu, setMobileSubmenu] = useState<string | null>(null);
 
   const headerRef = useRef<HTMLElement>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -303,13 +276,6 @@ export default function Header() {
     hoverTimeoutRef.current = setTimeout(() => {
       setActiveFlyout(null);
     }, 180);
-  };
-
-  const toggleMobileAccordion = (id: string) => {
-    setMobileExpanded((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
   };
 
   const currentFlyoutItem = navItems.find((item) => item.id === activeFlyout);
@@ -583,7 +549,13 @@ export default function Header() {
           {/* Mobile menu toggle */}
           <button
             onClick={() => {
-              setMobileMenuOpen(!mobileMenuOpen);
+              if (mobileMenuOpen) {
+                setMobileMenuOpen(false);
+                setMobileSubmenu(null);
+              } else {
+                setMobileMenuOpen(true);
+                setMobileSubmenu(null);
+              }
               setActiveFlyout(null);
             }}
             style={{
@@ -855,7 +827,7 @@ export default function Header() {
       )}
 
       {/* ========================================================================= */}
-      {/* MOBILE FULLSCREEN DRAWER WITH EXPANDABLE ACCORDIONS                       */}
+      {/* MOBILE FULLSCREEN DRAWER WITH CLEAN DRILL-DOWN NAVIGATION                  */}
       {/* ========================================================================= */}
       {mobileMenuOpen && (
         <div
@@ -865,7 +837,7 @@ export default function Header() {
             padding: "18px 14px",
             borderRadius: "24px",
             background:
-              "linear-gradient(165deg, rgba(255, 255, 255, 0.20) 0%, rgba(24, 32, 52, 0.62) 28%, rgba(10, 14, 24, 0.78) 100%)",
+              "linear-gradient(165deg, rgba(255, 255, 255, 0.20) 0%, rgba(24, 32, 52, 0.65) 28%, rgba(10, 14, 24, 0.82) 100%)",
             backdropFilter: "blur(54px) saturate(230%) contrast(110%)",
             WebkitBackdropFilter: "blur(54px) saturate(230%) contrast(110%)",
             border: "1px solid rgba(255, 255, 255, 0.24)",
@@ -873,7 +845,7 @@ export default function Header() {
               "inset 0 1.5px 1.5px rgba(255, 255, 255, 0.4), 0 32px 75px rgba(0, 0, 0, 0.85)",
             display: "flex",
             flexDirection: "column",
-            gap: "4px",
+            gap: "12px",
             maxHeight: "calc(100dvh - 90px)",
             overflowY: "auto",
             overscrollBehavior: "contain",
@@ -894,48 +866,222 @@ export default function Header() {
             }}
           />
 
-          {navItems.map((item) => {
-            const isActive = activeSection === item.href;
-            const hasCategories = !!item.categories && item.categories.length > 0;
-            const isExpanded = !!mobileExpanded[item.id];
+          {/* SUBMENU VIEW (e.g. When "Mannschaften" or "Verein" is tapped) */}
+          {mobileSubmenu ? (
+            (() => {
+              const activeSub = navItems.find((item) => item.id === mobileSubmenu);
+              if (!activeSub || !activeSub.categories) return null;
 
-            return (
-              <div
-                key={item.id}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  borderRadius: "12px",
-                  background: isExpanded ? "rgba(255, 255, 255, 0.04)" : "transparent",
-                  overflow: "hidden",
-                  transition: "background 0.2s ease",
-                }}
-              >
-                {/* Main Link / Accordion Header */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "10px 12px",
-                  }}
-                >
-                  <Link
-                    href={item.href}
-                    onClick={() => {
-                      if (!hasCategories) {
-                        setMobileMenuOpen(false);
-                      }
-                    }}
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {/* Back to main menu button */}
+                  <button
+                    onClick={() => setMobileSubmenu(null)}
                     style={{
-                      color: isActive ? "#FFFFFF" : "#E2E8F0",
-                      textDecoration: "none",
-                      fontSize: "0.96rem",
-                      fontWeight: isActive ? 600 : 500,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      background: "rgba(255, 255, 255, 0.08)",
+                      border: "1px solid rgba(255, 255, 255, 0.14)",
+                      borderRadius: "var(--radius-full)",
+                      padding: "7px 14px",
+                      color: "var(--color-azure-bright)",
+                      fontSize: "0.84rem",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      width: "fit-content",
+                    }}
+                  >
+                    <ChevronLeft size={16} />
+                    <span>Zurück</span>
+                  </button>
+
+                  {/* Header Title */}
+                  <div
+                    style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "8px",
-                      flex: 1,
+                      justifyContent: "space-between",
+                      paddingBottom: "8px",
+                      borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        fontSize: "1.15rem",
+                        fontWeight: 700,
+                        color: "#FFFFFF",
+                      }}
+                    >
+                      {activeSub.label}
+                    </span>
+                    {activeSub.href && (
+                      <Link
+                        href={activeSub.href}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setMobileSubmenu(null);
+                        }}
+                        style={{
+                          fontSize: "0.80rem",
+                          color: "#94A3B8",
+                          textDecoration: "none",
+                        }}
+                      >
+                        Übersicht ansehen →
+                      </Link>
+                    )}
+                  </div>
+
+                  {/* Categories & Links */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                    {activeSub.categories.map((cat, cIdx) => (
+                      <div key={cIdx} style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                        <div
+                          style={{
+                            fontSize: "0.70rem",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.08em",
+                            color: "#94A3B8",
+                            paddingBottom: "2px",
+                          }}
+                        >
+                          {cat.name}
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+                          {cat.items.map((sub, sIdx) => (
+                            <Link
+                              key={sIdx}
+                              href={sub.href}
+                              target={sub.isExternal ? "_blank" : undefined}
+                              rel={sub.isExternal ? "noopener noreferrer" : undefined}
+                              onClick={() => {
+                                setMobileMenuOpen(false);
+                                setMobileSubmenu(null);
+                              }}
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "2px",
+                                padding: "10px 12px",
+                                borderRadius: "10px",
+                                background: "rgba(255, 255, 255, 0.04)",
+                                border: "1px solid rgba(255, 255, 255, 0.06)",
+                                textDecoration: "none",
+                                color: "#FFFFFF",
+                                fontSize: "0.92rem",
+                                fontWeight: 500,
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                }}
+                              >
+                                <span>{sub.title}</span>
+                                {sub.isExternal && (
+                                  <ExternalLink size={13} style={{ color: "#94A3B8" }} />
+                                )}
+                              </div>
+                              {sub.subtitle && (
+                                <span style={{ fontSize: "0.74rem", color: "#94A3B8" }}>
+                                  {sub.subtitle}
+                                </span>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {activeSub.bottomAction && (
+                    <Link
+                      href={activeSub.bottomAction.href}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setMobileSubmenu(null);
+                      }}
+                      style={{
+                        marginTop: "8px",
+                        padding: "11px 14px",
+                        borderRadius: "12px",
+                        background: "rgba(72, 156, 216, 0.12)",
+                        border: "1px solid rgba(72, 156, 216, 0.25)",
+                        color: "var(--color-azure-bright)",
+                        fontSize: "0.85rem",
+                        fontWeight: 600,
+                        textDecoration: "none",
+                        textAlign: "center",
+                      }}
+                    >
+                      {activeSub.bottomAction.label}
+                    </Link>
+                  )}
+                </div>
+              );
+            })()
+          ) : (
+            /* ROOT MENU VIEW (Clean, compact 7 main sections) */
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              {navItems.map((item) => {
+                const isActive = activeSection === item.href;
+                const hasCategories = !!item.categories && item.categories.length > 0;
+
+                if (hasCategories) {
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setMobileSubmenu(item.id)}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "13px 16px",
+                        borderRadius: "14px",
+                        background: "rgba(255, 255, 255, 0.04)",
+                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        color: "#FFFFFF",
+                        fontSize: "1rem",
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        textAlign: "left",
+                        transition: "background 0.18s ease",
+                      }}
+                    >
+                      <span>{item.label}</span>
+                      <ChevronRight size={17} style={{ color: "#94A3B8" }} />
+                    </button>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setMobileSubmenu(null);
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "13px 16px",
+                      borderRadius: "14px",
+                      background: isActive ? "rgba(255, 255, 255, 0.08)" : "transparent",
+                      border: isActive ? "1px solid rgba(255, 255, 255, 0.12)" : "1px solid transparent",
+                      color: isActive ? "#FFFFFF" : "#E2E8F0",
+                      fontSize: "1rem",
+                      fontWeight: isActive ? 600 : 500,
+                      textDecoration: "none",
+                      transition: "background 0.18s ease",
                     }}
                   >
                     <span>{item.label}</span>
@@ -951,115 +1097,10 @@ export default function Header() {
                       />
                     )}
                   </Link>
-
-                  {hasCategories && (
-                    <button
-                      onClick={() => toggleMobileAccordion(item.id)}
-                      style={{
-                        background: isExpanded ? "rgba(255, 255, 255, 0.12)" : "transparent",
-                        border: "1px solid rgba(255, 255, 255, 0.10)",
-                        borderRadius: "6px",
-                        padding: "5px 10px",
-                        color: "#CBD5E1",
-                        fontSize: "0.74rem",
-                        fontWeight: 500,
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "4px",
-                        touchAction: "manipulation",
-                      }}
-                    >
-                      <span>{isExpanded ? "Schließen" : "Unterseiten"}</span>
-                      <ChevronDown
-                        size={12}
-                        style={{
-                          transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
-                          transition: "transform 0.25s ease",
-                        }}
-                      />
-                    </button>
-                  )}
-                </div>
-
-                {/* Expanded Accordion Content (Clean text list) */}
-                {hasCategories && isExpanded && item.categories && (
-                  <div
-                    style={{
-                      padding: "4px 12px 14px 12px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                      borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-                    }}
-                  >
-                    {item.categories.map((cat, catIdx) => (
-                      <div key={catIdx} style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-                        <div
-                          style={{
-                            fontSize: "0.68rem",
-                            fontWeight: 600,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.08em",
-                            color: "#94A3B8",
-                            paddingTop: "6px",
-                            paddingBottom: "2px",
-                          }}
-                        >
-                          {cat.name}
-                        </div>
-
-                        <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
-                          {cat.items.map((sub, subIdx) => (
-                            <Link
-                              key={subIdx}
-                              href={sub.href}
-                              target={sub.isExternal ? "_blank" : undefined}
-                              rel={sub.isExternal ? "noopener noreferrer" : undefined}
-                              onClick={() => setMobileMenuOpen(false)}
-                              style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                padding: "7px 8px",
-                                borderRadius: "8px",
-                                textDecoration: "none",
-                                color: "#F8FAFC",
-                                fontSize: "0.86rem",
-                                fontWeight: 500,
-                              }}
-                            >
-                              <span>{sub.title}</span>
-                              {sub.subtitle && (
-                                <span style={{ fontSize: "0.72rem", color: "#94A3B8" }}>
-                                  {sub.subtitle}
-                                </span>
-                              )}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-
-                    {item.bottomAction && (
-                      <Link
-                        href={item.bottomAction.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        style={{
-                          fontSize: "0.80rem",
-                          color: "var(--color-azure-bright)",
-                          fontWeight: 500,
-                          textDecoration: "none",
-                          paddingTop: "6px",
-                        }}
-                      >
-                        {item.bottomAction.label}
-                      </Link>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          )}
 
           {/* Social & Probetraining CTA inside mobile drawer */}
           <div
