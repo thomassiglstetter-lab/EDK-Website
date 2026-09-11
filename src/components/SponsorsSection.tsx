@@ -342,14 +342,30 @@ export default function SponsorsSection() {
                   } as React.CSSProperties
                 }
               >
-                {/* Corner Tier Tag (discreet, doesn't steal space from the logo) */}
-                {colors.label && (
-                  <div className="sponsor-corner-tier" style={{ color: colors.text }}>
-                    {colors.label}
-                  </div>
-                )}
+                {/* Dedicated Top Bar: Tier Badge on left/center & External Link indicator on right */}
+                <div className="sponsor-card-topbar">
+                  {colors.label ? (
+                    <span
+                      className="sponsor-tier-pill"
+                      style={{
+                        color: colors.text,
+                        borderColor: colors.border,
+                        background: colors.border.replace("0.25", "0.15").replace("0.2", "0.15").replace("0.18", "0.15"),
+                      }}
+                    >
+                      {colors.label}
+                    </span>
+                  ) : (
+                    <span />
+                  )}
+                  {sponsor.url && (
+                    <span className="sponsor-external-icon">
+                      <ExternalLink size={11} />
+                    </span>
+                  )}
+                </div>
 
-                {/* Sponsor Logo Container: Always un-cropped and perfectly scaled */}
+                {/* Sponsor Logo Container: Completely separated from the top bar - zero overlap possible! */}
                 {sponsor.logo ? (
                   <div
                     className={`sponsor-logo-container ${
@@ -369,19 +385,6 @@ export default function SponsorsSection() {
                   /* Fallback when no logo is uploaded */
                   <div className="sponsor-fallback-wrapper">
                     <span className="sponsor-name">{sponsor.name}</span>
-                    {colors.label && (
-                      <span className="sponsor-tier-badge" style={{ color: colors.text }}>
-                        {colors.label}
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {/* Hover Link Hint */}
-                {sponsor.url && (
-                  <div className="sponsor-hover-hint">
-                    <span>Website öffnen</span>
-                    <ExternalLink size={10} />
                   </div>
                 )}
               </a>
@@ -410,14 +413,13 @@ export default function SponsorsSection() {
         .sponsor-card {
           position: relative;
           display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0;
+          flex-direction: column;
+          padding: 8px 12px 10px 12px;
           background: var(--card-bg);
           border: 1px solid var(--card-border);
           border-radius: var(--radius-md);
           min-width: 250px;
-          height: 114px;
+          height: 122px;
           flex-shrink: 0;
           text-decoration: none;
           cursor: pointer;
@@ -426,36 +428,77 @@ export default function SponsorsSection() {
         }
 
         .sponsor-card:hover {
-          transform: translateY(-4px) scale(1.03);
+          transform: translateY(-4px) scale(1.02);
           border-color: var(--hover-border) !important;
           box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 28px var(--hover-glow);
           background: rgba(16, 22, 34, 0.96);
         }
 
+        .sponsor-card-topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          height: 20px;
+          margin-bottom: 2px;
+          flex-shrink: 0;
+        }
+
+        .sponsor-tier-pill {
+          font-size: 0.62rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          padding: 2px 8px;
+          border-radius: 9999px;
+          border: 1px solid;
+          display: inline-flex;
+          align-items: center;
+          line-height: 1.2;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+          transition: all 0.25s ease;
+        }
+
+        .sponsor-card:hover .sponsor-tier-pill {
+          border-color: var(--hover-border);
+          box-shadow: 0 2px 10px var(--hover-glow);
+        }
+
+        .sponsor-external-icon {
+          color: rgba(255, 255, 255, 0.3);
+          display: flex;
+          align-items: center;
+          transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .sponsor-card:hover .sponsor-external-icon {
+          color: #38BDF8;
+          transform: translate(1px, -1px);
+        }
+
         .sponsor-logo-container {
+          flex: 1;
           display: flex;
           align-items: center;
           justify-content: center;
           width: 100%;
-          height: 100%;
-          padding: 12px 20px;
           overflow: hidden;
-          border-radius: calc(var(--radius-md) - 1px);
+          border-radius: 6px;
         }
 
         .sponsor-logo-container.is-cover {
-          padding: 6px 12px;
+          padding: 2px 4px;
         }
 
         .sponsor-logo-container.is-contain {
-          padding: 12px 20px;
+          padding: 4px 10px;
         }
 
         .sponsor-logo {
           width: auto;
           height: auto;
           max-width: 100%;
-          max-height: 100%;
+          max-height: 72px;
           object-fit: contain;
           object-position: center;
           transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -468,47 +511,28 @@ export default function SponsorsSection() {
 
         @media (max-width: 640px) {
           .sponsor-card {
-            min-width: 200px !important;
-            height: 94px !important;
+            min-width: 210px !important;
+            height: 106px !important;
+            padding: 6px 10px 8px 10px !important;
           }
 
           .sponsor-fade-edge {
             width: 24px !important;
           }
 
-          .sponsor-logo-container {
-            padding: 8px 14px !important;
+          .sponsor-card-topbar {
+            height: 18px !important;
+            margin-bottom: 2px !important;
           }
 
-          .sponsor-logo-container.is-cover {
-            padding: 5px 10px !important;
+          .sponsor-tier-pill {
+            font-size: 0.54rem !important;
+            padding: 1px 6px !important;
           }
 
           .sponsor-logo {
-            max-width: 170px !important;
-            max-height: 74px !important;
+            max-height: 60px !important;
           }
-        }
-
-        .sponsor-corner-tier {
-          position: absolute;
-          top: 6px;
-          right: 8px;
-          font-size: 0.6rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          padding: 2px 6px;
-          border-radius: 4px;
-          background: rgba(0, 0, 0, 0.45);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          opacity: 0.75;
-          transition: opacity 0.25s ease;
-          pointer-events: none;
-        }
-
-        .sponsor-card:hover .sponsor-corner-tier {
-          opacity: 1;
         }
 
         .sponsor-fallback-wrapper {
