@@ -74,22 +74,53 @@ export async function POST(req: NextRequest) {
 
     const filename = `${safeSlug}-${Date.now()}.${ext}`;
     
-    // Save to public/uploads/<folder>/... (primary)
-    const uploadsDir = path.join(process.cwd(), "public", "uploads", safeFolder);
-    const uploadsPath = path.join(uploadsDir, filename);
-    await fs.mkdir(uploadsDir, { recursive: true });
-    await fs.writeFile(uploadsPath, buffer);
+    let publicUrl = "";
+    let savedToDisk = false;
 
-    // Also save to public/<folder>/... (backup / legacy support)
+    // 1. Try saving to public/uploads/<folder>/... (works in local dev, VPS, Docker)
     try {
-      const legacyDir = path.join(process.cwd(), "public", safeFolder);
-      await fs.mkdir(legacyDir, { recursive: true });
-      await fs.writeFile(path.join(legacyDir, filename), buffer);
-    } catch (e) {
-      // Non-fatal
+      const uploadsDir = path.join(process.cwd(), "public", "uploads", safeFolder);
+      const uploadsPath = path.join(uploadsDir, filename);
+      await fs.mkdir(uploadsDir, { recursive: true });
+      await fs.writeFile(uploadsPath, buffer);
+      publicUrl = `/uploads/${safeFolder}/${filename}`;
+      savedToDisk = true;
+
+      // Also try legacy public/<folder>/...
+      try {
+        const legacyDir = path.join(process.cwd(), "public", safeFolder);
+        await fs.mkdir(legacyDir, { recursive: true });
+        await fs.writeFile(path.join(legacyDir, filename), buffer);
+      } catch {
+        // Non-fatal
+      }
+    } catch (fsErr) {
+      console.warn("Public filesystem write failed (likely Vercel serverless read-only):", fsErr);
     }
 
-    const publicUrl = `/uploads/${safeFolder}/${filename}`;
+    // 2. Fallback for serverless environments (Vercel):
+    // Write to /tmp if possible, and encode as self-contained Base64 Data URL
+    if (!savedToDisk) {
+      try {
+        const tmpDir = path.join("/tmp", "uploads", safeFolder);
+        await fs.mkdir(tmpDir, { recursive: true });
+        await fs.writeFile(path.join(tmpDir, filename), buffer);
+      } catch (tmpErr) {
+        console.warn("Writing to /tmp failed:", tmpErr);
+      }
+
+      // Generate Data URL
+      const mime =
+        file.type ||
+        (ext === "png"
+          ? "image/png"
+          : ext === "webp"
+          ? "image/webp"
+          : ext === "svg"
+          ? "image/svg+xml"
+          : "image/jpeg");
+      publicUrl = `data:${mime};base64,${buffer.toString("base64")}`;
+    }
 
     return NextResponse.json({
       success: true,
@@ -99,7 +130,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(
-      { success: false, error: "Fehler beim Speichern der Datei auf dem Server." },
+      { success: false, error: "Fehler beim Verarbeiten der Datei auf dem Server." },
       { status: 500 }
     );
   }

@@ -41,7 +41,14 @@ export async function GET(
         await fs.access(filePath);
         exists = true;
       } catch {
-        exists = false;
+        // 3. Fallback: check /tmp/uploads/... (for serverless environments)
+        filePath = path.join("/tmp", "uploads", ...safeSegments);
+        try {
+          await fs.access(filePath);
+          exists = true;
+        } catch {
+          exists = false;
+        }
       }
     }
 

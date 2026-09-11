@@ -321,28 +321,48 @@ export default function ImageCropModal({
           return;
         }
 
-        const fd = new FormData();
-        const safeName = imageName.toLowerCase().replace(/[^a-z0-9]/g, "-") || "cropped";
-        fd.append("file", blob, `${safeName}.png`);
-        fd.append("folder", targetFolder);
-        fd.append("slug", `${safeName}-cropped`);
+        try {
+          const fd = new FormData();
+          const safeName = imageName.toLowerCase().replace(/[^a-z0-9]/g, "-") || "cropped";
+          fd.append("file", blob, `${safeName}.png`);
+          fd.append("folder", targetFolder);
+          fd.append("slug", `${safeName}-cropped`);
 
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: fd,
-        });
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            body: fd,
+          });
 
-        const json = await res.json();
-        if (json.success && json.url) {
-          try {
-            await Promise.resolve(onSuccess(json.url));
-          } catch (callbackErr) {
-            console.error("onSuccess callback error:", callbackErr);
+          const json = await res.json();
+          if (json.success && json.url) {
+            try {
+              await Promise.resolve(onSuccess(json.url));
+            } catch (callbackErr) {
+              console.error("onSuccess callback error:", callbackErr);
+            }
+            onClose();
+            setSaving(false);
+            return;
           }
-          onClose();
-        } else {
-          alert(json.error || "Upload fehlgeschlagen.");
+        } catch (uploadNetErr) {
+          console.warn("Upload fetch failed, using local canvas data URL fallback:", uploadNetErr);
         }
+
+        // Client-side fallback if server upload failed or was rejected:
+        // Use the generated canvas as a crisp Base64 data URL
+        try {
+          const fallbackDataUrl = exportCanvas.toDataURL("image/png");
+          if (fallbackDataUrl && fallbackDataUrl.length > 50) {
+            await Promise.resolve(onSuccess(fallbackDataUrl));
+            onClose();
+            setSaving(false);
+            return;
+          }
+        } catch (canvasErr) {
+          console.error("Canvas export failed:", canvasErr);
+        }
+
+        alert("Upload fehlgeschlagen. Bitte erneut versuchen.");
         setSaving(false);
       }, "image/png");
     } catch (err) {

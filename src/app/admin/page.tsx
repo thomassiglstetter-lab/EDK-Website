@@ -415,10 +415,24 @@ export default function AdminPage() {
       });
 
     // Fetch Sponsors
+    try {
+      const cached = localStorage.getItem("edk_sponsors_cache");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setSponsors(parsed);
+          setSponsorsLoading(false);
+        }
+      }
+    } catch {}
+
     fetch("/api/sponsors", { cache: "no-store", headers: { "Cache-Control": "no-cache", Pragma: "no-cache" } })
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) setSponsors(data);
+        if (Array.isArray(data)) {
+          setSponsors(data);
+          try { localStorage.setItem("edk_sponsors_cache", JSON.stringify(data)); } catch {}
+        }
         setSponsorsLoading(false);
       })
       .catch((err) => {
@@ -1016,7 +1030,11 @@ export default function AdminPage() {
         });
         if (res.ok) {
           const updated = await res.json();
-          setSponsors((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+          setSponsors((prev) => {
+            const next = prev.map((s) => (s.id === updated.id ? updated : s));
+            try { localStorage.setItem("edk_sponsors_cache", JSON.stringify(next)); } catch {}
+            return next;
+          });
           setEditingSponsor(updated);
           showToast("Sponsoren-Logo erfolgreich angepasst und dauerhaft gespeichert!");
           return;
@@ -1122,7 +1140,11 @@ export default function AdminPage() {
         });
         if (!res.ok) throw new Error("Aktualisierung fehlgeschlagen.");
         const updated = await res.json();
-        setSponsors((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+        setSponsors((prev) => {
+          const next = prev.map((s) => (s.id === updated.id ? updated : s));
+          try { localStorage.setItem("edk_sponsors_cache", JSON.stringify(next)); } catch {}
+          return next;
+        });
         setEditingSponsor(updated);
         showToast("Sponsor erfolgreich aktualisiert!");
       } else {
@@ -1134,7 +1156,11 @@ export default function AdminPage() {
         });
         if (!res.ok) throw new Error("Erstellung fehlgeschlagen.");
         const created = await res.json();
-        setSponsors((prev) => [...prev, created]);
+        setSponsors((prev) => {
+          const next = [...prev, created];
+          try { localStorage.setItem("edk_sponsors_cache", JSON.stringify(next)); } catch {}
+          return next;
+        });
         showToast("Neuer Partner erfolgreich angelegt!");
       }
       setSponsorModalOpen(false);
@@ -1175,7 +1201,11 @@ export default function AdminPage() {
     try {
       const res = await fetch(`/api/sponsors?id=${sponsorToDelete.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Löschen fehlgeschlagen.");
-      setSponsors(sponsors.filter((s) => s.id !== sponsorToDelete.id));
+      setSponsors((prev) => {
+        const next = prev.filter((s) => s.id !== sponsorToDelete.id);
+        try { localStorage.setItem("edk_sponsors_cache", JSON.stringify(next)); } catch {}
+        return next;
+      });
       showToast("Partner entfernt.", "success");
       setSponsorToDelete(null);
     } catch (err) {

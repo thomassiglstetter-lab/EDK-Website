@@ -84,6 +84,18 @@ export default function SponsorsSection() {
   const { ref: sectionRef, isRevealed } = useScrollReveal({ threshold: 0.1 });
 
   useEffect(() => {
+    // 1. Instant client-side cache load
+    try {
+      const cached = localStorage.getItem("edk_sponsors_cache");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setSponsorsList(parsed);
+        }
+      }
+    } catch {}
+
+    // 2. Fetch fresh from server
     fetch("/api/sponsors", {
       cache: "no-store",
       headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
@@ -95,6 +107,9 @@ export default function SponsorsSection() {
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setSponsorsList(data);
+          try {
+            localStorage.setItem("edk_sponsors_cache", JSON.stringify(data));
+          } catch {}
         }
       })
       .catch((err) => console.log("Using initial sponsors fallback:", err));

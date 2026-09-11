@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 
 const DATA_FILE = path.join(process.cwd(), "src", "data", "sponsors.json");
+const TMP_DATA_FILE = path.join("/tmp", "sponsors.json");
 
 export type SponsorTier = "gold" | "silver" | "partner" | "none";
 
@@ -16,6 +17,18 @@ export interface Sponsor {
 }
 
 async function getSponsors(): Promise<Sponsor[]> {
+  // 1. Try reading from /tmp (latest updates in serverless environment)
+  try {
+    const tmpRaw = await fs.readFile(TMP_DATA_FILE, "utf8");
+    const parsed = JSON.parse(tmpRaw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed;
+    }
+  } catch {
+    // /tmp does not exist yet, fallback to bundled file
+  }
+
+  // 2. Read from bundled src/data/sponsors.json
   try {
     const raw = await fs.readFile(DATA_FILE, "utf8");
     return JSON.parse(raw);
@@ -26,13 +39,25 @@ async function getSponsors(): Promise<Sponsor[]> {
 }
 
 async function saveSponsors(sponsors: Sponsor[]): Promise<boolean> {
+  let saved = false;
+
+  // 1. Try writing to src/data/sponsors.json (local dev, VPS)
   try {
     await fs.writeFile(DATA_FILE, JSON.stringify(sponsors, null, 2), "utf8");
-    return true;
+    saved = true;
   } catch (err) {
-    console.error("Error writing sponsors.json:", err);
-    return false;
+    console.warn("Could not write to src/data/sponsors.json (read-only on Vercel):", err);
   }
+
+  // 2. Also write to /tmp/sponsors.json (writable on Vercel serverless)
+  try {
+    await fs.writeFile(TMP_DATA_FILE, JSON.stringify(sponsors, null, 2), "utf8");
+    saved = true;
+  } catch (tmpErr) {
+    console.warn("Could not write to /tmp/sponsors.json:", tmpErr);
+  }
+
+  return saved;
 }
 
 export const dynamic = "force-dynamic";
