@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" width="240" height="80">
+  <defs>
+    <linearGradient id="snGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E11D48"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(18, 16)">
+    <polygon points="28,4 12,26 24,26 20,44 36,20 24,20" fill="url(#snGrad)"/>
+  </g>
+  <text x="75" y="34" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">DACHAU SPORTS</text>
+  <text x="75" y="52" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="12" font-weight="700" fill="#FB7185" letter-spacing="0.1em">NUTRITION</text>
+</svg>

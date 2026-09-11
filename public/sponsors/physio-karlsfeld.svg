@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" width="240" height="80">
+  <g transform="translate(18, 16)">
+    <rect x="18" y="6" width="12" height="36" rx="3" fill="#10B981"/>
+    <rect x="6" y="18" width="36" height="12" rx="3" fill="#10B981"/>
+    <circle cx="24" cy="24" r="5" fill="#FFFFFF"/>
+    <path d="M 6 38 C 16 34, 32 34, 42 38" stroke="#34D399" stroke-width="2" fill="none"/>
+  </g>
+  <text x="75" y="35" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Physio</text>
+  <text x="75" y="53" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="13" font-weight="600" fill="#34D399" letter-spacing="0.08em">KARLSFELD</text>
+</svg>

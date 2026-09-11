@@ -1,0 +1,374 @@
+[
+  {
+    "id": "team-herren-1",
+    "slug": "herren-1",
+    "name": "Herren 1",
+    "league": "Bezirksliga Männer West",
+    "category": "Herren",
+    "accentType": "crimson",
+    "nuligaCategory": "Herren 1",
+    "groupUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=AB+2026%2F27&group=495898",
+    "trainer": "Thomas Siglstetter",
+    "coachContact": {
+      "name": "Thomas Siglstetter",
+      "role": "Cheftrainer Herren 1",
+      "email": "herren1@handballeintracht.de",
+      "phone": "+49 171 1234567"
+    },
+    "trainingTimes": "Di 20:00 – 21:30 Uhr & Do 19:30 – 21:00 Uhr",
+    "trainingLocation": "Sporthalle Berufsschule",
+    "hallId": "hall-260060",
+    "trainingSchedule": [
+      {
+        "day": "Dienstag",
+        "time": "20:00 – 21:30 Uhr",
+        "hallId": "hall-260060",
+        "hallName": "Sporthalle Berufsschule"
+      },
+      {
+        "day": "Donnerstag",
+        "time": "19:30 – 21:00 Uhr",
+        "hallId": "hall-260068",
+        "hallName": "Dr. Josef Schwalber Realschule"
+      }
+    ],
+    "portrait": "",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/handballeintracht/"
+    },
+    "image": "/teams/herren-1.jpg",
+    "coaches": [
+      {
+        "name": "Thomas Siglstetter",
+        "role": "Cheftrainer Herren 1",
+        "email": "herren1@handballeintracht.de",
+        "phone": "+49 171 1234567"
+      }
+    ],
+    "showImage": true
+  },
+  {
+    "id": "team-damen-1",
+    "slug": "damen-1",
+    "name": "Damen 1",
+    "league": "Bezirksoberliga Frauen",
+    "category": "Damen",
+    "accentType": "azure",
+    "nuligaCategory": "Damen 1",
+    "groupUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=AB+2026%2F27&group=496310",
+    "trainer": "Sandra Huber",
+    "coachContact": {
+      "name": "Sandra Huber",
+      "role": "Cheftrainerin Damen 1",
+      "email": "damen1@handballeintracht.de",
+      "phone": "+49 175 5678901"
+    },
+    "trainingTimes": "Mo 19:00 – 21:00 Uhr & Mi 19:00 – 21:00 Uhr",
+    "trainingLocation": "Sporthalle Augustenfeld Dachau",
+    "hallId": "hall-260069",
+    "trainingSchedule": [
+      {
+        "day": "Montag",
+        "time": "19:00 – 21:00 Uhr",
+        "hallId": "hall-260069",
+        "hallName": "Sporthalle Augustenfeld Dachau"
+      },
+      {
+        "day": "Mittwoch",
+        "time": "19:00 – 21:00 Uhr",
+        "hallId": "hall-260069",
+        "hallName": "Sporthalle Augustenfeld Dachau"
+      }
+    ],
+    "portrait": "",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/handballeintracht/"
+    },
+    "image": "/teams/damen-1.jpg",
+    "coaches": [
+      {
+        "name": "Sandra Huber",
+        "role": "Cheftrainerin Damen 1",
+        "email": "damen1@handballeintracht.de",
+        "phone": "+49 175 5678901"
+      }
+    ],
+    "showImage": true
+  },
+  {
+    "id": "team-damen-2",
+    "slug": "damen-2",
+    "name": "Damen 2",
+    "league": "Bezirksklasse Frauen Staffel West",
+    "category": "Damen",
+    "accentType": "azure",
+    "nuligaCategory": "Damen 2",
+    "groupUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=AB+2026%2F27&group=495861",
+    "trainer": "Julia Fischer",
+    "coachContact": {
+      "name": "Julia Fischer",
+      "role": "Trainerin Damen 2",
+      "email": "damen2@handballeintracht.de",
+      "phone": "+49 176 6789012"
+    },
+    "trainingTimes": "Di 19:00 – 20:30 Uhr",
+    "trainingLocation": "Sporthalle Grundschule Karlsfeld (GSK)",
+    "hallId": "hall-260181",
+    "trainingSchedule": [
+      {
+        "day": "Dienstag",
+        "time": "19:00 – 20:30 Uhr",
+        "hallId": "hall-260181",
+        "hallName": "Sporthalle Grundschule Karlsfeld (GSK)"
+      }
+    ],
+    "portrait": "",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/handballeintracht/"
+    },
+    "image": "/teams/damen-2.jpg",
+    "coaches": [
+      {
+        "name": "Julia Fischer",
+        "role": "Trainerin Damen 2",
+        "email": "damen2@handballeintracht.de",
+        "phone": "+49 176 6789012"
+      }
+    ],
+    "showImage": false
+  },
+  {
+    "id": "team-m-b1",
+    "slug": "m-b1",
+    "name": "Männliche B-Jugend (mB1)",
+    "league": "BL männl. B-Jugend Staffel Süd 3",
+    "category": "Jugend männlich",
+    "accentType": "crimson",
+    "nuligaCategory": "mB-Jugend",
+    "groupUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=BHV+2026%2F27&group=513295",
+    "trainer": "Christian Wolf",
+    "coachContact": {
+      "name": "Christian Wolf",
+      "role": "Jugendtrainer mB",
+      "email": "jugend@handballeintracht.de",
+      "phone": "+49 177 7890123"
+    },
+    "trainingTimes": "Mo 17:30 – 19:30 Uhr & Do 17:30 – 19:30 Uhr",
+    "trainingLocation": "Sporthalle Mittelschule Karlsfeld (MSK)",
+    "hallId": "hall-260180",
+    "trainingSchedule": [
+      {
+        "day": "Montag",
+        "time": "17:30 – 19:30 Uhr",
+        "hallId": "hall-260180",
+        "hallName": "Sporthalle Mittelschule Karlsfeld (MSK)"
+      },
+      {
+        "day": "Donnerstag",
+        "time": "17:30 – 19:30 Uhr",
+        "hallId": "hall-260180",
+        "hallName": "Sporthalle Mittelschule Karlsfeld (MSK)"
+      }
+    ],
+    "portrait": "",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/handballeintracht/"
+    },
+    "image": "/teams/m-b1.jpg",
+    "coaches": [
+      {
+        "name": "Christian Wolf",
+        "role": "Jugendtrainer mB",
+        "email": "jugend@handballeintracht.de",
+        "phone": "+49 177 7890123"
+      }
+    ],
+    "showImage": false
+  },
+  {
+    "id": "team-m-c1",
+    "slug": "m-c1",
+    "name": "Männliche C-Jugend (mC1)",
+    "league": "BL männl. C-Jugend Staffel Süd 2",
+    "category": "Jugend männlich",
+    "accentType": "crimson",
+    "nuligaCategory": "mC-Jugend",
+    "groupUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=BHV+2026%2F27&group=513325",
+    "trainer": "Alexander Kraus",
+    "coachContact": {
+      "name": "Alexander Kraus",
+      "role": "Jugendtrainer mC",
+      "email": "jugend@handballeintracht.de",
+      "phone": "+49 178 8901234"
+    },
+    "trainingTimes": "Di 17:00 – 18:30 Uhr & Do 17:00 – 18:30 Uhr",
+    "trainingLocation": "Sporthalle Mittelschule Karlsfeld (MSK)",
+    "hallId": "hall-260180",
+    "trainingSchedule": [
+      {
+        "day": "Dienstag",
+        "time": "17:00 – 18:30 Uhr",
+        "hallId": "hall-260180",
+        "hallName": "Sporthalle Mittelschule Karlsfeld (MSK)"
+      },
+      {
+        "day": "Donnerstag",
+        "time": "17:00 – 18:30 Uhr",
+        "hallId": "hall-260180",
+        "hallName": "Sporthalle Mittelschule Karlsfeld (MSK)"
+      }
+    ],
+    "portrait": "",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/handballeintracht/"
+    },
+    "image": "/teams/m-c1.jpg",
+    "coaches": [
+      {
+        "name": "Alexander Kraus",
+        "role": "Jugendtrainer mC",
+        "email": "jugend@handballeintracht.de",
+        "phone": "+49 178 8901234"
+      }
+    ],
+    "showImage": false
+  },
+  {
+    "id": "team-w-c1",
+    "slug": "w-c1",
+    "name": "Weibliche C-Jugend (wC1)",
+    "league": "Oberliga weibl. C-Jugend Staffel Nord",
+    "category": "Jugend weiblich",
+    "accentType": "azure",
+    "nuligaCategory": "wC-Jugend",
+    "groupUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=BHV+2026%2F27&group=513380",
+    "trainer": "Katrin Baumgartner",
+    "coachContact": {
+      "name": "Katrin Baumgartner",
+      "role": "Jugendtrainerin wC",
+      "email": "jugend@handballeintracht.de",
+      "phone": "+49 179 9012345"
+    },
+    "trainingTimes": "Di 17:00 – 18:30 Uhr & Fr 17:00 – 18:30 Uhr",
+    "trainingLocation": "Sporthalle Grundschule Karlsfeld (GSK)",
+    "hallId": "hall-260181",
+    "trainingSchedule": [
+      {
+        "day": "Dienstag",
+        "time": "17:00 – 18:30 Uhr",
+        "hallId": "hall-260181",
+        "hallName": "Sporthalle Grundschule Karlsfeld (GSK)"
+      },
+      {
+        "day": "Freitag",
+        "time": "17:00 – 18:30 Uhr",
+        "hallId": "hall-260181",
+        "hallName": "Sporthalle Grundschule Karlsfeld (GSK)"
+      }
+    ],
+    "portrait": "",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/handballeintracht/"
+    },
+    "image": "/teams/w-c1.jpg",
+    "coaches": [
+      {
+        "name": "Katrin Baumgartner",
+        "role": "Jugendtrainerin wC",
+        "email": "jugend@handballeintracht.de",
+        "phone": "+49 179 9012345"
+      }
+    ],
+    "showImage": false
+  },
+  {
+    "id": "team-w-b1",
+    "slug": "w-b1",
+    "name": "Weibliche B-Jugend (wB1)",
+    "league": "BL weibl. B-Jugend Staffel Süd 3",
+    "category": "Jugend weiblich",
+    "accentType": "azure",
+    "nuligaCategory": "wB-Jugend",
+    "groupUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=BHV+2026%2F27&group=513326",
+    "trainer": "Claudia Reiter",
+    "coachContact": {
+      "name": "Claudia Reiter",
+      "role": "Jugendtrainerin wB",
+      "email": "jugend@handballeintracht.de",
+      "phone": "+49 170 0123456"
+    },
+    "trainingTimes": "Mo 18:00 – 19:30 Uhr & Do 18:00 – 19:30 Uhr",
+    "trainingLocation": "Sporthalle Augustenfeld Dachau",
+    "hallId": "hall-260069",
+    "trainingSchedule": [
+      {
+        "day": "Montag",
+        "time": "18:00 – 19:30 Uhr",
+        "hallId": "hall-260069",
+        "hallName": "Sporthalle Augustenfeld Dachau"
+      },
+      {
+        "day": "Donnerstag",
+        "time": "18:00 – 19:30 Uhr",
+        "hallId": "hall-260069",
+        "hallName": "Sporthalle Augustenfeld Dachau"
+      }
+    ],
+    "portrait": "",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/handballeintracht/"
+    },
+    "image": "/teams/w-b1.jpg",
+    "coaches": [
+      {
+        "name": "Claudia Reiter",
+        "role": "Jugendtrainerin wB",
+        "email": "jugend@handballeintracht.de",
+        "phone": "+49 170 0123456"
+      }
+    ],
+    "showImage": false
+  },
+  {
+    "id": "team-minis",
+    "slug": "minis",
+    "name": "Minis & Ballschule (ab 5 J.)",
+    "league": "Spielfeste & Turniere",
+    "category": "Kinderhandball",
+    "accentType": "azure",
+    "nuligaCategory": "Minis",
+    "groupUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/clubInfoDisplay?club=105665",
+    "trainer": "Anna Schneider",
+    "coachContact": {
+      "name": "Anna Schneider",
+      "role": "Leiterin Ballschule",
+      "email": "minis@handballeintracht.de",
+      "phone": "+49 171 9988776"
+    },
+    "trainingTimes": "Fr 15:30 – 17:00 Uhr",
+    "trainingLocation": "Sporthalle Berufsschule Dachau",
+    "hallId": "hall-260060",
+    "trainingSchedule": [
+      {
+        "day": "Freitag",
+        "time": "15:30 – 17:00 Uhr",
+        "hallId": "hall-260060",
+        "hallName": "Sporthalle Berufsschule Dachau"
+      }
+    ],
+    "portrait": "",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/handballeintracht/"
+    },
+    "image": "/teams/minis.jpg",
+    "coaches": [
+      {
+        "name": "Anna Schneider",
+        "role": "Leiterin Ballschule",
+        "email": "minis@handballeintracht.de",
+        "phone": "+49 171 9988776"
+      }
+    ],
+    "showImage": false
+  }
+]

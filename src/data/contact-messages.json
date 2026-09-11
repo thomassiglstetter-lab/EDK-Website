@@ -1,0 +1,26 @@
+[
+  {
+    "id": "msg-1789059896644-8dxwz",
+    "createdAt": "2026-09-10T17:04:56.644Z",
+    "name": "Thomas Test",
+    "email": "thomas.test@example.com",
+    "category": "Allgemeine Vereinsanfrage",
+    "targetEmail": "thomas.siglstetter@web.de",
+    "message": "Guten Tag, das ist ein Test der Kontaktformular-Anbindung!",
+    "read": false,
+    "mailSent": false,
+    "sendError": "Keine SMTP-Zugangsdaten konfiguriert (Nachricht im Posteingang gespeichert)."
+  },
+  {
+    "id": "msg-1789059839314-06htq",
+    "createdAt": "2026-09-10T17:03:59.314Z",
+    "name": "Max Mustermann",
+    "email": "max@beispiel.de",
+    "category": "Allgemeine Vereinsanfrage",
+    "targetEmail": "thomas.siglstetter@web.de",
+    "message": "Hallo Eintracht Dachau-Karlsfeld, ich interessiere mich fuer ein Schnuppertraining bei den Herren!",
+    "read": false,
+    "mailSent": false,
+    "sendError": "Keine SMTP-Zugangsdaten konfiguriert (Nachricht im Posteingang gespeichert)."
+  }
+]

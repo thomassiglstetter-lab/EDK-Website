@@ -1,0 +1,486 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { Handshake, ChevronRight, ExternalLink } from "lucide-react";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
+
+interface Sponsor {
+  id?: string;
+  name: string;
+  tier?: "gold" | "silver" | "partner" | "none";
+  url?: string;
+  logo?: string;
+  fit?: "cover" | "contain";
+}
+
+const initialSponsors: Sponsor[] = [
+  {
+    id: "sp-1",
+    name: "Stadtwerke Dachau",
+    tier: "gold",
+    url: "https://www.stadtwerke-dachau.de",
+    logo: "/sponsors/stadtwerke-dachau.svg",
+  },
+  {
+    id: "sp-2",
+    name: "Sparkasse Dachau",
+    tier: "gold",
+    url: "https://www.sparkasse-dachau.de",
+    logo: "/sponsors/sparkasse-dachau.svg",
+  },
+  {
+    id: "sp-3",
+    name: "Autohaus Demmler",
+    tier: "silver",
+    url: "https://www.autohaus-demmler.de",
+    logo: "/sponsors/autohaus-demmler.svg",
+  },
+  {
+    id: "sp-4",
+    name: "Dachauer Sportzentren",
+    tier: "silver",
+    url: "https://www.dachau.de",
+    logo: "/sponsors/sportzentren-dachau.svg",
+  },
+  {
+    id: "sp-5",
+    name: "Physio Karlsfeld",
+    tier: "partner",
+    url: "https://www.physiotherapie-karlsfeld.de",
+    logo: "/sponsors/physio-karlsfeld.svg",
+  },
+  {
+    id: "sp-6",
+    name: "Metzgerei Huber",
+    tier: "partner",
+    url: "https://www.metzgerei-huber.de",
+    logo: "/sponsors/metzgerei-huber.svg",
+  },
+  {
+    id: "sp-7",
+    name: "Bäckerei Lang",
+    tier: "partner",
+    url: "https://www.baeckerei-lang.de",
+    logo: "/sponsors/baeckerei-lang.svg",
+  },
+  {
+    id: "sp-8",
+    name: "IT-Service Müller",
+    tier: "partner",
+    url: "https://www.it-service-mueller.de",
+    logo: "/sponsors/it-service-mueller.svg",
+  },
+  {
+    id: "sp-1788952714718",
+    name: "Dachau Sports Nutrition",
+    tier: "gold",
+    url: "https://dachau-sports.de",
+    logo: "/sponsors/dachau-sports-nutrition.svg",
+  },
+];
+
+export default function SponsorsSection() {
+  const [sponsorsList, setSponsorsList] = useState<Sponsor[]>(initialSponsors);
+  const { ref: sectionRef, isRevealed } = useScrollReveal({ threshold: 0.1 });
+
+  useEffect(() => {
+    fetch("/api/sponsors", {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error("Failed to fetch sponsors");
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setSponsorsList(data);
+        }
+      })
+      .catch((err) => console.log("Using initial sponsors fallback:", err));
+  }, []);
+
+  // Duplicate for seamless infinite marquee loop
+  const marqueeSponsors = [...sponsorsList, ...sponsorsList];
+
+  return (
+    <section
+      ref={sectionRef}
+      id="partner"
+      style={{
+        position: "relative",
+        zIndex: 10,
+        padding: "80px 0 100px 0",
+        borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+      }}
+    >
+      <div
+        className={`reveal-3d-header ${isRevealed ? "is-revealed" : ""}`}
+        style={{
+          maxWidth: "1280px",
+          margin: "0 auto",
+          padding: "0 24px",
+          marginBottom: "52px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          flexWrap: "wrap",
+          gap: "24px",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              color: "var(--color-azure-bright)",
+              fontSize: "0.82rem",
+              fontWeight: 600,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              marginBottom: "14px",
+            }}
+          >
+            <Handshake size={15} />
+            <span>Partner &amp; Sponsoren</span>
+          </div>
+
+          <h2
+            style={{
+              fontSize: "clamp(1.8rem, 3vw, 2.4rem)",
+              fontWeight: 700,
+              lineHeight: 1.1,
+              color: "#FFFFFF",
+              letterSpacing: "-0.03em",
+            }}
+          >
+            Gemeinsam für den Handballsport.
+          </h2>
+        </div>
+
+        <a
+          href="#kontakt"
+          className="btn-secondary"
+          style={{
+            padding: "10px 22px",
+            fontSize: "0.88rem",
+          }}
+        >
+          <span>Sponsor werden</span>
+          <ChevronRight size={15} />
+        </a>
+      </div>
+
+      {/* Marquee Container */}
+      <div
+        className={`reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
+        style={{
+          overflow: "hidden",
+          position: "relative",
+          transitionDelay: "0.2s",
+        }}
+      >
+        {/* Left / Right Fade Edges */}
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: "90px",
+            background: "linear-gradient(to right, rgba(7,9,13,1), transparent)",
+            zIndex: 2,
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: "90px",
+            background: "linear-gradient(to left, rgba(7,9,13,1), transparent)",
+            zIndex: 2,
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Scrolling Track */}
+        <div className="sponsor-marquee-track">
+          {marqueeSponsors.map((sponsor, idx) => {
+            const tierColors: Record<string, { bg: string; border: string; hoverBorder: string; glow: string; text: string; label: string }> = {
+              gold: {
+                bg: "rgba(245, 158, 11, 0.06)",
+                border: "rgba(245, 158, 11, 0.25)",
+                hoverBorder: "rgba(245, 158, 11, 0.8)",
+                glow: "rgba(245, 158, 11, 0.35)",
+                text: "#FBBF24",
+                label: "Gold-Partner",
+              },
+              silver: {
+                bg: "rgba(148, 163, 184, 0.06)",
+                border: "rgba(148, 163, 184, 0.2)",
+                hoverBorder: "rgba(203, 213, 225, 0.7)",
+                glow: "rgba(148, 163, 184, 0.25)",
+                text: "#CBD5E1",
+                label: "Silber-Partner",
+              },
+              partner: {
+                bg: "rgba(72, 156, 216, 0.04)",
+                border: "rgba(72, 156, 216, 0.18)",
+                hoverBorder: "rgba(94, 178, 238, 0.7)",
+                glow: "rgba(72, 156, 216, 0.25)",
+                text: "#5EB2EE",
+                label: "Förderer",
+              },
+              none: {
+                bg: "rgba(255, 255, 255, 0.03)",
+                border: "rgba(255, 255, 255, 0.12)",
+                hoverBorder: "rgba(255, 255, 255, 0.6)",
+                glow: "rgba(255, 255, 255, 0.2)",
+                text: "transparent",
+                label: "",
+              },
+            };
+            const currentTier = sponsor.tier && tierColors[sponsor.tier] ? sponsor.tier : "none";
+            const colors = tierColors[currentTier];
+
+            return (
+              <a
+                key={`${sponsor.id || sponsor.name}-${idx}`}
+                href={sponsor.url || "#partner"}
+                target={sponsor.url ? "_blank" : undefined}
+                rel={sponsor.url ? "noopener noreferrer" : undefined}
+                className="sponsor-card"
+                title={sponsor.url ? `${sponsor.name} – Website besuchen` : sponsor.name}
+                style={
+                  {
+                    "--card-bg": colors.bg,
+                    "--card-border": colors.border,
+                    "--hover-border": colors.hoverBorder,
+                    "--hover-glow": colors.glow,
+                  } as React.CSSProperties
+                }
+              >
+                {/* Corner Tier Tag (discreet, doesn't steal space from the logo) */}
+                {colors.label && (
+                  <div className="sponsor-corner-tier" style={{ color: colors.text }}>
+                    {colors.label}
+                  </div>
+                )}
+
+                {/* Sponsor Logo Container: Fills the entire placeholder */}
+                {sponsor.logo ? (
+                  <div
+                    className={`sponsor-logo-container ${
+                      sponsor.fit === "cover" || (!sponsor.fit && !sponsor.logo.toLowerCase().endsWith(".svg"))
+                        ? "is-cover"
+                        : "is-contain"
+                    }`}
+                  >
+                    <img
+                      src={sponsor.logo}
+                      alt={sponsor.name}
+                      className={`sponsor-logo ${
+                        sponsor.fit === "cover" || (!sponsor.fit && !sponsor.logo.toLowerCase().endsWith(".svg"))
+                          ? "sponsor-logo-cover"
+                          : "sponsor-logo-contain"
+                      }`}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "/logo-dark.png";
+                      }}
+                    />
+                  </div>
+                ) : (
+                  /* Fallback when no logo is uploaded */
+                  <div className="sponsor-fallback-wrapper">
+                    <span className="sponsor-name">{sponsor.name}</span>
+                    {colors.label && (
+                      <span className="sponsor-tier-badge" style={{ color: colors.text }}>
+                        {colors.label}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Hover Link Hint */}
+                {sponsor.url && (
+                  <div className="sponsor-hover-hint">
+                    <span>Website öffnen</span>
+                    <ExternalLink size={10} />
+                  </div>
+                )}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+
+      <style jsx>{`
+        .sponsor-marquee-track {
+          display: flex;
+          gap: 22px;
+          animation: sponsorMarquee 38s linear infinite;
+          width: max-content;
+          padding: 12px 0;
+        }
+
+        .sponsor-marquee-track:hover {
+          animation-play-state: paused;
+        }
+
+        .sponsor-card {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          background: var(--card-bg);
+          border: 1px solid var(--card-border);
+          border-radius: var(--radius-md);
+          min-width: 250px;
+          height: 114px;
+          flex-shrink: 0;
+          text-decoration: none;
+          cursor: pointer;
+          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+          overflow: hidden;
+        }
+
+        .sponsor-card:hover {
+          transform: translateY(-4px) scale(1.03);
+          border-color: var(--hover-border) !important;
+          box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 28px var(--hover-glow);
+          background: rgba(16, 22, 34, 0.96);
+        }
+
+        .sponsor-logo-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          border-radius: calc(var(--radius-md) - 1px);
+        }
+
+        .sponsor-logo-container.is-cover {
+          padding: 0;
+        }
+
+        .sponsor-logo-container.is-contain {
+          padding: 10px 18px;
+        }
+
+        .sponsor-logo {
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .sponsor-logo-cover {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+
+        .sponsor-logo-contain {
+          width: 100%;
+          height: 100%;
+          max-height: 94px;
+          max-width: 220px;
+          object-fit: contain;
+          filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+        }
+
+        .sponsor-card:hover .sponsor-logo {
+          transform: scale(1.04);
+        }
+
+        .sponsor-corner-tier {
+          position: absolute;
+          top: 6px;
+          right: 8px;
+          font-size: 0.6rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          padding: 2px 6px;
+          border-radius: 4px;
+          background: rgba(0, 0, 0, 0.45);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          opacity: 0.75;
+          transition: opacity 0.25s ease;
+          pointer-events: none;
+        }
+
+        .sponsor-card:hover .sponsor-corner-tier {
+          opacity: 1;
+        }
+
+        .sponsor-fallback-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          text-align: center;
+          width: 100%;
+        }
+
+        .sponsor-name {
+          font-size: 1.05rem;
+          font-weight: 700;
+          color: #FFFFFF;
+          font-family: var(--font-display);
+          text-align: center;
+          letter-spacing: 0.01em;
+        }
+
+        .sponsor-tier-badge {
+          font-size: 0.68rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        }
+
+        .sponsor-hover-hint {
+          position: absolute;
+          bottom: 6px;
+          left: 50%;
+          transform: translateX(-50%) translateY(10px);
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.66rem;
+          font-weight: 600;
+          color: #E2E8F0;
+          background: rgba(0, 0, 0, 0.8);
+          backdrop-filter: blur(6px);
+          padding: 2px 8px;
+          border-radius: 4px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          opacity: 0;
+          transition: all 0.25s ease;
+          pointer-events: none;
+          white-space: nowrap;
+        }
+
+        .sponsor-card:hover .sponsor-hover-hint {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+
+        @keyframes sponsorMarquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+      `}</style>
+    </section>
+  );
+}

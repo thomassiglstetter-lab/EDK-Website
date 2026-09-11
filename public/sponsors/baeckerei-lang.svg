@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" width="240" height="80">
+  <g transform="translate(18, 16)">
+    <path d="M 8 28 C 8 16, 40 16, 40 28 Z" fill="#EAB308"/>
+    <circle cx="16" cy="18" r="2" fill="#FFFFFF"/>
+    <circle cx="24" cy="15" r="2" fill="#FFFFFF"/>
+    <circle cx="32" cy="18" r="2" fill="#FFFFFF"/>
+    <path d="M 12 32 C 18 36, 30 36, 36 32" stroke="#EAB308" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <text x="75" y="34" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">Bäckerei Lang</text>
+  <text x="75" y="52" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="12" font-weight="500" fill="#FDE047">Handwerkskunst</text>
+</svg>

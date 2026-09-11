@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" width="240" height="80">
+  <defs>
+    <linearGradient id="swGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00A3E0"/>
+      <stop offset="100%" stop-color="#004B87"/>
+    </linearGradient>
+  </defs>
+  <!-- Modern Utility Wave & Leaf -->
+  <g transform="translate(15, 15)">
+    <circle cx="25" cy="25" r="24" fill="url(#swGrad)" opacity="0.15"/>
+    <path d="M 12 28 C 16 16, 32 14, 38 25 C 42 32, 36 38, 26 38 C 16 38, 10 32, 12 28 Z" fill="url(#swGrad)"/>
+    <path d="M 22 18 C 26 10, 38 12, 36 22 C 34 28, 28 26, 22 18 Z" fill="#22C55E"/>
+    <circle cx="25" cy="25" r="3" fill="#FFFFFF"/>
+  </g>
+  <text x="75" y="36" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="16" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">STADTWERKE</text>
+  <text x="75" y="54" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="14" font-weight="700" fill="#38BDF8" letter-spacing="0.12em">DACHAU</text>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" width="240" height="80">
+  <!-- Iconic S Signet in Sparkasse Red -->
+  <g transform="translate(18, 14)">
+    <circle cx="26" cy="10" r="5.5" fill="#E30613"/>
+    <path d="M 26 19 C 32 19, 38 23, 38 29 C 38 35, 30 37, 26 40 C 22 43, 14 44, 14 50 C 14 51, 15 52, 16 52 C 20 52, 28 47, 34 43 L 37 47 C 31 52, 23 56, 16 56 C 8 56, 5 50, 5 44 C 5 36, 14 33, 19 30 C 24 27, 30 26, 30 22 C 30 20, 28 19, 26 19 Z" fill="#E30613"/>
+  </g>
+  <text x="75" y="37" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">Sparkasse</text>
+  <text x="75" y="54" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="14" font-weight="600" fill="#E30613" letter-spacing="0.06em">Dachau</text>
+</svg>

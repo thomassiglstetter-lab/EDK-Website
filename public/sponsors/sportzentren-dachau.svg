@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" width="240" height="80">
+  <g transform="translate(16, 16)">
+    <polygon points="24,4 44,44 4,44" fill="none" stroke="#F59E0B" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="24" cy="26" r="8" fill="#F59E0B"/>
+    <path d="M 14 36 Q 24 30 34 36" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+  </g>
+  <text x="75" y="35" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" letter-spacing="0.02em">SPORTZENTREN</text>
+  <text x="75" y="53" font-family="-apple-system, BlinkMacSystemFont, Inter, sans-serif" font-size="13" font-weight="600" fill="#FBBF24" letter-spacing="0.08em">DACHAU</text>
+</svg>

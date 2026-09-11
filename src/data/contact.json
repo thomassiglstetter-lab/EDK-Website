@@ -1,0 +1,56 @@
+{
+  "generalEmail": "kontakt@handballeintracht.de",
+  "categories": [
+    {
+      "id": "cat-allgemein",
+      "name": "Allgemeine Vereinsanfrage",
+      "email": "thomas.siglstetter@web.de",
+      "description": "Allgemeine Fragen zum Verein, Mitgliedschaft und Organisation",
+      "active": true
+    },
+    {
+      "id": "cat-jugend",
+      "name": "Probetraining Jugend (Minis bis A-Jugend)",
+      "email": "jugend@eintracht-handball.de",
+      "description": "Für Kinder und Jugendliche von den Minis (ab 5 J.) bis zur A-Jugend",
+      "active": true
+    },
+    {
+      "id": "cat-aktive",
+      "name": "Probetraining Aktive (Damen & Herren)",
+      "email": "aktive@eintracht-handball.de",
+      "description": "Für Quereinsteiger, Vereinswechsler und interessierte Senioren-Spieler",
+      "active": true
+    },
+    {
+      "id": "cat-sponsoring",
+      "name": "Sponsoring & Partnerschaften",
+      "email": "sponsoring@eintracht-handball.de",
+      "description": "Für Unternehmen, Förderer und Werbepartner der Eintracht",
+      "active": true
+    },
+    {
+      "id": "cat-schiedsrichter",
+      "name": "Schiedsrichter / Kampfgericht",
+      "email": "schiedsrichter@eintracht-handball.de",
+      "description": "Interesse am Schiedsrichterwesen oder Kampfrichtertisch",
+      "active": true
+    },
+    {
+      "id": "cat-freundschaftsspiele-turniere",
+      "name": "Freundschaftsspiele & Turniere",
+      "email": "turniere@eintracht-handball.de",
+      "description": "Anfragen für Testspiele, Turniere und Vorbereitung",
+      "active": true
+    }
+  ],
+  "smtp": {
+    "host": "",
+    "port": 587,
+    "secure": false,
+    "user": "",
+    "password": "",
+    "fromEmail": "kontakt@handballeintracht.de",
+    "fromName": "Eintracht Dachau-Karlsfeld Handball"
+  }
+}

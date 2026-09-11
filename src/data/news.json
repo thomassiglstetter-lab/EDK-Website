@@ -1,0 +1,68 @@
+[
+  {
+    "id": "1789052548277",
+    "category": "Spielbetrieb",
+    "categoryColor": "azure",
+    "date": "10. September 2026",
+    "readTime": "3 Min. Lesezeit",
+    "title": "Test",
+    "excerpt": "Test",
+    "content": "test sdfsdfkjksdfjskdfj test test sökjdölkjölkjlökj",
+    "image": "/uploads/news/test-cropped-1789056393599.png"
+  },
+  {
+    "id": "1",
+    "category": "Spielbetrieb",
+    "categoryColor": "azure",
+    "date": "06. September 2026",
+    "readTime": "3 Min. Lesezeit",
+    "title": "Auftaktsieg der Herren 1: Nervenstark im Derby-Krimi gegen Allach",
+    "excerpt": "Mit einer geschlossenen Mannschaftsleistung und einem überragenden Rückraum sichern sich die Eintracht-Männer die ersten zwei Punkte in heimischer Halle.",
+    "content": "Die Herren 1 der Eintracht Dachau-Karlsfeld sind mit einem hart erkämpften 28:26-Heimsieg gegen den TSV Allach in die neue Handballsaison gestartet. Vor über 350 Zuschauern in der Sporthalle Mittelschule Karlsfeld entwickelte sich von Beginn an ein hochintensiver Schlagabtausch.\n\nBesonders in der entscheidenden Schlussphase behielt die Mannschaft kühlen Kopf. Torhüter Felix B. parierte in den letzten drei Minuten zwei freie Würfe, während Spielmacher Jonas K. mit seinem siebten Treffer 30 Sekunden vor Schluss den Deckel draufmachte.\n\nTrainer Markus V. zeigte sich nach dem Schlusspfiff hochzufrieden: 'Die Einstellung und der Kampfgeist jedes Einzelnen waren heute ausschlaggebend. Wir wissen aber auch, woran wir in den kommenden Wochen noch feilen müssen.'",
+    "image": "/news-match.jpg"
+  },
+  {
+    "id": "2",
+    "category": "Jugend",
+    "categoryColor": "crimson",
+    "date": "03. September 2026",
+    "readTime": "4 Min. Lesezeit",
+    "title": "Männliche B-Jugend qualifiziert sich für die Bayernliga-Endrunde",
+    "excerpt": "Das Trainerteam blickt stolz auf das Qualifikationsturnier: Mit schnellem Umschaltspiel und starker Abwehr setzt sich der Nachwuchs souverän durch.",
+    "content": "Großer Erfolg für die Jugendarbeit der Eintracht: Die männliche B1-Jugend hat beim Qualifikationsturnier in Karlsfeld den Sprung in die höchste bayerische Spielklasse geschafft.\n\nMit drei Siegen aus drei Spielen ließ das Team um Kapitän Leo S. keinen Zweifel an den Ambitionen. Das konsequente Tempospiel und eine disziplinierte 6:0-Abwehr stellten die gegnerischen Angriffsreihen immer wieder vor unlösbare Aufgaben.",
+    "image": "/news-youth.jpg"
+  },
+  {
+    "id": "3",
+    "category": "Verein",
+    "categoryColor": "azure",
+    "date": "01. September 2026",
+    "readTime": "2 Min. Lesezeit",
+    "title": "Ausbau des Trainer- & Betreuerteams zur neuen Handballsaison 2026/27",
+    "excerpt": "Wir begrüßen drei neue B-Lizenz-Inhaber im Nachwuchsbereich und erweitern unser Athletik-Förderprogramm in Zusammenarbeit mit den Dachauer Sportzentren.",
+    "content": "Zur kontinuierlichen Qualitätssteigerung im Jugend- und Seniorenbereich verstärkt die Eintracht ihren Trainerstab zur Saison 2026/27 mit qualifizierten Neuzugängen. Neben zwei neuen Übungsleitern für die weibliche C- und B-Jugend startet im Oktober ein wöchentliches Athletik- und Präventionstraining in Kooperation mit den Dachauer Sportzentren.",
+    "image": "/news-coaches.jpg"
+  },
+  {
+    "id": "4",
+    "category": "Spielbetrieb",
+    "categoryColor": "azure",
+    "date": "28. August 2026",
+    "readTime": "3 Min. Lesezeit",
+    "title": "Damen 1 starten mit klarem 31:22 Sieg in die neue Saison",
+    "excerpt": "Die Damenmannschaft zeigt von Beginn an eine überzeugende Leistung und dominiert das Auftaktspiel. Rückraumspielerin Lena M. erzielt 9 Treffer.",
+    "content": "Ein souveräner Saisonauftakt gelang den Damen 1 der Eintracht Dachau-Karlsfeld. Bereits zur Halbzeit führte das Team mit 16:9 und ließ auch im zweiten Durchgang nichts mehr anbrennen. Besonders das Zusammenspiel zwischen Kreis und Rückraum funktionierte bereits hervorragend.",
+    "image": "/news-match.jpg"
+  },
+  {
+    "id": "5",
+    "category": "Jugend",
+    "categoryColor": "crimson",
+    "date": "25. August 2026",
+    "readTime": "2 Min. Lesezeit",
+    "title": "Mini-Handball-Tag: Über 60 Kinder beim Schnuppertraining",
+    "excerpt": "Ein voller Erfolg! Beim diesjährigen Mini-Handball-Tag konnten wir zahlreiche neue Talente für den Handballsport begeistern.",
+    "content": "Hallenluft schnuppern, Tore werfen und jede Menge Spaß mit dem Ball: Über 60 begeisterte Mädchen und Jungen folgten der Einladung zum diesjährigen Eintracht-Mini-Handball-Tag in der Sporthalle Grundschule Karlsfeld.",
+    "image": "/news-youth.jpg"
+  }
+]

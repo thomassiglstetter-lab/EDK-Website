@@ -1,0 +1,42 @@
+[
+  {
+    "id": "sp-7",
+    "name": "Bäckerei Lang",
+    "tier": "partner",
+    "url": "https://www.baeckerei-lang.de",
+    "logo": "/sponsors/baeckerei-lang.svg",
+    "fit": "contain"
+  },
+  {
+    "id": "sp-8",
+    "name": "IT-Service Müller",
+    "tier": "partner",
+    "url": "https://www.it-service-mueller.de",
+    "logo": "/sponsors/it-service-mueller.svg",
+    "fit": "contain"
+  },
+  {
+    "id": "sp-1788952714718",
+    "name": "Dachau Sports Nutrition",
+    "tier": "gold",
+    "url": "https://dachau-sports.de",
+    "logo": "/sponsors/dachau-sports-nutrition.svg",
+    "fit": "contain"
+  },
+  {
+    "id": "sp-1788953583583",
+    "name": "Test Partner ohne Stufe",
+    "tier": "none",
+    "url": "",
+    "logo": "/sponsors/stadtwerke-dachau.svg",
+    "fit": "contain"
+  },
+  {
+    "id": "sp-1789053571188",
+    "name": "Tommy Tronic",
+    "tier": "none",
+    "url": "",
+    "logo": "/uploads/sponsors/tommy-tronic-cropped-1789056316291.png",
+    "fit": "cover"
+  }
+]
