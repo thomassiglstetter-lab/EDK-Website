@@ -312,28 +312,6 @@ export default function Header() {
     }));
   };
 
-  const getBadgeStyles = (badgeType?: "crimson" | "azure" | "gold") => {
-    if (badgeType === "crimson") {
-      return {
-        bg: "rgba(244, 63, 94, 0.14)",
-        border: "rgba(244, 63, 94, 0.35)",
-        text: "var(--color-crimson-bright)",
-      };
-    }
-    if (badgeType === "gold") {
-      return {
-        bg: "rgba(245, 158, 11, 0.14)",
-        border: "rgba(245, 158, 11, 0.35)",
-        text: "#FBBF24",
-      };
-    }
-    return {
-      bg: "rgba(72, 156, 216, 0.14)",
-      border: "rgba(72, 156, 216, 0.35)",
-      text: "var(--color-azure-bright)",
-    };
-  };
-
   const currentFlyoutItem = navItems.find((item) => item.id === activeFlyout);
 
   return (
@@ -675,9 +653,9 @@ export default function Header() {
               top: 0,
               left: "10%",
               right: "10%",
-              height: "1.5px",
+              height: "1px",
               background:
-                "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%)",
+                "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.8) 50%, transparent 100%)",
               pointerEvents: "none",
             }}
           />
@@ -688,106 +666,46 @@ export default function Header() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              paddingBottom: "16px",
+              paddingBottom: "14px",
               marginBottom: "18px",
-              borderBottom: "1px solid rgba(255, 255, 255, 0.10)",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              {currentFlyoutItem.id === "teams" && (
-                <div
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    borderRadius: "50%",
-                    background: "rgba(244, 63, 94, 0.18)",
-                    border: "1px solid rgba(244, 63, 94, 0.35)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Users size={16} style={{ color: "var(--color-crimson-bright)" }} />
-                </div>
-              )}
-              {currentFlyoutItem.id === "verein" && (
-                <div
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    borderRadius: "50%",
-                    background: "rgba(72, 156, 216, 0.18)",
-                    border: "1px solid rgba(72, 156, 216, 0.35)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Shield size={16} style={{ color: "var(--color-azure-bright)" }} />
-                </div>
-              )}
-              {currentFlyoutItem.id === "spielplan" && (
-                <div
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    borderRadius: "50%",
-                    background: "rgba(72, 156, 216, 0.18)",
-                    border: "1px solid rgba(72, 156, 216, 0.35)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Calendar size={16} style={{ color: "var(--color-azure-bright)" }} />
-                </div>
-              )}
-              <span
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "1.05rem",
-                  fontWeight: 700,
-                  color: "#FFFFFF",
-                  letterSpacing: "0.02em",
-                }}
-              >
-                {currentFlyoutItem.label} – Schnellzugriff
-              </span>
-            </div>
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "0.98rem",
+                fontWeight: 600,
+                color: "#FFFFFF",
+                letterSpacing: "0.01em",
+              }}
+            >
+              {currentFlyoutItem.label}
+            </span>
 
             <button
               onClick={() => setActiveFlyout(null)}
               style={{
-                background: "rgba(255, 255, 255, 0.08)",
-                border: "1px solid rgba(255, 255, 255, 0.16)",
-                borderRadius: "var(--radius-full)",
-                color: "#E2E8F0",
+                background: "transparent",
+                border: "none",
+                color: "#94A3B8",
                 cursor: "pointer",
-                padding: "5px 12px",
+                padding: "4px 8px",
                 display: "flex",
                 alignItems: "center",
                 gap: "5px",
                 fontSize: "0.78rem",
-                fontWeight: 500,
-                transition: "all 0.2s ease",
+                transition: "color 0.18s ease",
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "#FFFFFF";
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.18)";
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "#E2E8F0";
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.16)";
-              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}
             >
               <span>Schließen</span>
-              <X size={13} />
+              <X size={14} />
             </button>
           </div>
 
-          {/* Columns Grid with iOS Glass Cards */}
+          {/* Clean Columns Grid (No Nested Box Cards) */}
           <div
             style={{
               display: "grid",
@@ -797,7 +715,7 @@ export default function Header() {
                   : currentFlyoutItem.id === "verein"
                   ? "repeat(2, 1fr)"
                   : "repeat(2, 1fr)",
-              gap: "16px",
+              gap: "28px",
             }}
           >
             {currentFlyoutItem.categories.map((cat, cIdx) => (
@@ -806,141 +724,98 @@ export default function Header() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "10px",
-                  background:
-                    "linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)",
-                  border: "1px solid rgba(255, 255, 255, 0.14)",
-                  borderRadius: "20px",
-                  padding: "16px 14px",
-                  backdropFilter: "blur(24px)",
-                  WebkitBackdropFilter: "blur(24px)",
-                  boxShadow:
-                    "inset 0 1px 1px 0 rgba(255, 255, 255, 0.22), 0 8px 24px rgba(0, 0, 0, 0.25)",
+                  gap: "6px",
                 }}
               >
                 <div
                   style={{
-                    fontSize: "0.74rem",
-                    fontWeight: 700,
+                    fontSize: "0.72rem",
+                    fontWeight: 600,
                     textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    color:
-                      cat.name.includes("Herren")
-                        ? "var(--color-crimson-bright)"
-                        : cat.name.includes("Damen")
-                        ? "var(--color-azure-bright)"
-                        : cat.name.includes("Kinder")
-                        ? "#FBBF24"
-                        : "#CBD5E1",
+                    letterSpacing: "0.08em",
+                    color: "#94A3B8",
                     paddingBottom: "6px",
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                    borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+                    marginBottom: "4px",
                   }}
                 >
                   {cat.name}
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {cat.items.map((sub, sIdx) => {
-                    const badgeStyles = getBadgeStyles(sub.badgeType);
-                    return (
-                      <Link
-                        key={sIdx}
-                        href={sub.href}
-                        target={sub.isExternal ? "_blank" : undefined}
-                        rel={sub.isExternal ? "noopener noreferrer" : undefined}
-                        onClick={() => setActiveFlyout(null)}
+                <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                  {cat.items.map((sub, sIdx) => (
+                    <Link
+                      key={sIdx}
+                      href={sub.href}
+                      target={sub.isExternal ? "_blank" : undefined}
+                      rel={sub.isExternal ? "noopener noreferrer" : undefined}
+                      onClick={() => setActiveFlyout(null)}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "2px",
+                        padding: "8px 10px",
+                        borderRadius: "10px",
+                        background: "transparent",
+                        textDecoration: "none",
+                        transition: "background 0.18s ease, transform 0.18s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgba(255, 255, 255, 0.07)";
+                        e.currentTarget.style.transform = "translateX(2px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.transform = "none";
+                      }}
+                    >
+                      <div
                         style={{
                           display: "flex",
-                          flexDirection: "column",
-                          gap: "3px",
-                          padding: "10px 12px",
-                          borderRadius: "14px",
-                          background: "rgba(255, 255, 255, 0.05)",
-                          border: "1px solid rgba(255, 255, 255, 0.10)",
-                          boxShadow: "inset 0 1px 0.5px rgba(255, 255, 255, 0.18)",
-                          textDecoration: "none",
-                          transition: "all 0.22s cubic-bezier(0.16, 1, 0.3, 1)",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background =
-                            "linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%)";
-                          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.38)";
-                          e.currentTarget.style.boxShadow =
-                            "inset 0 1.5px 1.5px rgba(255, 255, 255, 0.52), 0 10px 24px rgba(0, 0, 0, 0.35)";
-                          e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.10)";
-                          e.currentTarget.style.boxShadow = "inset 0 1px 0.5px rgba(255, 255, 255, 0.18)";
-                          e.currentTarget.style.transform = "none";
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "8px",
                         }}
                       >
-                        <div
+                        <span
                           style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: "8px",
+                            color: "#FFFFFF",
+                            fontSize: "0.88rem",
+                            fontWeight: 500,
                           }}
                         >
-                          <span
-                            style={{
-                              color: "#FFFFFF",
-                              fontSize: "0.88rem",
-                              fontWeight: 600,
-                            }}
-                          >
-                            {sub.title}
-                          </span>
-                          {sub.badge && (
-                            <span
-                              style={{
-                                fontSize: "0.64rem",
-                                fontWeight: 700,
-                                padding: "3px 7px",
-                                borderRadius: "6px",
-                                background: badgeStyles.bg,
-                                border: `1px solid ${badgeStyles.border}`,
-                                color: badgeStyles.text,
-                                whiteSpace: "nowrap",
-                                boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
-                              }}
-                            >
-                              {sub.badge}
-                            </span>
-                          )}
-                          {sub.isExternal && (
-                            <ExternalLink size={12} style={{ color: "#CBD5E1" }} />
-                          )}
-                        </div>
-
-                        {sub.subtitle && (
-                          <span
-                            style={{
-                              color: "#94A3B8",
-                              fontSize: "0.74rem",
-                              lineHeight: 1.3,
-                            }}
-                          >
-                            {sub.subtitle}
-                          </span>
+                          {sub.title}
+                        </span>
+                        {sub.isExternal && (
+                          <ExternalLink size={12} style={{ color: "#64748B" }} />
                         )}
-                      </Link>
-                    );
-                  })}
+                      </div>
+
+                      {sub.subtitle && (
+                        <span
+                          style={{
+                            color: "#94A3B8",
+                            fontSize: "0.76rem",
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {sub.subtitle}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Bottom Action Bar */}
+          {/* Clean Bottom Action Bar (No Colored Button Box) */}
           {currentFlyoutItem.bottomAction && (
             <div
               style={{
                 marginTop: "20px",
                 paddingTop: "14px",
-                borderTop: "1px solid rgba(255, 255, 255, 0.10)",
+                borderTop: "1px solid rgba(255, 255, 255, 0.08)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -952,40 +827,26 @@ export default function Header() {
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "8px",
-                  padding: "8px 16px",
-                  borderRadius: "var(--radius-full)",
-                  background:
-                    "linear-gradient(135deg, rgba(72, 156, 216, 0.22) 0%, rgba(72, 156, 216, 0.08) 100%)",
-                  border: "1px solid rgba(72, 156, 216, 0.35)",
-                  color: "#FFFFFF",
-                  fontSize: "0.86rem",
-                  fontWeight: 600,
+                  gap: "6px",
+                  color: "#CBD5E1",
+                  fontSize: "0.84rem",
+                  fontWeight: 500,
                   textDecoration: "none",
-                  boxShadow: "inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 4px 14px rgba(0, 0, 0, 0.2)",
-                  transition: "all 0.22s cubic-bezier(0.16, 1, 0.3, 1)",
+                  transition: "color 0.2s ease, gap 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background =
-                    "linear-gradient(135deg, rgba(72, 156, 216, 0.36) 0%, rgba(72, 156, 216, 0.16) 100%)";
-                  e.currentTarget.style.borderColor = "rgba(72, 156, 216, 0.6)";
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                  e.currentTarget.style.boxShadow =
-                    "inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 6px 18px rgba(72, 156, 216, 0.3)";
+                  e.currentTarget.style.color = "#FFFFFF";
+                  e.currentTarget.style.gap = "8px";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background =
-                    "linear-gradient(135deg, rgba(72, 156, 216, 0.22) 0%, rgba(72, 156, 216, 0.08) 100%)";
-                  e.currentTarget.style.borderColor = "rgba(72, 156, 216, 0.35)";
-                  e.currentTarget.style.transform = "none";
-                  e.currentTarget.style.boxShadow =
-                    "inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 4px 14px rgba(0, 0, 0, 0.2)";
+                  e.currentTarget.style.color = "#CBD5E1";
+                  e.currentTarget.style.gap = "6px";
                 }}
               >
                 <span>{currentFlyoutItem.bottomAction.label}</span>
               </Link>
 
-              <span style={{ fontSize: "0.74rem", color: "#94A3B8", letterSpacing: "0.04em" }}>
+              <span style={{ fontSize: "0.72rem", color: "#64748B" }}>
                 Eintracht Dachau-Karlsfeld
               </span>
             </div>
@@ -1001,18 +862,18 @@ export default function Header() {
           style={{
             position: "relative",
             marginTop: "10px",
-            padding: "20px 16px",
-            borderRadius: "26px",
+            padding: "18px 14px",
+            borderRadius: "24px",
             background:
               "linear-gradient(165deg, rgba(255, 255, 255, 0.20) 0%, rgba(24, 32, 52, 0.62) 28%, rgba(10, 14, 24, 0.78) 100%)",
             backdropFilter: "blur(54px) saturate(230%) contrast(110%)",
             WebkitBackdropFilter: "blur(54px) saturate(230%) contrast(110%)",
-            border: "1px solid rgba(255, 255, 255, 0.26)",
+            border: "1px solid rgba(255, 255, 255, 0.24)",
             boxShadow:
-              "inset 0 2px 2px rgba(255, 255, 255, 0.48), inset 0 -2px 3px rgba(0, 0, 0, 0.4), 0 32px 75px rgba(0, 0, 0, 0.85), 0 0 35px rgba(225, 29, 72, 0.16)",
+              "inset 0 1.5px 1.5px rgba(255, 255, 255, 0.4), 0 32px 75px rgba(0, 0, 0, 0.85)",
             display: "flex",
             flexDirection: "column",
-            gap: "8px",
+            gap: "4px",
             maxHeight: "calc(100dvh - 90px)",
             overflowY: "auto",
             overscrollBehavior: "contain",
@@ -1024,11 +885,11 @@ export default function Header() {
             style={{
               position: "absolute",
               top: 0,
-              left: "12%",
-              right: "12%",
-              height: "1.5px",
+              left: "15%",
+              right: "15%",
+              height: "1px",
               background:
-                "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%)",
+                "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.85) 50%, transparent 100%)",
               pointerEvents: "none",
             }}
           />
@@ -1044,18 +905,10 @@ export default function Header() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  borderRadius: "16px",
-                  background: isExpanded
-                    ? "linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.03) 100%)"
-                    : "rgba(255, 255, 255, 0.04)",
-                  border: isExpanded
-                    ? "1px solid rgba(255, 255, 255, 0.18)"
-                    : "1px solid rgba(255, 255, 255, 0.08)",
-                  boxShadow: isExpanded
-                    ? "inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 16px rgba(0, 0, 0, 0.25)"
-                    : "inset 0 1px 0 rgba(255, 255, 255, 0.12)",
+                  borderRadius: "12px",
+                  background: isExpanded ? "rgba(255, 255, 255, 0.04)" : "transparent",
                   overflow: "hidden",
-                  transition: "all 0.25s ease",
+                  transition: "background 0.2s ease",
                 }}
               >
                 {/* Main Link / Accordion Header */}
@@ -1064,7 +917,7 @@ export default function Header() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    padding: "11px 14px",
+                    padding: "10px 12px",
                   }}
                 >
                   <Link
@@ -1077,7 +930,7 @@ export default function Header() {
                     style={{
                       color: isActive ? "#FFFFFF" : "#E2E8F0",
                       textDecoration: "none",
-                      fontSize: "1rem",
+                      fontSize: "0.96rem",
                       fontWeight: isActive ? 600 : 500,
                       display: "flex",
                       alignItems: "center",
@@ -1089,11 +942,11 @@ export default function Header() {
                     {isActive && (
                       <span
                         style={{
-                          width: "7px",
-                          height: "7px",
+                          width: "6px",
+                          height: "6px",
                           borderRadius: "50%",
                           background: "var(--color-azure-bright)",
-                          boxShadow: "0 0 10px var(--color-azure-bright)",
+                          boxShadow: "0 0 8px var(--color-azure-bright)",
                         }}
                       />
                     )}
@@ -1103,26 +956,23 @@ export default function Header() {
                     <button
                       onClick={() => toggleMobileAccordion(item.id)}
                       style={{
-                        background: isExpanded
-                          ? "rgba(255, 255, 255, 0.16)"
-                          : "rgba(255, 255, 255, 0.08)",
-                        border: "1px solid rgba(255, 255, 255, 0.18)",
-                        borderRadius: "8px",
-                        padding: "6px 12px",
-                        color: "#FFFFFF",
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
+                        background: isExpanded ? "rgba(255, 255, 255, 0.12)" : "transparent",
+                        border: "1px solid rgba(255, 255, 255, 0.10)",
+                        borderRadius: "6px",
+                        padding: "5px 10px",
+                        color: "#CBD5E1",
+                        fontSize: "0.74rem",
+                        fontWeight: 500,
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        gap: "5px",
+                        gap: "4px",
                         touchAction: "manipulation",
-                        boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.25)",
                       }}
                     >
                       <span>{isExpanded ? "Schließen" : "Unterseiten"}</span>
                       <ChevronDown
-                        size={13}
+                        size={12}
                         style={{
                           transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
                           transition: "transform 0.25s ease",
@@ -1132,83 +982,60 @@ export default function Header() {
                   )}
                 </div>
 
-                {/* Expanded Accordion Content */}
+                {/* Expanded Accordion Content (Clean text list) */}
                 {hasCategories && isExpanded && item.categories && (
                   <div
                     style={{
-                      padding: "10px 14px 16px 14px",
+                      padding: "4px 12px 14px 12px",
                       display: "flex",
                       flexDirection: "column",
-                      gap: "12px",
-                      borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-                      background: "rgba(0, 0, 0, 0.15)",
+                      gap: "10px",
+                      borderTop: "1px solid rgba(255, 255, 255, 0.05)",
                     }}
                   >
                     {item.categories.map((cat, catIdx) => (
-                      <div key={catIdx} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <div key={catIdx} style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
                         <div
                           style={{
-                            fontSize: "0.70rem",
-                            fontWeight: 700,
+                            fontSize: "0.68rem",
+                            fontWeight: 600,
                             textTransform: "uppercase",
                             letterSpacing: "0.08em",
-                            color:
-                              cat.name.includes("Herren")
-                                ? "var(--color-crimson-bright)"
-                                : cat.name.includes("Damen")
-                                ? "var(--color-azure-bright)"
-                                : cat.name.includes("Kinder")
-                                ? "#FBBF24"
-                                : "#CBD5E1",
+                            color: "#94A3B8",
+                            paddingTop: "6px",
+                            paddingBottom: "2px",
                           }}
                         >
                           {cat.name}
                         </div>
 
-                        <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                          {cat.items.map((sub, subIdx) => {
-                            const badge = getBadgeStyles(sub.badgeType);
-                            return (
-                              <Link
-                                key={subIdx}
-                                href={sub.href}
-                                target={sub.isExternal ? "_blank" : undefined}
-                                rel={sub.isExternal ? "noopener noreferrer" : undefined}
-                                onClick={() => setMobileMenuOpen(false)}
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "space-between",
-                                  padding: "9px 12px",
-                                  borderRadius: "10px",
-                                  background: "rgba(255, 255, 255, 0.05)",
-                                  border: "1px solid rgba(255, 255, 255, 0.09)",
-                                  boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.15)",
-                                  textDecoration: "none",
-                                  color: "#F8FAFC",
-                                  fontSize: "0.88rem",
-                                  fontWeight: 500,
-                                }}
-                              >
-                                <span>{sub.title}</span>
-                                {sub.badge && (
-                                  <span
-                                    style={{
-                                      fontSize: "0.64rem",
-                                      fontWeight: 700,
-                                      padding: "3px 6px",
-                                      borderRadius: "5px",
-                                      background: badge.bg,
-                                      border: `1px solid ${badge.border}`,
-                                      color: badge.text,
-                                    }}
-                                  >
-                                    {sub.badge}
-                                  </span>
-                                )}
-                              </Link>
-                            );
-                          })}
+                        <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+                          {cat.items.map((sub, subIdx) => (
+                            <Link
+                              key={subIdx}
+                              href={sub.href}
+                              target={sub.isExternal ? "_blank" : undefined}
+                              rel={sub.isExternal ? "noopener noreferrer" : undefined}
+                              onClick={() => setMobileMenuOpen(false)}
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                padding: "7px 8px",
+                                borderRadius: "8px",
+                                textDecoration: "none",
+                                color: "#F8FAFC",
+                                fontSize: "0.86rem",
+                                fontWeight: 500,
+                              }}
+                            >
+                              <span>{sub.title}</span>
+                              {sub.subtitle && (
+                                <span style={{ fontSize: "0.72rem", color: "#94A3B8" }}>
+                                  {sub.subtitle}
+                                </span>
+                              )}
+                            </Link>
+                          ))}
                         </div>
                       </div>
                     ))}
@@ -1218,9 +1045,9 @@ export default function Header() {
                         href={item.bottomAction.href}
                         onClick={() => setMobileMenuOpen(false)}
                         style={{
-                          fontSize: "0.82rem",
+                          fontSize: "0.80rem",
                           color: "var(--color-azure-bright)",
-                          fontWeight: 600,
+                          fontWeight: 500,
                           textDecoration: "none",
                           paddingTop: "6px",
                         }}
