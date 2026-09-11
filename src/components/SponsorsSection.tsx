@@ -59,9 +59,10 @@ const initialSponsors: Sponsor[] = [
   {
     id: "sp-7",
     name: "Bäckerei Lang",
-    tier: "partner",
+    tier: "gold",
     url: "https://www.baeckerei-lang.de",
-    logo: "/sponsors/baeckerei-lang.svg",
+    logo: "/uploads/sponsors/b-ckerei-lang-cropped-1789139269756.png",
+    fit: "contain",
   },
   {
     id: "sp-8",
@@ -69,6 +70,7 @@ const initialSponsors: Sponsor[] = [
     tier: "partner",
     url: "https://www.it-service-mueller.de",
     logo: "/sponsors/it-service-mueller.svg",
+    fit: "contain",
   },
   {
     id: "sp-1788952714718",
@@ -76,6 +78,15 @@ const initialSponsors: Sponsor[] = [
     tier: "gold",
     url: "https://dachau-sports.de",
     logo: "/sponsors/dachau-sports-nutrition.svg",
+    fit: "contain",
+  },
+  {
+    id: "sp-1789053571188",
+    name: "Tommy Tronic",
+    tier: "none",
+    url: "",
+    logo: "/uploads/sponsors/tommy-tronic-cropped-1789056316291.png",
+    fit: "contain",
   },
 ];
 
@@ -84,35 +95,57 @@ export default function SponsorsSection() {
   const { ref: sectionRef, isRevealed } = useScrollReveal({ threshold: 0.1 });
 
   useEffect(() => {
-    // 1. Instant client-side cache load
-    try {
-      const cached = localStorage.getItem("edk_sponsors_cache");
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setSponsorsList(parsed);
+    const loadFromCache = () => {
+      try {
+        const cached = localStorage.getItem("edk_sponsors_cache");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSponsorsList(parsed);
+          }
         }
-      }
-    } catch {}
+      } catch {}
+    };
 
-    // 2. Fetch fresh from server
-    fetch("/api/sponsors", {
-      cache: "no-store",
-      headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw new Error("Failed to fetch sponsors");
+    const fetchFresh = () => {
+      fetch("/api/sponsors", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
       })
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setSponsorsList(data);
-          try {
-            localStorage.setItem("edk_sponsors_cache", JSON.stringify(data));
-          } catch {}
-        }
-      })
-      .catch((err) => console.log("Using initial sponsors fallback:", err));
+        .then((res) => {
+          if (res.ok) return res.json();
+          throw new Error("Failed to fetch sponsors");
+        })
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setSponsorsList(data);
+            try {
+              localStorage.setItem("edk_sponsors_cache", JSON.stringify(data));
+            } catch {}
+          }
+        })
+        .catch((err) => console.log("Using initial sponsors fallback:", err));
+    };
+
+    // 1. Initial load
+    loadFromCache();
+    fetchFresh();
+
+    // 2. Real-time sync: when updated from admin in same tab, other tabs or on window focus
+    const handleUpdate = () => {
+      loadFromCache();
+      fetchFresh();
+    };
+
+    window.addEventListener("storage", handleUpdate);
+    window.addEventListener("edk_sponsors_updated", handleUpdate);
+    window.addEventListener("focus", handleUpdate);
+
+    return () => {
+      window.removeEventListener("storage", handleUpdate);
+      window.removeEventListener("edk_sponsors_updated", handleUpdate);
+      window.removeEventListener("focus", handleUpdate);
+    };
   }, []);
 
   // Duplicate for seamless infinite marquee loop

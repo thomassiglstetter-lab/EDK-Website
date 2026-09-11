@@ -154,6 +154,13 @@ export function formatImageLabel(url?: string | null): string {
   return url.replace(/^\/?(sponsors\/|teams\/|news\/|uploads\/sponsors\/|uploads\/teams\/|uploads\/news\/|uploads\/)/, "");
 }
 
+export function updateSponsorsCacheAndNotify(next: any[]) {
+  try {
+    localStorage.setItem("edk_sponsors_cache", JSON.stringify(next));
+    window.dispatchEvent(new Event("edk_sponsors_updated"));
+  } catch {}
+}
+
 const DEFAULT_PIN = "eintracht2026";
 
 export default function AdminPage() {
@@ -443,7 +450,7 @@ export default function AdminPage() {
       .then((data) => {
         if (Array.isArray(data)) {
           setSponsors(data);
-          try { localStorage.setItem("edk_sponsors_cache", JSON.stringify(data)); } catch {}
+          updateSponsorsCacheAndNotify(data);
         }
         setSponsorsLoading(false);
       })
@@ -1044,7 +1051,7 @@ export default function AdminPage() {
           const updated = await res.json();
           setSponsors((prev) => {
             const next = prev.map((s) => (s.id === updated.id ? updated : s));
-            try { localStorage.setItem("edk_sponsors_cache", JSON.stringify(next)); } catch {}
+            updateSponsorsCacheAndNotify(next);
             return next;
           });
           setEditingSponsor(updated);
@@ -1154,7 +1161,7 @@ export default function AdminPage() {
         const updated = await res.json();
         setSponsors((prev) => {
           const next = prev.map((s) => (s.id === updated.id ? updated : s));
-          try { localStorage.setItem("edk_sponsors_cache", JSON.stringify(next)); } catch {}
+          updateSponsorsCacheAndNotify(next);
           return next;
         });
         setEditingSponsor(updated);
@@ -1170,7 +1177,7 @@ export default function AdminPage() {
         const created = await res.json();
         setSponsors((prev) => {
           const next = [...prev, created];
-          try { localStorage.setItem("edk_sponsors_cache", JSON.stringify(next)); } catch {}
+          updateSponsorsCacheAndNotify(next);
           return next;
         });
         showToast("Neuer Partner erfolgreich angelegt!");
@@ -1215,7 +1222,7 @@ export default function AdminPage() {
       if (!res.ok) throw new Error("Löschen fehlgeschlagen.");
       setSponsors((prev) => {
         const next = prev.filter((s) => s.id !== sponsorToDelete.id);
-        try { localStorage.setItem("edk_sponsors_cache", JSON.stringify(next)); } catch {}
+        updateSponsorsCacheAndNotify(next);
         return next;
       });
       showToast("Partner entfernt.", "success");

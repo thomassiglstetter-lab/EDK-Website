@@ -1,8 +1,56 @@
 [
   {
+    "id": "sp-1",
+    "name": "Stadtwerke Dachau",
+    "tier": "gold",
+    "url": "https://www.stadtwerke-dachau.de",
+    "logo": "/sponsors/stadtwerke-dachau.svg",
+    "fit": "contain"
+  },
+  {
+    "id": "sp-2",
+    "name": "Sparkasse Dachau",
+    "tier": "gold",
+    "url": "https://www.sparkasse-dachau.de",
+    "logo": "/sponsors/sparkasse-dachau.svg",
+    "fit": "contain"
+  },
+  {
+    "id": "sp-3",
+    "name": "Autohaus Demmler",
+    "tier": "silver",
+    "url": "https://www.autohaus-demmler.de",
+    "logo": "/sponsors/autohaus-demmler.svg",
+    "fit": "contain"
+  },
+  {
+    "id": "sp-4",
+    "name": "Dachauer Sportzentren",
+    "tier": "silver",
+    "url": "https://www.dachau.de",
+    "logo": "/sponsors/sportzentren-dachau.svg",
+    "fit": "contain"
+  },
+  {
+    "id": "sp-5",
+    "name": "Physio Karlsfeld",
+    "tier": "partner",
+    "url": "https://www.physiotherapie-karlsfeld.de",
+    "logo": "/sponsors/physio-karlsfeld.svg",
+    "fit": "contain"
+  },
+  {
+    "id": "sp-6",
+    "name": "Metzgerei Huber",
+    "tier": "partner",
+    "url": "https://www.metzgerei-huber.de",
+    "logo": "/sponsors/metzgerei-huber.svg",
+    "fit": "contain"
+  },
+  {
     "id": "sp-7",
     "name": "Bäckerei Lang",
-    "tier": "partner",
+    "tier": "gold",
     "url": "https://www.baeckerei-lang.de",
     "logo": "/uploads/sponsors/b-ckerei-lang-cropped-1789139269756.png",
     "fit": "contain"
@@ -21,14 +69,6 @@
     "tier": "gold",
     "url": "https://dachau-sports.de",
     "logo": "/sponsors/dachau-sports-nutrition.svg",
-    "fit": "contain"
-  },
-  {
-    "id": "sp-1788953583583",
-    "name": "Test Partner ohne Stufe",
-    "tier": "none",
-    "url": "",
-    "logo": "/sponsors/stadtwerke-dachau.svg",
     "fit": "contain"
   },
   {
