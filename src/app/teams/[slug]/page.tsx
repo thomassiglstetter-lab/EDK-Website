@@ -758,7 +758,9 @@ export default async function TeamDetailPage({
                 </thead>
                 <tbody>
                   {tableData.rows.map((row: any, idx: number) => {
-                    const isOwn = row.isOwnClub || row.team.includes(team.name) || row.team.includes("Eintracht");
+                    const isOwn =
+                      !row.team.toLowerCase().includes("asv") &&
+                      (row.isOwnClub || row.team.includes(team.name) || row.team.includes("Eintracht"));
                     return (
                       <tr
                         key={idx}

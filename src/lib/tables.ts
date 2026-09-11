@@ -117,10 +117,10 @@ export async function syncLeagueTable(slug: string, groupUrl: string): Promise<L
 
       if (teamName) {
         const lower = teamName.toLowerCase();
+        // ASV Dachau is a completely separate rival club and must NEVER be flagged as own club!
         const isOwnClub =
-          lower.includes("dachau") ||
-          lower.includes("karlsfeld") ||
-          lower.includes("eintracht");
+          !lower.includes("asv") &&
+          (lower.includes("eintracht") || lower.includes("dachau-karlsfeld"));
 
         rows.push({
           rank: rank || rows.length + 1,

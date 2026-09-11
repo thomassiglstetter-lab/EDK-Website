@@ -159,10 +159,6 @@ const navItems: NavItem[] = [
         ],
       },
     ],
-    bottomAction: {
-      label: "Alle 16 Mannschaften & Trainingszeiten ansehen →",
-      href: "/#teams",
-    },
   },
   {
     id: "spielplan",

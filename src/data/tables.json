@@ -1,7 +1,7 @@
 {
   "herren-1": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=AB+2026%2F27&group=495898",
-    "lastUpdated": "2026-09-11T13:20:55.099Z",
+    "lastUpdated": "2026-09-11T14:28:26.508Z",
     "rows": [
       {
         "rank": 1,
@@ -49,7 +49,7 @@
         "goals": "0:0",
         "diff": "0",
         "points": "0:0",
-        "isOwnClub": true
+        "isOwnClub": false
       },
       {
         "rank": 5,
@@ -193,7 +193,7 @@
   },
   "damen-1": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=AB+2026%2F27&group=496310",
-    "lastUpdated": "2026-09-11T13:20:55.186Z",
+    "lastUpdated": "2026-09-11T14:28:26.682Z",
     "rows": [
       {
         "rank": 1,
@@ -319,7 +319,7 @@
   },
   "damen-2": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=AB+2026%2F27&group=495861",
-    "lastUpdated": "2026-09-11T13:20:55.189Z",
+    "lastUpdated": "2026-09-11T14:28:26.669Z",
     "rows": [
       {
         "rank": 1,
@@ -421,7 +421,7 @@
   },
   "m-b1": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=BHV+2026%2F27&group=513295",
-    "lastUpdated": "2026-09-11T13:20:55.169Z",
+    "lastUpdated": "2026-09-11T14:28:26.662Z",
     "rows": [
       {
         "rank": 1,
@@ -475,7 +475,7 @@
   },
   "w-b1": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=BHV+2026%2F27&group=513326",
-    "lastUpdated": "2026-09-11T13:20:55.172Z",
+    "lastUpdated": "2026-09-11T14:28:26.661Z",
     "rows": [
       {
         "rank": 1,
@@ -559,7 +559,7 @@
         "goals": "0:0",
         "diff": "0",
         "points": "0:0",
-        "isOwnClub": true
+        "isOwnClub": false
       },
       {
         "rank": 8,
@@ -577,7 +577,7 @@
   },
   "m-c1": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=BHV+2026%2F27&group=513325",
-    "lastUpdated": "2026-09-11T13:20:55.169Z",
+    "lastUpdated": "2026-09-11T14:28:26.664Z",
     "rows": [
       {
         "rank": 1,
@@ -667,7 +667,7 @@
   },
   "w-c1": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=BHV+2026%2F27&group=513380",
-    "lastUpdated": "2026-09-11T13:20:55.174Z",
+    "lastUpdated": "2026-09-11T14:28:26.646Z",
     "rows": [
       {
         "rank": 1,

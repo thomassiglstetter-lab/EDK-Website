@@ -157,8 +157,8 @@ export async function syncNuLigaData(): Promise<NuLigaData> {
             }
           }
 
-          const isHome = home.includes("Eintracht") || home.includes("Dachau-Karlsfeld");
-          const isGuest = guest.includes("Eintracht") || guest.includes("Dachau-Karlsfeld");
+          const isHome = !home.includes("ASV") && (home.includes("Eintracht") || home.includes("Dachau-Karlsfeld"));
+          const isGuest = !guest.includes("ASV") && (guest.includes("Eintracht") || guest.includes("Dachau-Karlsfeld"));
 
           let outcome: "win" | "loss" | "draw" | null = null;
           if (result && (isHome || isGuest)) {

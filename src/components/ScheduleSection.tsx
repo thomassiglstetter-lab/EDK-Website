@@ -69,6 +69,10 @@ function parseDateParts(dateStr: string, timeStr: string = "12:00"): Date {
   return new Date();
 }
 
+// ASV Dachau is a completely separate rival club and must NEVER be highlighted!
+const isOurClub = (name: string) =>
+  !name.includes("ASV") && (name.includes("Eintracht") || name.includes("Dachau-Karlsfeld"));
+
 // Prepare initial state from bundled matches.json
 const rawMatches = (initialMatchesJson.matches || []) as NuLigaMatch[];
 const initialUpcoming = rawMatches.filter((m) => m.result === null);
@@ -355,7 +359,7 @@ export function ScheduleSection() {
                 </thead>
                 <tbody>
                   {weekendMatches.map((m, idx) => {
-                    const isEintrachtHome = m.home.includes("Eintracht");
+                    const isEintrachtHome = isOurClub(m.home);
                     const teamSlug = CATEGORY_TO_SLUG[m.category];
                     const isLast = idx === weekendMatches.length - 1;
 
@@ -430,14 +434,14 @@ export function ScheduleSection() {
                             {/* Home */}
                             <span
                               style={{
-                                fontWeight: m.home.includes("Eintracht") ? 800 : 500,
-                                color: m.home.includes("Eintracht") ? "#FFFFFF" : "#CBD5E1",
+                                fontWeight: isOurClub(m.home) ? 800 : 500,
+                                color: isOurClub(m.home) ? "#FFFFFF" : "#CBD5E1",
                                 display: "inline-flex",
                                 alignItems: "center",
                                 gap: "6px",
                               }}
                             >
-                              {m.home.includes("Eintracht") && (
+                              {isOurClub(m.home) && (
                                 <span
                                   style={{
                                     width: "6px",
@@ -459,14 +463,14 @@ export function ScheduleSection() {
                             {/* Guest */}
                             <span
                               style={{
-                                fontWeight: m.guest.includes("Eintracht") ? 800 : 500,
-                                color: m.guest.includes("Eintracht") ? "#FFFFFF" : "#CBD5E1",
+                                fontWeight: isOurClub(m.guest) ? 800 : 500,
+                                color: isOurClub(m.guest) ? "#FFFFFF" : "#CBD5E1",
                                 display: "inline-flex",
                                 alignItems: "center",
                                 gap: "6px",
                               }}
                             >
-                              {m.guest.includes("Eintracht") && (
+                              {isOurClub(m.guest) && (
                                 <span
                                   style={{
                                     width: "6px",
@@ -556,7 +560,7 @@ export function ScheduleSection() {
           {/* Mobile Match Cards List (Native App-Style) */}
           <div className="mobile-schedule-view">
             {weekendMatches.map((m) => {
-              const isEintrachtHome = m.home.includes("Eintracht");
+              const isEintrachtHome = isOurClub(m.home);
               const teamSlug = CATEGORY_TO_SLUG[m.category];
 
               return (
@@ -682,15 +686,15 @@ export function ScheduleSection() {
                     >
                       <span
                         style={{
-                          fontWeight: m.home.includes("Eintracht") ? 800 : 500,
-                          color: m.home.includes("Eintracht") ? "#FFFFFF" : "#CBD5E1",
+                          fontWeight: isOurClub(m.home) ? 800 : 500,
+                          color: isOurClub(m.home) ? "#FFFFFF" : "#CBD5E1",
                           fontSize: "0.95rem",
                           display: "flex",
                           alignItems: "center",
                           gap: "6px",
                         }}
                       >
-                        {m.home.includes("Eintracht") && (
+                        {isOurClub(m.home) && (
                           <span
                             style={{
                               width: "6px",
@@ -721,15 +725,15 @@ export function ScheduleSection() {
                     >
                       <span
                         style={{
-                          fontWeight: m.guest.includes("Eintracht") ? 800 : 500,
-                          color: m.guest.includes("Eintracht") ? "#FFFFFF" : "#CBD5E1",
+                          fontWeight: isOurClub(m.guest) ? 800 : 500,
+                          color: isOurClub(m.guest) ? "#FFFFFF" : "#CBD5E1",
                           fontSize: "0.95rem",
                           display: "flex",
                           alignItems: "center",
                           gap: "6px",
                         }}
                       >
-                        {m.guest.includes("Eintracht") && (
+                        {isOurClub(m.guest) && (
                           <span
                             style={{
                               width: "6px",
