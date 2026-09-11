@@ -361,17 +361,32 @@ export default function Header() {
           padding: "10px 20px",
           borderRadius: "var(--radius-full)",
           background: scrolled
-            ? "rgba(10, 14, 20, 0.88)"
-            : "rgba(13, 17, 24, 0.72)",
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
+            ? "linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(20, 26, 42, 0.48) 45%, rgba(10, 14, 24, 0.62) 100%)"
+            : "linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(24, 32, 50, 0.36) 45%, rgba(12, 16, 28, 0.48) 100%)",
+          backdropFilter: "blur(48px) saturate(220%) contrast(108%)",
+          WebkitBackdropFilter: "blur(48px) saturate(220%) contrast(108%)",
+          border: "1px solid rgba(255, 255, 255, 0.26)",
           boxShadow: scrolled
-            ? "0 16px 36px rgba(0, 0, 0, 0.6)"
-            : "0 8px 24px rgba(0, 0, 0, 0.3)",
+            ? "inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.45), inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.4), 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 30px rgba(225, 29, 72, 0.18)"
+            : "inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.52), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.3), 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 26px rgba(72, 156, 216, 0.16)",
           zIndex: 52,
         }}
       >
+        {/* Top Edge Specular Rim Sheen */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "15%",
+            right: "15%",
+            height: "1px",
+            background:
+              "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.85) 50%, transparent 100%)",
+            pointerEvents: "none",
+            borderRadius: "var(--radius-full)",
+          }}
+        />
+
         {/* Club Logo & Brand */}
         <Link
           href="/#uebersicht"
@@ -389,8 +404,10 @@ export default function Header() {
               width: "44px",
               height: "44px",
               borderRadius: "50%",
-              background: "rgba(255, 255, 255, 0.04)",
-              border: "1px solid rgba(255, 255, 255, 0.12)",
+              background:
+                "linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.04) 100%)",
+              border: "1px solid rgba(255, 255, 255, 0.22)",
+              boxShadow: "inset 0 1px 1px rgba(255, 255, 255, 0.35)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -459,25 +476,36 @@ export default function Header() {
                   href={item.href}
                   onClick={(e) => {
                     if (hasCategories) {
-                      // On click, toggle flyout or navigate
                       if (!isOpen) {
                         setActiveFlyout(item.id);
                       }
                     }
                   }}
                   style={{
-                    color: isActive || isOpen ? "#FFFFFF" : "#94A3B8",
+                    color: isActive || isOpen ? "#FFFFFF" : "#CBD5E1",
                     textDecoration: "none",
                     fontSize: "0.82rem",
                     fontWeight: isActive || isOpen ? 600 : 500,
-                    padding: "7px 13px",
+                    padding: "7px 14px",
                     borderRadius: "var(--radius-full)",
                     background: isOpen
-                      ? "rgba(255, 255, 255, 0.12)"
+                      ? "linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%)"
                       : isActive
-                      ? "rgba(255, 255, 255, 0.08)"
+                      ? "linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 100%)"
                       : "transparent",
-                    transition: "all 0.2s ease",
+                    border: isOpen
+                      ? "1px solid rgba(255, 255, 255, 0.32)"
+                      : isActive
+                      ? "1px solid rgba(255, 255, 255, 0.20)"
+                      : "1px solid transparent",
+                    boxShadow: isOpen
+                      ? "inset 0 1px 1px rgba(255, 255, 255, 0.45), 0 4px 14px rgba(0, 0, 0, 0.25)"
+                      : isActive
+                      ? "inset 0 1px 1px rgba(255, 255, 255, 0.3)"
+                      : "none",
+                    backdropFilter: isOpen || isActive ? "blur(16px)" : "none",
+                    WebkitBackdropFilter: isOpen || isActive ? "blur(16px)" : "none",
+                    transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
                     whiteSpace: "nowrap",
                     display: "inline-flex",
                     alignItems: "center",
@@ -487,13 +515,19 @@ export default function Header() {
                   onMouseEnter={(e) => {
                     if (!isActive && !isOpen) {
                       e.currentTarget.style.color = "#FFFFFF";
-                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                      e.currentTarget.style.background =
+                        "linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 100%)";
+                      e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.22)";
+                      e.currentTarget.style.boxShadow =
+                        "inset 0 1px 1px rgba(255, 255, 255, 0.35)";
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive && !isOpen) {
-                      e.currentTarget.style.color = "#94A3B8";
+                      e.currentTarget.style.color = "#CBD5E1";
                       e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.borderColor = "transparent";
+                      e.currentTarget.style.boxShadow = "none";
                     }
                   }}
                 >
@@ -504,7 +538,7 @@ export default function Header() {
                       style={{
                         transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
                         transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                        opacity: 0.75,
+                        opacity: 0.85,
                       }}
                     />
                   )}
@@ -604,25 +638,27 @@ export default function Header() {
           className="desktop-flyout-panel"
           style={{
             position: "absolute",
-            top: "calc(100% + 8px)",
+            top: "calc(100% + 10px)",
             left: "50%",
             transform: "translateX(-50%)",
             width:
               currentFlyoutItem.id === "teams"
-                ? "min(1100px, 94vw)"
+                ? "min(1120px, 94vw)"
                 : currentFlyoutItem.id === "verein"
-                ? "min(780px, 90vw)"
-                : "min(680px, 85vw)",
-            background: "rgba(9, 13, 20, 0.96)",
-            backdropFilter: "blur(32px)",
-            WebkitBackdropFilter: "blur(32px)",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-            borderRadius: "22px",
+                ? "min(800px, 90vw)"
+                : "min(700px, 85vw)",
+            background:
+              "linear-gradient(145deg, rgba(255, 255, 255, 0.20) 0%, rgba(26, 34, 52, 0.50) 25%, rgba(12, 16, 28, 0.65) 100%)",
+            backdropFilter: "blur(54px) saturate(230%) contrast(110%)",
+            WebkitBackdropFilter: "blur(54px) saturate(230%) contrast(110%)",
+            border: "1px solid rgba(255, 255, 255, 0.28)",
+            borderRadius: "28px",
             boxShadow:
-              "0 24px 64px rgba(0, 0, 0, 0.85), 0 0 32px rgba(72, 156, 216, 0.12)",
-            padding: "24px 28px",
+              "inset 0 2px 2px 0 rgba(255, 255, 255, 0.52), inset 0 -2px 3px 0 rgba(0, 0, 0, 0.4), 0 35px 85px -10px rgba(0, 0, 0, 0.8), 0 0 45px rgba(72, 156, 216, 0.18), 0 0 55px rgba(244, 63, 94, 0.16)",
+            padding: "26px 30px",
             zIndex: 51,
-            animation: "flyoutAppear 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            animation: "flyoutAppear 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            overflow: "hidden",
           }}
           onMouseEnter={() => {
             if (hoverTimeoutRef.current) {
@@ -632,6 +668,20 @@ export default function Header() {
           }}
           onMouseLeave={handleMouseLeaveNav}
         >
+          {/* Top Edge Specular Prism Highlight Sheen */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: "10%",
+              right: "10%",
+              height: "1.5px",
+              background:
+                "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%)",
+              pointerEvents: "none",
+            }}
+          />
+
           {/* Header Title inside Flyout */}
           <div
             style={{
@@ -640,23 +690,62 @@ export default function Header() {
               justifyContent: "space-between",
               paddingBottom: "16px",
               marginBottom: "18px",
-              borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.10)",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               {currentFlyoutItem.id === "teams" && (
-                <Users size={18} style={{ color: "var(--color-crimson-bright)" }} />
+                <div
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    background: "rgba(244, 63, 94, 0.18)",
+                    border: "1px solid rgba(244, 63, 94, 0.35)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Users size={16} style={{ color: "var(--color-crimson-bright)" }} />
+                </div>
               )}
               {currentFlyoutItem.id === "verein" && (
-                <Shield size={18} style={{ color: "var(--color-azure-bright)" }} />
+                <div
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    background: "rgba(72, 156, 216, 0.18)",
+                    border: "1px solid rgba(72, 156, 216, 0.35)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Shield size={16} style={{ color: "var(--color-azure-bright)" }} />
+                </div>
               )}
               {currentFlyoutItem.id === "spielplan" && (
-                <Calendar size={18} style={{ color: "var(--color-azure-bright)" }} />
+                <div
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    background: "rgba(72, 156, 216, 0.18)",
+                    border: "1px solid rgba(72, 156, 216, 0.35)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Calendar size={16} style={{ color: "var(--color-azure-bright)" }} />
+                </div>
               )}
               <span
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontSize: "1rem",
+                  fontSize: "1.05rem",
                   fontWeight: 700,
                   color: "#FFFFFF",
                   letterSpacing: "0.02em",
@@ -669,25 +758,36 @@ export default function Header() {
             <button
               onClick={() => setActiveFlyout(null)}
               style={{
-                background: "transparent",
-                border: "none",
-                color: "#94A3B8",
+                background: "rgba(255, 255, 255, 0.08)",
+                border: "1px solid rgba(255, 255, 255, 0.16)",
+                borderRadius: "var(--radius-full)",
+                color: "#E2E8F0",
                 cursor: "pointer",
-                padding: "4px",
+                padding: "5px 12px",
                 display: "flex",
                 alignItems: "center",
-                gap: "4px",
+                gap: "5px",
                 fontSize: "0.78rem",
+                fontWeight: 500,
+                transition: "all 0.2s ease",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#FFFFFF";
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.18)";
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "#E2E8F0";
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.16)";
+              }}
             >
               <span>Schließen</span>
-              <X size={14} />
+              <X size={13} />
             </button>
           </div>
 
-          {/* Columns Grid */}
+          {/* Columns Grid with iOS Glass Cards */}
           <div
             style={{
               display: "grid",
@@ -697,14 +797,30 @@ export default function Header() {
                   : currentFlyoutItem.id === "verein"
                   ? "repeat(2, 1fr)"
                   : "repeat(2, 1fr)",
-              gap: "20px",
+              gap: "16px",
             }}
           >
             {currentFlyoutItem.categories.map((cat, cIdx) => (
-              <div key={cIdx} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div
+                key={cIdx}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  background:
+                    "linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)",
+                  border: "1px solid rgba(255, 255, 255, 0.14)",
+                  borderRadius: "20px",
+                  padding: "16px 14px",
+                  backdropFilter: "blur(24px)",
+                  WebkitBackdropFilter: "blur(24px)",
+                  boxShadow:
+                    "inset 0 1px 1px 0 rgba(255, 255, 255, 0.22), 0 8px 24px rgba(0, 0, 0, 0.25)",
+                }}
+              >
                 <div
                   style={{
-                    fontSize: "0.72rem",
+                    fontSize: "0.74rem",
                     fontWeight: 700,
                     textTransform: "uppercase",
                     letterSpacing: "0.1em",
@@ -715,9 +831,9 @@ export default function Header() {
                         ? "var(--color-azure-bright)"
                         : cat.name.includes("Kinder")
                         ? "#FBBF24"
-                        : "#94A3B8",
-                    paddingBottom: "4px",
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+                        : "#CBD5E1",
+                    paddingBottom: "6px",
+                    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
                   }}
                 >
                   {cat.name}
@@ -737,21 +853,26 @@ export default function Header() {
                           display: "flex",
                           flexDirection: "column",
                           gap: "3px",
-                          padding: "8px 10px",
-                          borderRadius: "10px",
-                          background: "rgba(255, 255, 255, 0.02)",
-                          border: "1px solid rgba(255, 255, 255, 0.04)",
+                          padding: "10px 12px",
+                          borderRadius: "14px",
+                          background: "rgba(255, 255, 255, 0.05)",
+                          border: "1px solid rgba(255, 255, 255, 0.10)",
+                          boxShadow: "inset 0 1px 0.5px rgba(255, 255, 255, 0.18)",
                           textDecoration: "none",
-                          transition: "all 0.2s ease",
+                          transition: "all 0.22s cubic-bezier(0.16, 1, 0.3, 1)",
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
-                          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.16)";
-                          e.currentTarget.style.transform = "translateX(3px)";
+                          e.currentTarget.style.background =
+                            "linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%)";
+                          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.38)";
+                          e.currentTarget.style.boxShadow =
+                            "inset 0 1.5px 1.5px rgba(255, 255, 255, 0.52), 0 10px 24px rgba(0, 0, 0, 0.35)";
+                          e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.02)";
-                          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.04)";
+                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.10)";
+                          e.currentTarget.style.boxShadow = "inset 0 1px 0.5px rgba(255, 255, 255, 0.18)";
                           e.currentTarget.style.transform = "none";
                         }}
                       >
@@ -777,19 +898,20 @@ export default function Header() {
                               style={{
                                 fontSize: "0.64rem",
                                 fontWeight: 700,
-                                padding: "2px 6px",
-                                borderRadius: "4px",
+                                padding: "3px 7px",
+                                borderRadius: "6px",
                                 background: badgeStyles.bg,
                                 border: `1px solid ${badgeStyles.border}`,
                                 color: badgeStyles.text,
                                 whiteSpace: "nowrap",
+                                boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
                               }}
                             >
                               {sub.badge}
                             </span>
                           )}
                           {sub.isExternal && (
-                            <ExternalLink size={12} style={{ color: "#94A3B8" }} />
+                            <ExternalLink size={12} style={{ color: "#CBD5E1" }} />
                           )}
                         </div>
 
@@ -818,7 +940,7 @@ export default function Header() {
               style={{
                 marginTop: "20px",
                 paddingTop: "14px",
-                borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                borderTop: "1px solid rgba(255, 255, 255, 0.10)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -830,22 +952,40 @@ export default function Header() {
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "6px",
-                  color: "var(--color-azure-bright)",
-                  fontSize: "0.84rem",
+                  gap: "8px",
+                  padding: "8px 16px",
+                  borderRadius: "var(--radius-full)",
+                  background:
+                    "linear-gradient(135deg, rgba(72, 156, 216, 0.22) 0%, rgba(72, 156, 216, 0.08) 100%)",
+                  border: "1px solid rgba(72, 156, 216, 0.35)",
+                  color: "#FFFFFF",
+                  fontSize: "0.86rem",
                   fontWeight: 600,
                   textDecoration: "none",
-                  transition: "color 0.2s ease",
+                  boxShadow: "inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 4px 14px rgba(0, 0, 0, 0.2)",
+                  transition: "all 0.22s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = "var(--color-azure-bright)")
-                }
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background =
+                    "linear-gradient(135deg, rgba(72, 156, 216, 0.36) 0%, rgba(72, 156, 216, 0.16) 100%)";
+                  e.currentTarget.style.borderColor = "rgba(72, 156, 216, 0.6)";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.boxShadow =
+                    "inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 6px 18px rgba(72, 156, 216, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background =
+                    "linear-gradient(135deg, rgba(72, 156, 216, 0.22) 0%, rgba(72, 156, 216, 0.08) 100%)";
+                  e.currentTarget.style.borderColor = "rgba(72, 156, 216, 0.35)";
+                  e.currentTarget.style.transform = "none";
+                  e.currentTarget.style.boxShadow =
+                    "inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 4px 14px rgba(0, 0, 0, 0.2)";
+                }}
               >
                 <span>{currentFlyoutItem.bottomAction.label}</span>
               </Link>
 
-              <span style={{ fontSize: "0.74rem", color: "#64748B" }}>
+              <span style={{ fontSize: "0.74rem", color: "#94A3B8", letterSpacing: "0.04em" }}>
                 Eintracht Dachau-Karlsfeld
               </span>
             </div>
@@ -859,23 +999,40 @@ export default function Header() {
       {mobileMenuOpen && (
         <div
           style={{
-            marginTop: "8px",
+            position: "relative",
+            marginTop: "10px",
             padding: "20px 16px",
-            borderRadius: "var(--radius-lg)",
-            background: "rgba(10, 14, 20, 0.97)",
-            backdropFilter: "blur(28px)",
-            WebkitBackdropFilter: "blur(28px)",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-            boxShadow: "0 20px 48px rgba(0, 0, 0, 0.85)",
+            borderRadius: "26px",
+            background:
+              "linear-gradient(165deg, rgba(255, 255, 255, 0.20) 0%, rgba(24, 32, 52, 0.62) 28%, rgba(10, 14, 24, 0.78) 100%)",
+            backdropFilter: "blur(54px) saturate(230%) contrast(110%)",
+            WebkitBackdropFilter: "blur(54px) saturate(230%) contrast(110%)",
+            border: "1px solid rgba(255, 255, 255, 0.26)",
+            boxShadow:
+              "inset 0 2px 2px rgba(255, 255, 255, 0.48), inset 0 -2px 3px rgba(0, 0, 0, 0.4), 0 32px 75px rgba(0, 0, 0, 0.85), 0 0 35px rgba(225, 29, 72, 0.16)",
             display: "flex",
             flexDirection: "column",
-            gap: "6px",
+            gap: "8px",
             maxHeight: "calc(100dvh - 90px)",
             overflowY: "auto",
             overscrollBehavior: "contain",
             WebkitOverflowScrolling: "touch",
           }}
         >
+          {/* Top Edge Specular Rim Sheen */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: "12%",
+              right: "12%",
+              height: "1.5px",
+              background:
+                "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%)",
+              pointerEvents: "none",
+            }}
+          />
+
           {navItems.map((item) => {
             const isActive = activeSection === item.href;
             const hasCategories = !!item.categories && item.categories.length > 0;
@@ -887,14 +1044,18 @@ export default function Header() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  borderRadius: "var(--radius-sm)",
+                  borderRadius: "16px",
                   background: isExpanded
-                    ? "rgba(255, 255, 255, 0.04)"
-                    : "transparent",
+                    ? "linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.03) 100%)"
+                    : "rgba(255, 255, 255, 0.04)",
                   border: isExpanded
-                    ? "1px solid rgba(255, 255, 255, 0.08)"
-                    : "1px solid transparent",
+                    ? "1px solid rgba(255, 255, 255, 0.18)"
+                    : "1px solid rgba(255, 255, 255, 0.08)",
+                  boxShadow: isExpanded
+                    ? "inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 16px rgba(0, 0, 0, 0.25)"
+                    : "inset 0 1px 0 rgba(255, 255, 255, 0.12)",
                   overflow: "hidden",
+                  transition: "all 0.25s ease",
                 }}
               >
                 {/* Main Link / Accordion Header */}
@@ -903,7 +1064,7 @@ export default function Header() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    padding: "10px 14px",
+                    padding: "11px 14px",
                   }}
                 >
                   <Link
@@ -914,7 +1075,7 @@ export default function Header() {
                       }
                     }}
                     style={{
-                      color: isActive ? "#FFFFFF" : "#CBD5E1",
+                      color: isActive ? "#FFFFFF" : "#E2E8F0",
                       textDecoration: "none",
                       fontSize: "1rem",
                       fontWeight: isActive ? 600 : 500,
@@ -928,11 +1089,11 @@ export default function Header() {
                     {isActive && (
                       <span
                         style={{
-                          width: "6px",
-                          height: "6px",
+                          width: "7px",
+                          height: "7px",
                           borderRadius: "50%",
                           background: "var(--color-azure-bright)",
-                          boxShadow: "0 0 8px var(--color-azure-bright)",
+                          boxShadow: "0 0 10px var(--color-azure-bright)",
                         }}
                       />
                     )}
@@ -942,18 +1103,21 @@ export default function Header() {
                     <button
                       onClick={() => toggleMobileAccordion(item.id)}
                       style={{
-                        background: "rgba(255, 255, 255, 0.06)",
-                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                        borderRadius: "6px",
-                        padding: "6px 10px",
-                        color: "#CBD5E1",
-                        fontSize: "0.74rem",
+                        background: isExpanded
+                          ? "rgba(255, 255, 255, 0.16)"
+                          : "rgba(255, 255, 255, 0.08)",
+                        border: "1px solid rgba(255, 255, 255, 0.18)",
+                        borderRadius: "8px",
+                        padding: "6px 12px",
+                        color: "#FFFFFF",
+                        fontSize: "0.75rem",
                         fontWeight: 600,
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        gap: "4px",
+                        gap: "5px",
                         touchAction: "manipulation",
+                        boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.25)",
                       }}
                     >
                       <span>{isExpanded ? "Schließen" : "Unterseiten"}</span>
@@ -972,18 +1136,19 @@ export default function Header() {
                 {hasCategories && isExpanded && item.categories && (
                   <div
                     style={{
-                      padding: "8px 14px 14px 14px",
+                      padding: "10px 14px 16px 14px",
                       display: "flex",
                       flexDirection: "column",
                       gap: "12px",
-                      borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+                      borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                      background: "rgba(0, 0, 0, 0.15)",
                     }}
                   >
                     {item.categories.map((cat, catIdx) => (
                       <div key={catIdx} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                         <div
                           style={{
-                            fontSize: "0.68rem",
+                            fontSize: "0.70rem",
                             fontWeight: 700,
                             textTransform: "uppercase",
                             letterSpacing: "0.08em",
@@ -992,13 +1157,15 @@ export default function Header() {
                                 ? "var(--color-crimson-bright)"
                                 : cat.name.includes("Damen")
                                 ? "var(--color-azure-bright)"
-                                : "#94A3B8",
+                                : cat.name.includes("Kinder")
+                                ? "#FBBF24"
+                                : "#CBD5E1",
                           }}
                         >
                           {cat.name}
                         </div>
 
-                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                           {cat.items.map((sub, subIdx) => {
                             const badge = getBadgeStyles(sub.badgeType);
                             return (
@@ -1012,12 +1179,14 @@ export default function Header() {
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "space-between",
-                                  padding: "8px 10px",
-                                  borderRadius: "6px",
-                                  background: "rgba(255, 255, 255, 0.03)",
+                                  padding: "9px 12px",
+                                  borderRadius: "10px",
+                                  background: "rgba(255, 255, 255, 0.05)",
+                                  border: "1px solid rgba(255, 255, 255, 0.09)",
+                                  boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.15)",
                                   textDecoration: "none",
-                                  color: "#F1F5F9",
-                                  fontSize: "0.85rem",
+                                  color: "#F8FAFC",
+                                  fontSize: "0.88rem",
                                   fontWeight: 500,
                                 }}
                               >
@@ -1025,10 +1194,10 @@ export default function Header() {
                                 {sub.badge && (
                                   <span
                                     style={{
-                                      fontSize: "0.62rem",
+                                      fontSize: "0.64rem",
                                       fontWeight: 700,
-                                      padding: "2px 5px",
-                                      borderRadius: "4px",
+                                      padding: "3px 6px",
+                                      borderRadius: "5px",
                                       background: badge.bg,
                                       border: `1px solid ${badge.border}`,
                                       color: badge.text,
@@ -1049,7 +1218,7 @@ export default function Header() {
                         href={item.bottomAction.href}
                         onClick={() => setMobileMenuOpen(false)}
                         style={{
-                          fontSize: "0.8rem",
+                          fontSize: "0.82rem",
                           color: "var(--color-azure-bright)",
                           fontWeight: 600,
                           textDecoration: "none",
