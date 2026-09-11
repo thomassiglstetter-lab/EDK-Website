@@ -283,8 +283,8 @@ export default function ImageCropModal({
     setSaving(true);
 
     try {
-      // Create high-res export canvas (800px width)
-      const exportW = 800;
+      // Create high-res export canvas (480px for sponsors is crisp 2x retina, 960px for news/teams)
+      const exportW = targetFolder === "sponsors" ? 480 : 960;
       const exportH = Math.round(exportW / aspectRatio);
       const exportCanvas = document.createElement("canvas");
       exportCanvas.width = exportW;

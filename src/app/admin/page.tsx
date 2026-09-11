@@ -142,6 +142,18 @@ export interface SmtpConfig {
   fromName: string;
 }
 
+export function formatImageLabel(url?: string | null): string {
+  if (!url) return "Kein Logo";
+  if (url.startsWith("data:")) {
+    const isSvg = url.includes("image/svg");
+    const isPng = url.includes("image/png");
+    const isWebp = url.includes("image/webp");
+    const fmt = isSvg ? "SVG" : isPng ? "PNG" : isWebp ? "WEBP" : "Bild";
+    return `Individueller Zuschnitt (${fmt})`;
+  }
+  return url.replace(/^\/?(sponsors\/|teams\/|news\/|uploads\/sponsors\/|uploads\/teams\/|uploads\/news\/|uploads\/)/, "");
+}
+
 const DEFAULT_PIN = "eintracht2026";
 
 export default function AdminPage() {
@@ -3130,7 +3142,7 @@ export default function AdminPage() {
                               {sponsor.name}
                             </h4>
                             <span style={{ fontSize: "0.72rem", color: "#64748B" }}>
-                              Logo: {sponsor.logo ? sponsor.logo.replace(/^\/sponsors\//, "") : "Kein Logo"}
+                              Logo: {formatImageLabel(sponsor.logo)}
                             </span>
                           </div>
                         </div>
@@ -5420,8 +5432,9 @@ export default function AdminPage() {
                     </div>
 
                     {newsFormData.image && (
-                      <div style={{ fontSize: "0.75rem", color: "#34D399", marginTop: "4px", wordBreak: "break-all" }}>
-                        Aktiver Pfad: {newsFormData.image}
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", color: "#34D399", marginTop: "6px" }}>
+                        <Check size={14} color="#10B981" />
+                        <span>Aktives Bild: <strong style={{ color: "#38BDF8" }}>{formatImageLabel(newsFormData.image)}</strong></span>
                       </div>
                     )}
                   </div>
@@ -5862,8 +5875,9 @@ export default function AdminPage() {
                       Empfohlenes Format: 16:9 Querformat (JPG, PNG oder WEBP). Max. 15 MB.
                     </div>
                     {teamFormData.image && (
-                      <div style={{ fontSize: "0.75rem", color: "#34D399", marginTop: "4px" }}>
-                        Aktueller Pfad: {teamFormData.image}
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", color: "#34D399", marginTop: "6px" }}>
+                        <Check size={14} color="#10B981" />
+                        <span>Aktives Foto: <strong style={{ color: "#38BDF8" }}>{formatImageLabel(teamFormData.image)}</strong></span>
                       </div>
                     )}
                   </div>
@@ -6702,14 +6716,12 @@ export default function AdminPage() {
                     </div>
 
                     {sponsorFormData.logo && (
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap", fontSize: "0.75rem", color: "#34D399", marginTop: "6px", wordBreak: "break-all" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", fontSize: "0.75rem", color: "#34D399", marginTop: "6px" }}>
                         <Check size={14} color="#10B981" />
-                        <span>Aktives Logo: <strong>{sponsorFormData.logo}</strong></span>
-                        {editingSponsor && (
-                          <span style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: "4px", padding: "1px 6px", fontSize: "0.7rem", color: "#10B981" }}>
-                            ✓ Dauerhaft gespeichert
-                          </span>
-                        )}
+                        <span>Aktives Logo: <strong style={{ color: "#38BDF8" }}>{formatImageLabel(sponsorFormData.logo)}</strong></span>
+                        <span style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: "4px", padding: "1px 6px", fontSize: "0.7rem", color: "#10B981" }}>
+                          ✓ Zugewiesen
+                        </span>
                       </div>
                     )}
                   </div>
