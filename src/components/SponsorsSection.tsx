@@ -183,24 +183,24 @@ export default function SponsorsSection() {
       >
         {/* Left / Right Fade Edges */}
         <div
+          className="sponsor-fade-edge sponsor-fade-left"
           style={{
             position: "absolute",
             left: 0,
             top: 0,
             bottom: 0,
-            width: "90px",
             background: "linear-gradient(to right, rgba(7,9,13,1), transparent)",
             zIndex: 2,
             pointerEvents: "none",
           }}
         />
         <div
+          className="sponsor-fade-edge sponsor-fade-right"
           style={{
             position: "absolute",
             right: 0,
             top: 0,
             bottom: 0,
-            width: "90px",
             background: "linear-gradient(to left, rgba(7,9,13,1), transparent)",
             zIndex: 2,
             pointerEvents: "none",
@@ -271,23 +271,17 @@ export default function SponsorsSection() {
                   </div>
                 )}
 
-                {/* Sponsor Logo Container: Fills the entire placeholder */}
+                {/* Sponsor Logo Container: Always un-cropped and perfectly scaled */}
                 {sponsor.logo ? (
                   <div
                     className={`sponsor-logo-container ${
-                      sponsor.fit === "cover" || (!sponsor.fit && !sponsor.logo.toLowerCase().endsWith(".svg"))
-                        ? "is-cover"
-                        : "is-contain"
+                      sponsor.fit === "cover" ? "is-cover" : "is-contain"
                     }`}
                   >
                     <img
                       src={sponsor.logo}
                       alt={sponsor.name}
-                      className={`sponsor-logo ${
-                        sponsor.fit === "cover" || (!sponsor.fit && !sponsor.logo.toLowerCase().endsWith(".svg"))
-                          ? "sponsor-logo-cover"
-                          : "sponsor-logo-contain"
-                      }`}
+                      className="sponsor-logo"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = "/logo-dark.png";
                       }}
@@ -319,6 +313,10 @@ export default function SponsorsSection() {
       </div>
 
       <style jsx>{`
+        .sponsor-fade-edge {
+          width: 80px;
+        }
+
         .sponsor-marquee-track {
           display: flex;
           gap: 22px;
@@ -362,40 +360,56 @@ export default function SponsorsSection() {
           justify-content: center;
           width: 100%;
           height: 100%;
+          padding: 12px 20px;
           overflow: hidden;
           border-radius: calc(var(--radius-md) - 1px);
         }
 
         .sponsor-logo-container.is-cover {
-          padding: 0;
+          padding: 6px 12px;
         }
 
         .sponsor-logo-container.is-contain {
-          padding: 10px 18px;
+          padding: 12px 20px;
         }
 
         .sponsor-logo {
-          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .sponsor-logo-cover {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-        }
-
-        .sponsor-logo-contain {
-          width: 100%;
-          height: 100%;
-          max-height: 94px;
-          max-width: 220px;
+          width: auto;
+          height: auto;
+          max-width: 100%;
+          max-height: 100%;
           object-fit: contain;
-          filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+          object-position: center;
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+          filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
         }
 
         .sponsor-card:hover .sponsor-logo {
           transform: scale(1.04);
+        }
+
+        @media (max-width: 640px) {
+          .sponsor-card {
+            min-width: 200px !important;
+            height: 94px !important;
+          }
+
+          .sponsor-fade-edge {
+            width: 24px !important;
+          }
+
+          .sponsor-logo-container {
+            padding: 8px 14px !important;
+          }
+
+          .sponsor-logo-container.is-cover {
+            padding: 5px 10px !important;
+          }
+
+          .sponsor-logo {
+            max-width: 170px !important;
+            max-height: 74px !important;
+          }
         }
 
         .sponsor-corner-tier {

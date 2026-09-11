@@ -37,6 +37,6 @@
     "tier": "none",
     "url": "",
     "logo": "/uploads/sponsors/tommy-tronic-cropped-1789056316291.png",
-    "fit": "cover"
+    "fit": "contain"
   }
 ]
