@@ -118,9 +118,39 @@ export default function SponsorsSection() {
         })
         .then((data) => {
           if (Array.isArray(data) && data.length > 0) {
-            setSponsorsList(data);
+            let merged = data;
             try {
-              localStorage.setItem("edk_sponsors_cache", JSON.stringify(data));
+              const cachedRaw = localStorage.getItem("edk_sponsors_cache");
+              if (cachedRaw) {
+                const cachedArr: Sponsor[] = JSON.parse(cachedRaw);
+                if (Array.isArray(cachedArr) && cachedArr.length > 0) {
+                  const cachedMap = new Map<string, Sponsor>();
+                  cachedArr.forEach((c) => {
+                    if (c.id) cachedMap.set(c.id, c);
+                    else if (c.name) cachedMap.set(c.name.toLowerCase().trim(), c);
+                  });
+                  merged = data.map((server) => {
+                    const cached = cachedMap.get(server.id) || cachedMap.get(server.name.toLowerCase().trim());
+                    if (!cached) return server;
+                    return {
+                      ...server,
+                      tier: cached.tier || server.tier,
+                      logo: cached.logo || server.logo,
+                      fit: cached.fit || server.fit,
+                      url: cached.url !== undefined ? cached.url : server.url,
+                    };
+                  });
+                  cachedArr.forEach((c) => {
+                    const exists = merged.some((m) => m.id === c.id || m.name.toLowerCase().trim() === c.name.toLowerCase().trim());
+                    if (!exists) merged.push(c);
+                  });
+                }
+              }
+            } catch {}
+
+            setSponsorsList(merged);
+            try {
+              localStorage.setItem("edk_sponsors_cache", JSON.stringify(merged));
             } catch {}
           }
         })

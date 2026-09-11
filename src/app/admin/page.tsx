@@ -302,6 +302,10 @@ export default function AdminPage() {
     logo: "",
     fit: "cover",
   });
+  const sponsorFormDataRef = React.useRef(sponsorFormData);
+  useEffect(() => {
+    sponsorFormDataRef.current = sponsorFormData;
+  }, [sponsorFormData]);
   const [uploadingSponsorLogo, setUploadingSponsorLogo] = useState<boolean>(false);
   const [sponsorFormError, setSponsorFormError] = useState<string>("");
   const [sponsorSaving, setSponsorSaving] = useState<boolean>(false);
@@ -449,8 +453,38 @@ export default function AdminPage() {
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
-          setSponsors(data);
-          updateSponsorsCacheAndNotify(data);
+          let merged = data;
+          try {
+            const cachedRaw = localStorage.getItem("edk_sponsors_cache");
+            if (cachedRaw) {
+              const cachedArr: Sponsor[] = JSON.parse(cachedRaw);
+              if (Array.isArray(cachedArr) && cachedArr.length > 0) {
+                const cachedMap = new Map<string, Sponsor>();
+                cachedArr.forEach((c) => {
+                  if (c.id) cachedMap.set(c.id, c);
+                  else if (c.name) cachedMap.set(c.name.toLowerCase().trim(), c);
+                });
+                merged = data.map((server) => {
+                  const cached = cachedMap.get(server.id) || cachedMap.get(server.name.toLowerCase().trim());
+                  if (!cached) return server;
+                  return {
+                    ...server,
+                    tier: cached.tier || server.tier,
+                    logo: cached.logo || server.logo,
+                    fit: cached.fit || server.fit,
+                    url: cached.url !== undefined ? cached.url : server.url,
+                  };
+                });
+                cachedArr.forEach((c) => {
+                  const exists = merged.some((m) => m.id === c.id || m.name.toLowerCase().trim() === c.name.toLowerCase().trim());
+                  if (!exists) merged.push(c);
+                });
+              }
+            }
+          } catch {}
+
+          setSponsors(merged);
+          updateSponsorsCacheAndNotify(merged);
         }
         setSponsorsLoading(false);
       })
@@ -1030,15 +1064,16 @@ export default function AdminPage() {
   };
 
   const persistSponsorLogo = async (newUrl: string) => {
-    const determinedFit = sponsorFormData.fit || (newUrl.toLowerCase().endsWith(".svg") ? "contain" : "cover");
+    const currentForm = sponsorFormDataRef.current;
+    const determinedFit = currentForm.fit || (newUrl.toLowerCase().endsWith(".svg") ? "contain" : "cover");
     setSponsorFormData((prev) => ({ ...prev, logo: newUrl, fit: determinedFit }));
     if (editingSponsor) {
       try {
         const payload = {
           id: editingSponsor.id,
-          name: sponsorFormData.name || editingSponsor.name,
-          tier: sponsorFormData.tier || editingSponsor.tier,
-          url: sponsorFormData.url !== undefined ? sponsorFormData.url : (editingSponsor.url || ""),
+          name: currentForm.name || editingSponsor.name,
+          tier: currentForm.tier || editingSponsor.tier,
+          url: currentForm.url !== undefined ? currentForm.url : (editingSponsor.url || ""),
           logo: newUrl,
           fit: determinedFit,
         };
@@ -1055,7 +1090,7 @@ export default function AdminPage() {
             return next;
           });
           setEditingSponsor(updated);
-          showToast("Sponsoren-Logo erfolgreich angepasst und dauerhaft gespeichert!");
+          showToast("Logo & Partner-Stufe erfolgreich gespeichert!");
           return;
         } else {
           throw new Error("Aktualisierung fehlgeschlagen.");
