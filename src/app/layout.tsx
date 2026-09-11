@@ -1,7 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ScrollBackground from "@/components/ScrollBackground";
 import GeometricTriangles from "@/components/GeometricTriangles";
+
+export const viewport: Viewport = {
+  themeColor: "#07090D",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: "Eintracht Dachau-Karlsfeld | Handball",
@@ -9,6 +18,32 @@ export const metadata: Metadata = {
     "Offizielle 3D-Webpräsenz der Eintracht Dachau-Karlsfeld. Leistungs- und Breitensport, Jugendförderung und Spielbetrieb im Münchner Norden.",
   icons: {
     icon: "/logo-dark.png",
+    apple: "/logo-dark.png",
+  },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Eintracht Handball",
+  },
+  formatDetection: {
+    telephone: false,
+    date: false,
+    address: false,
+    email: false,
+  },
+  openGraph: {
+    title: "Eintracht Dachau-Karlsfeld | Handball",
+    description:
+      "Offizielle Webpräsenz der HSG Eintracht Dachau-Karlsfeld. Spielpläne, Tabellen, Mannschaften und News.",
+    url: "https://edk-website-nu.vercel.app",
+    siteName: "Eintracht Dachau-Karlsfeld",
+    locale: "de_DE",
+    type: "website",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
   },
 };
 

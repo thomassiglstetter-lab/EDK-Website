@@ -717,7 +717,15 @@ export default async function TeamDetailPage({
               >
                 <span>← Tabelle seitlich wischen für alle Spalten (Spiele, Tore, Punkte) →</span>
               </div>
-              <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", width: "100%" }}>
+              <div
+                className="touch-scroll-x"
+                style={{
+                  overflowX: "auto",
+                  WebkitOverflowScrolling: "touch",
+                  overscrollBehaviorX: "contain",
+                  width: "100%",
+                }}
+              >
                 <table
                   style={{
                     width: "100%",

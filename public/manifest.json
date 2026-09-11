@@ -1,0 +1,24 @@
+{
+  "name": "Eintracht Dachau-Karlsfeld Handball",
+  "short_name": "EDK Handball",
+  "description": "Offizielle Webpräsenz der Eintracht Dachau-Karlsfeld Handball",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090D",
+  "theme_color": "#07090D",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo-dark.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-dark-1024.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

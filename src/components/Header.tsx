@@ -49,7 +49,7 @@ export default function Header() {
     <header
       style={{
         position: "fixed",
-        top: "16px",
+        top: "max(12px, env(safe-area-inset-top, 12px))",
         left: "50%",
         transform: "translateX(-50%)",
         width: "calc(100% - 32px)",
@@ -279,8 +279,10 @@ export default function Header() {
             display: "flex",
             flexDirection: "column",
             gap: "4px",
-            maxHeight: "calc(100vh - 100px)",
+            maxHeight: "calc(100dvh - 90px)",
             overflowY: "auto",
+            overscrollBehavior: "contain",
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {navLinks.map((link) => {

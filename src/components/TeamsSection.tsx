@@ -129,7 +129,7 @@ export default function TeamsSection() {
 
         {/* Category Tabs */}
         <div
-          className="teams-category-tabs"
+          className="teams-category-tabs touch-scroll-x"
           style={{
             display: "flex",
             alignItems: "center",
@@ -140,6 +140,7 @@ export default function TeamsSection() {
             border: "1px solid rgba(255, 255, 255, 0.08)",
             overflowX: "auto",
             WebkitOverflowScrolling: "touch",
+            overscrollBehaviorX: "contain",
             maxWidth: "100%",
           }}
         >

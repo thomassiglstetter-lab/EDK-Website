@@ -13,7 +13,7 @@ export default function Footer() {
         zIndex: 10,
         backgroundColor: "#060911",
         borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-        padding: "80px 24px 32px 24px",
+        padding: "80px 24px calc(32px + env(safe-area-inset-bottom, 0px)) 24px",
       }}
     >
       <div
