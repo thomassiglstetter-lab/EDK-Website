@@ -149,6 +149,7 @@ export default async function TeamDetailPage({
 
         {/* Hero Banner */}
         <div
+          className="team-hero-banner"
           style={{
             position: "relative",
             padding: "40px 36px",
@@ -245,7 +246,7 @@ export default async function TeamDetailPage({
             </div>
 
             {/* Actions & Social Media */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "flex-end" }}>
+            <div className="team-hero-actions" style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "flex-end" }}>
               {team.socialMedia?.instagram && (
                 <a
                   href={team.socialMedia.instagram}
@@ -699,15 +700,33 @@ export default async function TeamDetailPage({
           </div>
 
           {tableData && tableData.rows && tableData.rows.length > 0 ? (
-            <div style={{ overflowX: "auto" }}>
-              <table
+            <div>
+              <div
+                className="mobile-table-hint"
                 style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  textAlign: "left",
-                  fontSize: "0.9rem",
+                  display: "none",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "0.74rem",
+                  color: "#94A3B8",
+                  marginBottom: "8px",
+                  background: "rgba(255, 255, 255, 0.04)",
+                  padding: "6px 12px",
+                  borderRadius: "6px",
                 }}
               >
+                <span>← Tabelle seitlich wischen für alle Spalten (Spiele, Tore, Punkte) →</span>
+              </div>
+              <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", width: "100%" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    minWidth: "620px",
+                    borderCollapse: "collapse",
+                    textAlign: "left",
+                    fontSize: "0.9rem",
+                  }}
+                >
                 <thead>
                   <tr
                     style={{
@@ -777,7 +796,8 @@ export default async function TeamDetailPage({
                 </tbody>
               </table>
             </div>
-          ) : (
+          </div>
+        ) : (
             <div
               style={{
                 padding: "36px 20px",
@@ -1008,6 +1028,21 @@ export default async function TeamDetailPage({
       </main>
 
       <Footer />
+
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-table-hint {
+            display: flex !important;
+          }
+          .team-hero-banner {
+            padding: 24px 18px !important;
+          }
+          .team-hero-actions {
+            align-items: flex-start !important;
+            width: 100% !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

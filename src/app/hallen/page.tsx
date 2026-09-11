@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import hallsData from "@/data/halls.json";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function HallenPage() {
   const [selectedCity, setSelectedCity] = useState<"all" | "Dachau" | "Karlsfeld">("all");
@@ -28,6 +29,7 @@ export default function HallenPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#060911", color: "#E2E8F0" }}>
+      <Header />
       <main
         style={{
           maxWidth: "1280px",

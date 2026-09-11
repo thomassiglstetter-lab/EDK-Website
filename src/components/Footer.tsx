@@ -262,6 +262,7 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div
+        className="footer-bottom-bar"
         style={{
           maxWidth: "1280px",
           margin: "0 auto",
@@ -280,7 +281,7 @@ export default function Footer() {
           © {new Date().getFullYear()} Eintracht Dachau-Karlsfeld. Alle Rechte vorbehalten.
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+        <div className="footer-legal-links" style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
           <a
             href="https://www.instagram.com/handballeintracht/"
             target="_blank"
@@ -351,6 +352,20 @@ export default function Footer() {
           </a>
         </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          :global(.footer-bottom-bar) {
+            flex-direction: column !important;
+            text-align: center !important;
+            gap: 16px !important;
+          }
+          :global(.footer-legal-links) {
+            justify-content: center !important;
+            gap: 14px 16px !important;
+          }
+        }
+      `}</style>
     </footer>
   );
 }

@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Shield,
   Activity,
+  MapPin,
 } from "lucide-react";
 import initialMatchesJson from "@/data/matches.json";
 
@@ -273,7 +274,7 @@ export function ScheduleSection() {
         </div>
       </div>
 
-      {/* Match Table Format */}
+      {/* Match Display: Desktop Table + Mobile Cards */}
       {weekendMatches.length === 0 ? (
         <div
           style={{
@@ -312,242 +313,499 @@ export function ScheduleSection() {
           </Link>
         </div>
       ) : (
-        <div
-          style={{
-            background: "linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.5))",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            borderRadius: "16px",
-            boxShadow: "0 14px 34px -10px rgba(0, 0, 0, 0.5)",
-            overflow: "hidden",
-          }}
-        >
-          <div style={{ overflowX: "auto", width: "100%" }}>
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                textAlign: "left",
-                minWidth: "760px",
-              }}
-            >
-              <thead>
-                <tr
+        <>
+          {/* Desktop Table View */}
+          <div
+            className="desktop-schedule-view"
+            style={{
+              background: "linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.5))",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: "16px",
+              boxShadow: "0 14px 34px -10px rgba(0, 0, 0, 0.5)",
+              overflow: "hidden",
+            }}
+          >
+            <div style={{ overflowX: "auto", width: "100%" }}>
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  textAlign: "left",
+                  minWidth: "760px",
+                }}
+              >
+                <thead>
+                  <tr
+                    style={{
+                      borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                      background: "rgba(255, 255, 255, 0.03)",
+                      fontSize: "0.78rem",
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      color: "#94A3B8",
+                    }}
+                  >
+                    <th style={{ padding: "16px 20px" }}>Anwurf & Datum</th>
+                    <th style={{ padding: "16px 16px" }}>Team & Liga</th>
+                    <th style={{ padding: "16px 16px" }}>Begegnung (Heim vs. Gast)</th>
+                    <th style={{ padding: "16px 16px", textAlign: "center" }}>Spielort</th>
+                    <th style={{ padding: "16px 20px", textAlign: "right" }}>Mannschaft</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {weekendMatches.map((m, idx) => {
+                    const isEintrachtHome = m.home.includes("Eintracht");
+                    const teamSlug = CATEGORY_TO_SLUG[m.category];
+                    const isLast = idx === weekendMatches.length - 1;
+
+                    return (
+                      <tr
+                        key={m.id || `${m.date}-${m.time}-${m.home}`}
+                        style={{
+                          borderBottom: isLast ? "none" : "1px solid rgba(255, 255, 255, 0.05)",
+                          transition: "background-color 0.15s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.04)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                      >
+                        {/* Anwurf & Datum */}
+                        <td style={{ padding: "18px 20px", whiteSpace: "nowrap" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <Clock size={15} style={{ color: "var(--color-azure-bright)" }} />
+                            <span
+                              style={{
+                                fontSize: "1rem",
+                                fontWeight: 800,
+                                color: "#FFFFFF",
+                                fontVariantNumeric: "tabular-nums",
+                              }}
+                            >
+                              {m.time} Uhr
+                            </span>
+                          </div>
+                          <div style={{ fontSize: "0.78rem", color: "#94A3B8", marginTop: "4px" }}>
+                            {m.day || "Sa"}, {m.date}
+                          </div>
+                        </td>
+
+                        {/* Team & Liga */}
+                        <td style={{ padding: "18px 16px", whiteSpace: "nowrap" }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                            <span
+                              style={{
+                                display: "inline-block",
+                                padding: "3px 10px",
+                                borderRadius: "6px",
+                                background: "rgba(255, 255, 255, 0.08)",
+                                color: "#FFFFFF",
+                                fontWeight: 700,
+                                fontSize: "0.82rem",
+                                width: "fit-content",
+                              }}
+                            >
+                              {m.category}
+                            </span>
+                            <span style={{ fontSize: "0.76rem", color: "#64748B", fontWeight: 500 }}>
+                              {m.league}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Begegnung (Heim vs. Gast) */}
+                        <td style={{ padding: "18px 16px" }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
+                              flexWrap: "wrap",
+                              fontSize: "0.95rem",
+                            }}
+                          >
+                            {/* Home */}
+                            <span
+                              style={{
+                                fontWeight: m.home.includes("Eintracht") ? 800 : 500,
+                                color: m.home.includes("Eintracht") ? "#FFFFFF" : "#CBD5E1",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                              }}
+                            >
+                              {m.home.includes("Eintracht") && (
+                                <span
+                                  style={{
+                                    width: "6px",
+                                    height: "6px",
+                                    borderRadius: "50%",
+                                    background: "var(--color-primary)",
+                                    display: "inline-block",
+                                    flexShrink: 0,
+                                  }}
+                                />
+                              )}
+                              {m.home}
+                            </span>
+
+                            <span style={{ color: "#64748B", fontSize: "0.8rem", fontWeight: 400 }}>
+                              vs.
+                            </span>
+
+                            {/* Guest */}
+                            <span
+                              style={{
+                                fontWeight: m.guest.includes("Eintracht") ? 800 : 500,
+                                color: m.guest.includes("Eintracht") ? "#FFFFFF" : "#CBD5E1",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                              }}
+                            >
+                              {m.guest.includes("Eintracht") && (
+                                <span
+                                  style={{
+                                    width: "6px",
+                                    height: "6px",
+                                    borderRadius: "50%",
+                                    background: "var(--color-primary)",
+                                    display: "inline-block",
+                                    flexShrink: 0,
+                                  }}
+                                />
+                              )}
+                              {m.guest}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Spielort (Heim / Auswärts) */}
+                        <td style={{ padding: "18px 16px", textAlign: "center", whiteSpace: "nowrap" }}>
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              padding: "4px 10px",
+                              borderRadius: "6px",
+                              fontSize: "0.74rem",
+                              fontWeight: 700,
+                              textTransform: "uppercase",
+                              letterSpacing: "0.04em",
+                              background: isEintrachtHome
+                                ? "rgba(230, 57, 70, 0.16)"
+                                : "rgba(14, 165, 233, 0.16)",
+                              color: isEintrachtHome ? "#FFA6BD" : "var(--color-azure-bright)",
+                              border: `1px solid ${
+                                isEintrachtHome ? "rgba(230, 57, 70, 0.3)" : "rgba(14, 165, 233, 0.3)"
+                              }`,
+                            }}
+                          >
+                            {isEintrachtHome ? "Heimspiel" : "Auswärts"}
+                          </span>
+                        </td>
+
+                        {/* Aktion / Mannschaftsseite */}
+                        <td style={{ padding: "18px 20px", textAlign: "right", whiteSpace: "nowrap" }}>
+                          {teamSlug ? (
+                            <Link
+                              href={`/teams/${teamSlug}`}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "5px",
+                                padding: "6px 12px",
+                                borderRadius: "8px",
+                                background: "rgba(255, 255, 255, 0.05)",
+                                border: "1px solid rgba(255, 255, 255, 0.1)",
+                                color: "#E2E8F0",
+                                fontSize: "0.78rem",
+                                fontWeight: 600,
+                                textDecoration: "none",
+                                transition: "all 0.15s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = "rgba(14, 165, 233, 0.15)";
+                                e.currentTarget.style.borderColor = "rgba(14, 165, 233, 0.3)";
+                                e.currentTarget.style.color = "var(--color-azure-bright)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                                e.currentTarget.style.color = "#E2E8F0";
+                              }}
+                            >
+                              <span>Teamseite</span>
+                              <ArrowRight size={13} />
+                            </Link>
+                          ) : (
+                            <span style={{ color: "#475569", fontSize: "0.78rem" }}>—</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Mobile Match Cards List (Native App-Style) */}
+          <div className="mobile-schedule-view">
+            {weekendMatches.map((m) => {
+              const isEintrachtHome = m.home.includes("Eintracht");
+              const teamSlug = CATEGORY_TO_SLUG[m.category];
+
+              return (
+                <div
+                  key={m.id || `${m.date}-${m.time}-${m.home}`}
                   style={{
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-                    background: "rgba(255, 255, 255, 0.03)",
-                    fontSize: "0.78rem",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                    color: "#94A3B8",
+                    background: "rgba(13, 17, 26, 0.88)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderLeft: `4px solid ${
+                      isEintrachtHome ? "var(--color-primary)" : "var(--color-azure)"
+                    }`,
+                    borderRadius: "14px",
+                    padding: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
                   }}
                 >
-                  <th style={{ padding: "16px 20px" }}>Anwurf & Datum</th>
-                  <th style={{ padding: "16px 16px" }}>Team & Liga</th>
-                  <th style={{ padding: "16px 16px" }}>Begegnung (Heim vs. Gast)</th>
-                  <th style={{ padding: "16px 16px", textAlign: "center" }}>Spielort</th>
-                  <th style={{ padding: "16px 20px", textAlign: "right" }}>Mannschaft</th>
-                </tr>
-              </thead>
-              <tbody>
-                {weekendMatches.map((m, idx) => {
-                  const isEintrachtHome = m.home.includes("Eintracht");
-                  const teamSlug = CATEGORY_TO_SLUG[m.category];
-                  const isLast = idx === weekendMatches.length - 1;
+                  {/* Top Bar: Anwurfzeit + Tag + Heim/Auswärts Badge */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      flexWrap: "wrap",
+                      gap: "8px",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "5px",
+                          padding: "4px 10px",
+                          borderRadius: "6px",
+                          background: "rgba(255, 255, 255, 0.08)",
+                          color: "#FFFFFF",
+                          fontWeight: 800,
+                          fontSize: "0.92rem",
+                          fontVariantNumeric: "tabular-nums",
+                        }}
+                      >
+                        <Clock size={13} style={{ color: "var(--color-azure-bright)" }} />
+                        {m.time} Uhr
+                      </span>
+                      <span style={{ fontSize: "0.8rem", color: "#94A3B8", fontWeight: 500 }}>
+                        {m.day || "Sa"}, {m.date}
+                      </span>
+                    </div>
 
-                  return (
-                    <tr
-                      key={m.id || `${m.date}-${m.time}-${m.home}`}
+                    <span
                       style={{
-                        borderBottom: isLast ? "none" : "1px solid rgba(255, 255, 255, 0.05)",
-                        transition: "background-color 0.15s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.04)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "transparent";
+                        display: "inline-block",
+                        padding: "3px 9px",
+                        borderRadius: "6px",
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.04em",
+                        background: isEintrachtHome
+                          ? "rgba(230, 57, 70, 0.16)"
+                          : "rgba(14, 165, 233, 0.16)",
+                        color: isEintrachtHome ? "#FFA6BD" : "var(--color-azure-bright)",
+                        border: `1px solid ${
+                          isEintrachtHome
+                            ? "rgba(230, 57, 70, 0.3)"
+                            : "rgba(14, 165, 233, 0.3)"
+                        }`,
                       }}
                     >
-                      {/* Anwurf & Datum */}
-                      <td style={{ padding: "18px 20px", whiteSpace: "nowrap" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <Clock size={15} style={{ color: "var(--color-azure-bright)" }} />
-                          <span
-                            style={{
-                              fontSize: "1rem",
-                              fontWeight: 800,
-                              color: "#FFFFFF",
-                              fontVariantNumeric: "tabular-nums",
-                            }}
-                          >
-                            {m.time} Uhr
-                          </span>
-                        </div>
-                        <div style={{ fontSize: "0.78rem", color: "#94A3B8", marginTop: "4px" }}>
-                          {m.day || "Sa"}, {m.date}
-                        </div>
-                      </td>
+                      {isEintrachtHome ? "Heimspiel" : "Auswärts"}
+                    </span>
+                  </div>
 
-                      {/* Team & Liga */}
-                      <td style={{ padding: "18px 16px", whiteSpace: "nowrap" }}>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {/* Team Category & League */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span
+                      style={{
+                        padding: "2px 8px",
+                        borderRadius: "4px",
+                        background: "rgba(255, 255, 255, 0.08)",
+                        color: "#FFFFFF",
+                        fontWeight: 700,
+                        fontSize: "0.78rem",
+                      }}
+                    >
+                      {m.category}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.76rem",
+                        color: "#64748B",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {m.league}
+                    </span>
+                  </div>
+
+                  {/* Matchup: Heim vs Gast Box */}
+                  <div
+                    style={{
+                      background: "rgba(0, 0, 0, 0.28)",
+                      padding: "12px 14px",
+                      borderRadius: "10px",
+                      border: "1px solid rgba(255, 255, 255, 0.05)",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "8px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "10px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: m.home.includes("Eintracht") ? 800 : 500,
+                          color: m.home.includes("Eintracht") ? "#FFFFFF" : "#CBD5E1",
+                          fontSize: "0.95rem",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        {m.home.includes("Eintracht") && (
                           <span
                             style={{
+                              width: "6px",
+                              height: "6px",
+                              borderRadius: "50%",
+                              background: "var(--color-primary)",
                               display: "inline-block",
-                              padding: "3px 10px",
-                              borderRadius: "6px",
-                              background: "rgba(255, 255, 255, 0.08)",
-                              color: "#FFFFFF",
-                              fontWeight: 700,
-                              fontSize: "0.82rem",
-                              width: "fit-content",
+                              flexShrink: 0,
                             }}
-                          >
-                            {m.category}
-                          </span>
-                          <span style={{ fontSize: "0.76rem", color: "#64748B", fontWeight: 500 }}>
-                            {m.league}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Begegnung (Heim vs. Gast) */}
-                      <td style={{ padding: "18px 16px" }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "12px",
-                            flexWrap: "wrap",
-                            fontSize: "0.95rem",
-                          }}
-                        >
-                          {/* Home */}
-                          <span
-                            style={{
-                              fontWeight: m.home.includes("Eintracht") ? 800 : 500,
-                              color: m.home.includes("Eintracht") ? "#FFFFFF" : "#CBD5E1",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "6px",
-                            }}
-                          >
-                            {m.home.includes("Eintracht") && (
-                              <span
-                                style={{
-                                  width: "6px",
-                                  height: "6px",
-                                  borderRadius: "50%",
-                                  background: "var(--color-primary)",
-                                  display: "inline-block",
-                                  flexShrink: 0,
-                                }}
-                              />
-                            )}
-                            {m.home}
-                          </span>
-
-                          <span style={{ color: "#64748B", fontSize: "0.8rem", fontWeight: 400 }}>
-                            vs.
-                          </span>
-
-                          {/* Guest */}
-                          <span
-                            style={{
-                              fontWeight: m.guest.includes("Eintracht") ? 800 : 500,
-                              color: m.guest.includes("Eintracht") ? "#FFFFFF" : "#CBD5E1",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "6px",
-                            }}
-                          >
-                            {m.guest.includes("Eintracht") && (
-                              <span
-                                style={{
-                                  width: "6px",
-                                  height: "6px",
-                                  borderRadius: "50%",
-                                  background: "var(--color-primary)",
-                                  display: "inline-block",
-                                  flexShrink: 0,
-                                }}
-                              />
-                            )}
-                            {m.guest}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Spielort (Heim / Auswärts) */}
-                      <td style={{ padding: "18px 16px", textAlign: "center", whiteSpace: "nowrap" }}>
-                        <span
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            padding: "4px 10px",
-                            borderRadius: "6px",
-                            fontSize: "0.74rem",
-                            fontWeight: 700,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.04em",
-                            background: isEintrachtHome
-                              ? "rgba(230, 57, 70, 0.16)"
-                              : "rgba(14, 165, 233, 0.16)",
-                            color: isEintrachtHome ? "#FFA6BD" : "var(--color-azure-bright)",
-                            border: `1px solid ${
-                              isEintrachtHome ? "rgba(230, 57, 70, 0.3)" : "rgba(14, 165, 233, 0.3)"
-                            }`,
-                          }}
-                        >
-                          {isEintrachtHome ? "Heimspiel" : "Auswärts"}
-                        </span>
-                      </td>
-
-                      {/* Aktion / Mannschaftsseite */}
-                      <td style={{ padding: "18px 20px", textAlign: "right", whiteSpace: "nowrap" }}>
-                        {teamSlug ? (
-                          <Link
-                            href={`/teams/${teamSlug}`}
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "5px",
-                              padding: "6px 12px",
-                              borderRadius: "8px",
-                              background: "rgba(255, 255, 255, 0.05)",
-                              border: "1px solid rgba(255, 255, 255, 0.1)",
-                              color: "#E2E8F0",
-                              fontSize: "0.78rem",
-                              fontWeight: 600,
-                              textDecoration: "none",
-                              transition: "all 0.15s ease",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = "rgba(14, 165, 233, 0.15)";
-                              e.currentTarget.style.borderColor = "rgba(14, 165, 233, 0.3)";
-                              e.currentTarget.style.color = "var(--color-azure-bright)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                              e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
-                              e.currentTarget.style.color = "#E2E8F0";
-                            }}
-                          >
-                            <span>Teamseite</span>
-                            <ArrowRight size={13} />
-                          </Link>
-                        ) : (
-                          <span style={{ color: "#475569", fontSize: "0.78rem" }}>—</span>
+                          />
                         )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        {m.home}
+                      </span>
+                      <span style={{ fontSize: "0.7rem", color: "#64748B", textTransform: "uppercase", fontWeight: 600 }}>
+                        Heim
+                      </span>
+                    </div>
+
+                    <div style={{ height: "1px", background: "rgba(255, 255, 255, 0.06)" }} />
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "10px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: m.guest.includes("Eintracht") ? 800 : 500,
+                          color: m.guest.includes("Eintracht") ? "#FFFFFF" : "#CBD5E1",
+                          fontSize: "0.95rem",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        {m.guest.includes("Eintracht") && (
+                          <span
+                            style={{
+                              width: "6px",
+                              height: "6px",
+                              borderRadius: "50%",
+                              background: "var(--color-primary)",
+                              display: "inline-block",
+                              flexShrink: 0,
+                            }}
+                          />
+                        )}
+                        {m.guest}
+                      </span>
+                      <span style={{ fontSize: "0.7rem", color: "#64748B", textTransform: "uppercase", fontWeight: 600 }}>
+                        Gast
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card Footer: Hall Location & Team Page Link */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "10px",
+                      marginTop: "2px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {m.hallName ? (
+                      <span
+                        style={{
+                          fontSize: "0.76rem",
+                          color: "#94A3B8",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          maxWidth: "60%",
+                        }}
+                      >
+                        <MapPin size={12} style={{ color: "#64748B", flexShrink: 0 }} />
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {m.hallName}
+                        </span>
+                      </span>
+                    ) : <div />}
+
+                    {teamSlug && (
+                      <Link
+                        href={`/teams/${teamSlug}`}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "5px",
+                          padding: "6px 12px",
+                          borderRadius: "8px",
+                          background: "rgba(14, 165, 233, 0.12)",
+                          border: "1px solid rgba(14, 165, 233, 0.25)",
+                          color: "var(--color-azure-bright)",
+                          fontSize: "0.78rem",
+                          fontWeight: 600,
+                          textDecoration: "none",
+                          marginLeft: "auto",
+                        }}
+                      >
+                        <span>Teamseite</span>
+                        <ArrowRight size={13} />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
+        </>
       )}
 
       {/* Footer Note */}
@@ -590,6 +848,24 @@ export function ScheduleSection() {
           <ExternalLink size={13} />
         </a>
       </div>
+
+      <style jsx>{`
+        @media (min-width: 769px) {
+          .mobile-schedule-view {
+            display: none !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .desktop-schedule-view {
+            display: none !important;
+          }
+          .mobile-schedule-view {
+            display: flex !important;
+            flex-direction: column;
+            gap: 14px;
+          }
+        }
+      `}</style>
     </section>
   );
 }

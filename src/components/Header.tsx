@@ -188,7 +188,7 @@ export default function Header() {
         </nav>
 
         {/* Action Button & Social */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           {/* Instagram Button */}
           <a
             href="https://www.instagram.com/handballeintracht/"
@@ -208,6 +208,7 @@ export default function Header() {
               color: "#CBD5E1",
               textDecoration: "none",
               transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+              flexShrink: 0,
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = "#FFFFFF";
@@ -227,10 +228,11 @@ export default function Header() {
 
           <a
             href="/#kontakt"
-            className="btn-primary"
+            className="btn-primary header-top-cta"
             style={{
               padding: "9px 20px",
               fontSize: "0.85rem",
+              whiteSpace: "nowrap",
             }}
           >
             <span>Mitmachen</span>
@@ -242,16 +244,22 @@ export default function Header() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             style={{
               display: "none",
-              background: "transparent",
-              border: "none",
+              background: "rgba(255, 255, 255, 0.06)",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
+              borderRadius: "50%",
+              width: "36px",
+              height: "36px",
               color: "var(--color-text-main)",
               cursor: "pointer",
-              padding: "4px",
+              padding: "0",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
             }}
             className="mobile-toggle"
             aria-label="Menü umschalten"
           >
-            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            {mobileMenuOpen ? <X size={19} /> : <Menu size={19} />}
           </button>
         </div>
       </div>
@@ -263,12 +271,16 @@ export default function Header() {
             marginTop: "8px",
             padding: "20px",
             borderRadius: "var(--radius-lg)",
-            background: "rgba(10, 14, 20, 0.95)",
-            backdropFilter: "blur(24px)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
+            background: "rgba(10, 14, 20, 0.96)",
+            backdropFilter: "blur(28px)",
+            WebkitBackdropFilter: "blur(28px)",
+            border: "1px solid rgba(255, 255, 255, 0.12)",
+            boxShadow: "0 20px 48px rgba(0, 0, 0, 0.8)",
             display: "flex",
             flexDirection: "column",
             gap: "4px",
+            maxHeight: "calc(100vh - 100px)",
+            overflowY: "auto",
           }}
         >
           {navLinks.map((link) => {
@@ -283,15 +295,29 @@ export default function Header() {
                   textDecoration: "none",
                   fontSize: "1rem",
                   fontWeight: isActive ? 600 : 400,
-                  padding: "10px 14px",
+                  padding: "12px 16px",
                   borderRadius: "var(--radius-sm)",
                   background: isActive
-                    ? "rgba(255, 255, 255, 0.06)"
+                    ? "rgba(255, 255, 255, 0.08)"
                     : "transparent",
                   transition: "background 0.2s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                 }}
               >
-                {link.label}
+                <span>{link.label}</span>
+                {isActive && (
+                  <span
+                    style={{
+                      width: "6px",
+                      height: "6px",
+                      borderRadius: "50%",
+                      background: "var(--color-azure-bright)",
+                      boxShadow: "0 0 8px var(--color-azure-bright)",
+                    }}
+                  />
+                )}
               </a>
             );
           })}
@@ -299,11 +325,11 @@ export default function Header() {
           <div
             style={{
               marginTop: "8px",
-              paddingTop: "12px",
+              paddingTop: "14px",
               borderTop: "1px solid rgba(255, 255, 255, 0.08)",
               display: "flex",
               flexDirection: "column",
-              gap: "8px",
+              gap: "10px",
             }}
           >
             <a
@@ -315,17 +341,17 @@ export default function Header() {
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "8px",
-                padding: "10px 16px",
+                padding: "12px 16px",
                 borderRadius: "var(--radius-sm)",
                 background: "rgba(225, 48, 108, 0.15)",
                 border: "1px solid rgba(225, 48, 108, 0.35)",
                 color: "#FFFFFF",
-                fontSize: "0.88rem",
+                fontSize: "0.9rem",
                 fontWeight: 600,
                 textDecoration: "none",
               }}
             >
-              <Instagram size={16} />
+              <Instagram size={17} />
               <span>@handballeintracht auf Instagram</span>
               <ArrowUpRight size={14} />
             </a>
@@ -337,11 +363,11 @@ export default function Header() {
               style={{
                 width: "100%",
                 justifyContent: "center",
-                padding: "12px 20px",
-                fontSize: "0.92rem",
+                padding: "14px 20px",
+                fontSize: "0.95rem",
               }}
             >
-              <span>Mitmachen</span>
+              <span>Mitmachen & Probetraining</span>
               <ArrowUpRight size={15} />
             </a>
           </div>
@@ -354,11 +380,16 @@ export default function Header() {
             display: none !important;
           }
           .mobile-toggle {
-            display: block !important;
+            display: flex !important;
           }
         }
-        @media (max-width: 480px) {
-          .brand-text {
+        @media (max-width: 560px) {
+          .header-top-cta {
+            display: none !important;
+          }
+        }
+        @media (max-width: 360px) {
+          .brand-text span:last-child {
             display: none !important;
           }
         }

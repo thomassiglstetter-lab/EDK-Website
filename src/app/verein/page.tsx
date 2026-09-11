@@ -18,10 +18,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function VereinPage() {
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#060911", color: "#E2E8F0" }}>
+      <Header />
       <main
         style={{
           maxWidth: "1280px",

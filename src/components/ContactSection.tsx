@@ -142,7 +142,7 @@ export default function ContactSection() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
           gap: "36px",
         }}
       >
@@ -444,7 +444,7 @@ export default function ContactSection() {
 
         {/* Right Column: Contact Form (Slide Right) */}
         <div
-          className={`glass-panel reveal-3d-slide-right ${isRevealed ? "is-revealed" : ""}`}
+          className={`glass-panel contact-form-card reveal-3d-slide-right ${isRevealed ? "is-revealed" : ""}`}
           style={{
             padding: "36px 32px",
             background: "rgba(14, 18, 28, 0.9)",
@@ -814,6 +814,14 @@ export default function ContactSection() {
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 560px) {
+          :global(.contact-form-card) {
+            padding: 24px 18px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

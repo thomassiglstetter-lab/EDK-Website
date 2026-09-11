@@ -88,14 +88,14 @@ export default function ClubIdentity() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
           gap: "24px",
           marginBottom: "48px",
         }}
       >
         {/* Spalte 1: Unsere Werte (Crimson Accent) */}
         <div
-          className={`glass-panel reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
+          className={`glass-panel pillar-card reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
           style={{
             padding: "36px 30px",
             background: "rgba(13, 17, 26, 0.92)",
@@ -216,7 +216,7 @@ export default function ClubIdentity() {
 
         {/* Spalte 2: Historie & Entstehung (Azure Accent) */}
         <div
-          className={`glass-panel reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
+          className={`glass-panel pillar-card reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
           style={{
             padding: "36px 30px",
             background: "rgba(13, 17, 26, 0.92)",
@@ -386,7 +386,7 @@ export default function ClubIdentity() {
 
         {/* Spalte 3: Hallen & Standorte (Beibehalten) */}
         <div
-          className={`glass-panel reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
+          className={`glass-panel pillar-card reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
           style={{
             padding: "36px 30px",
             background: "rgba(13, 17, 26, 0.92)",
@@ -600,6 +600,14 @@ export default function ClubIdentity() {
           <ArrowRight size={14} />
         </Link>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 560px) {
+          :global(.pillar-card) {
+            padding: 24px 18px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

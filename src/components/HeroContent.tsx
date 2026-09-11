@@ -95,6 +95,7 @@ export default function HeroContent() {
 
           {/* Stats Strip - Crisp typography & solid backdrop */}
           <div
+            className="hero-stats-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
@@ -414,6 +415,15 @@ export default function HeroContent() {
         @media (max-width: 640px) {
           .apple-scroll-cue {
             bottom: 18px;
+          }
+        }
+
+        @media (max-width: 520px) {
+          :global(.hero-stats-grid) {
+            gap: 8px !important;
+          }
+          :global(.hero-stats-grid > div) {
+            padding: 12px 10px !important;
           }
         }
       `}</style>

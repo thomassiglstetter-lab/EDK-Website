@@ -351,3 +351,33 @@ h1, h2, h3, h4, .font-display {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* ==========================================================================
+   Mobile-First & Touch Optimization Enhancements
+   ========================================================================== */
+
+/* Remove grey tap highlight box on mobile WebKit */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent iOS Safari automatic page zooming when focusing inputs/selects */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="password"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* Safe container side padding on narrow mobile screens */
+  .hero-wrapper {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+

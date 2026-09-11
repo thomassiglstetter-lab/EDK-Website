@@ -1,6 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Mail, MapPin, Globe, Shield, ExternalLink } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export const metadata = {
   title: "Impressum | Eintracht Dachau-Karlsfeld",
@@ -9,16 +11,16 @@ export const metadata = {
 
 export default function ImpressumPage() {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(180deg, #070A12 0%, #03060B 100%)",
-        color: "#E2E8F0",
-        padding: "120px 24px 80px 24px",
-        position: "relative",
-        zIndex: 10,
-      }}
-    >
+    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #070A12 0%, #03060B 100%)", color: "#E2E8F0" }}>
+      <Header />
+      <main
+        style={{
+          minHeight: "80vh",
+          padding: "120px 24px 80px 24px",
+          position: "relative",
+          zIndex: 10,
+        }}
+      >
       <div style={{ maxWidth: "860px", margin: "0 auto" }}>
         {/* Back Link */}
         <Link
@@ -271,5 +273,7 @@ export default function ImpressumPage() {
         </div>
       </div>
     </main>
-  );
+    <Footer />
+  </div>
+);
 }

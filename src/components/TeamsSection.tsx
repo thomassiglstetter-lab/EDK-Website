@@ -129,6 +129,7 @@ export default function TeamsSection() {
 
         {/* Category Tabs */}
         <div
+          className="teams-category-tabs"
           style={{
             display: "flex",
             alignItems: "center",
@@ -137,7 +138,9 @@ export default function TeamsSection() {
             padding: "4px",
             borderRadius: "var(--radius-full)",
             border: "1px solid rgba(255, 255, 255, 0.08)",
-            flexWrap: "wrap",
+            overflowX: "auto",
+            WebkitOverflowScrolling: "touch",
+            maxWidth: "100%",
           }}
         >
           {categories.map((cat) => {
@@ -165,6 +168,7 @@ export default function TeamsSection() {
                   cursor: "pointer",
                   transition: "all 0.2s ease",
                   whiteSpace: "nowrap",
+                  flexShrink: 0,
                 }}
               >
                 {cat} {cat === "Alle" && `(${teams.length})`}
@@ -178,7 +182,7 @@ export default function TeamsSection() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))",
           gap: "24px",
         }}
       >
