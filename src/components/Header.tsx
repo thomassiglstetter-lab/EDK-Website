@@ -46,7 +46,34 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { id: "uebersicht", label: "Übersicht", href: "/#uebersicht" },
-  { id: "news", label: "Aktuelles", href: "/#news" },
+  {
+    id: "news",
+    label: "Aktuelles",
+    href: "/#news",
+    categories: [
+      {
+        name: "News & Berichte",
+        items: [
+          {
+            title: "Aktuelle Berichte",
+            subtitle: "Die neuesten 5 Meldungen von der Eintracht",
+            href: "/#news",
+          },
+          {
+            title: "News-Archiv",
+            subtitle: "Alle Berichte & Mitteilungen im durchsuchbaren Archiv",
+            href: "/news",
+            badge: "Archiv",
+            badgeType: "azure",
+          },
+        ],
+      },
+    ],
+    bottomAction: {
+      label: "Zum kompletten News-Archiv →",
+      href: "/news",
+    },
+  },
   {
     id: "verein",
     label: "Verein",

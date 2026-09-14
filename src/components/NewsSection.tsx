@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import {
   Newspaper,
   Calendar,
@@ -119,8 +120,10 @@ export default function NewsSection() {
       ? articlesList
       : articlesList.filter((a) => a.category === activeFilter);
 
-  const featuredArticle = filteredArticles[0];
-  const remainingArticles = filteredArticles.slice(1);
+  // Exactly max 5 news articles displayed on homepage
+  const displayArticles = filteredArticles.slice(0, 5);
+  const featuredArticle = displayArticles[0];
+  const remainingArticles = displayArticles.slice(1);
 
   return (
     <section
@@ -252,6 +255,52 @@ export default function NewsSection() {
             />
           ))}
         </div>
+      </div>
+
+      {/* Link to full News Archive */}
+      <div
+        style={{
+          marginTop: "48px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Link
+          href="/news"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "14px 28px",
+            borderRadius: "var(--radius-full)",
+            background: "rgba(13, 17, 26, 0.9)",
+            border: "1px solid rgba(72, 156, 216, 0.35)",
+            color: "#FFFFFF",
+            fontFamily: "var(--font-display)",
+            fontSize: "0.92rem",
+            fontWeight: 600,
+            textDecoration: "none",
+            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+            transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "var(--color-azure)";
+            e.currentTarget.style.background = "rgba(72, 156, 216, 0.15)";
+            e.currentTarget.style.transform = "translateY(-3px)";
+            e.currentTarget.style.boxShadow = "0 14px 32px rgba(72, 156, 216, 0.25)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "rgba(72, 156, 216, 0.35)";
+            e.currentTarget.style.background = "rgba(13, 17, 26, 0.9)";
+            e.currentTarget.style.transform = "none";
+            e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.4)";
+          }}
+        >
+          <Newspaper size={18} style={{ color: "var(--color-azure-bright)" }} />
+          <span>Zum News-Archiv (alle {articlesList.length} Berichte)</span>
+          <ArrowRight size={16} style={{ color: "var(--color-azure-bright)" }} />
+        </Link>
       </div>
 
       {/* Beautifully Framed Article Reader Modal (Portaled above navbar & everything) */}

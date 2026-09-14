@@ -18,6 +18,8 @@ import {
   HelpCircle,
   Sparkles,
   Navigation,
+  FileText,
+  ChevronRight,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -31,6 +33,23 @@ import { triggerBackgroundSyncIfNeeded } from "@/lib/sync";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+async function getMatchReports(teamSlug: string): Promise<any[]> {
+  try {
+    const filePath = path.join(process.cwd(), "src", "data", "reports.json");
+    const tmpFilePath = path.join("/tmp", "reports.json");
+    let raw = "";
+    try {
+      raw = await fs.readFile(tmpFilePath, "utf8");
+    } catch {
+      raw = await fs.readFile(filePath, "utf8");
+    }
+    const reports = JSON.parse(raw);
+    return Array.isArray(reports) ? reports.filter((r: any) => r.teamSlug === teamSlug) : [];
+  } catch {
+    return [];
+  }
+}
 
 async function getTeams(): Promise<any[]> {
   try {
@@ -115,7 +134,10 @@ export default async function TeamDetailPage({
     return da.getTime() - db.getTime();
   });
 
-  // 3. Hall reference
+  // 3. Match reports for this team
+  const teamReports = await getMatchReports(team.slug);
+
+  // 4. Hall reference
   const primaryHall = hallsData.find((h) => h.id === team.hallId);
 
   return (
@@ -247,6 +269,30 @@ export default async function TeamDetailPage({
 
             {/* Actions & Social Media */}
             <div className="team-hero-actions" style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "flex-end" }}>
+              <Link
+                href={`/teams/${team.slug}/spielberichte`}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "9px 16px",
+                  borderRadius: "10px",
+                  background: isCrimson
+                    ? "rgba(230, 57, 70, 0.15)"
+                    : "rgba(14, 165, 233, 0.15)",
+                  border: `1px solid ${badgeBorder}`,
+                  color: accentBright,
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <FileText size={15} />
+                <span>Spielberichte ({teamReports.length})</span>
+                <ChevronRight size={14} />
+              </Link>
+
               {team.socialMedia?.instagram && (
                 <a
                   href={team.socialMedia.instagram}
@@ -628,6 +674,265 @@ export default async function TeamDetailPage({
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Section: Spielberichte der Mannschaft */}
+        <div
+          className="glass-panel"
+          style={{
+            padding: "32px 28px",
+            borderRadius: "20px",
+            background: "rgba(13, 17, 26, 0.9)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            borderTop: `3px solid ${accentColor}`,
+            boxShadow: "0 14px 32px rgba(0, 0, 0, 0.5)",
+            marginBottom: "24px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "16px",
+              marginBottom: "20px",
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "4px 10px",
+                  borderRadius: "6px",
+                  background: badgeBg,
+                  border: `1px solid ${badgeBorder}`,
+                  color: accentBright,
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                  marginBottom: "8px",
+                }}
+              >
+                <FileText size={12} />
+                <span>Exklusiv für diese Mannschaft</span>
+              </div>
+              <h2 style={{ fontSize: "1.6rem", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
+                Spielberichte: {team.name}
+              </h2>
+            </div>
+
+            <Link
+              href={`/teams/${team.slug}/spielberichte`}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 16px",
+                borderRadius: "10px",
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                color: "#FFFFFF",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                textDecoration: "none",
+                transition: "all 0.2s ease",
+              }}
+            >
+              <span>Alle {teamReports.length} Spielberichte öffnen</span>
+              <ChevronRight size={14} color={accentBright} />
+            </Link>
+          </div>
+
+          {teamReports.length > 0 ? (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: teamReports.length > 1 ? "repeat(auto-fit, minmax(320px, 1fr))" : "1fr",
+                gap: "18px",
+              }}
+            >
+              {teamReports.slice(0, 2).map((rep: any) => {
+                const isWin = rep.outcome === "Sieg";
+                const isLoss = rep.outcome === "Niederlage";
+                const oColor = isWin ? "#34D399" : isLoss ? "#F87171" : "#FBBF24";
+                const oBg = isWin
+                  ? "rgba(16, 185, 129, 0.14)"
+                  : isLoss
+                  ? "rgba(239, 68, 68, 0.14)"
+                  : "rgba(245, 158, 11, 0.14)";
+                const oBorder = isWin
+                  ? "rgba(16, 185, 129, 0.3)"
+                  : isLoss
+                  ? "rgba(239, 68, 68, 0.3)"
+                  : "rgba(245, 158, 11, 0.3)";
+
+                return (
+                  <Link
+                    key={rep.id}
+                    href={`/teams/${team.slug}/spielberichte`}
+                    style={{
+                      textDecoration: "none",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      padding: "20px 22px",
+                      borderRadius: "14px",
+                      background: "rgba(255, 255, 255, 0.03)",
+                      border: "1px solid rgba(255, 255, 255, 0.07)",
+                      borderLeft: `3px solid ${oColor}`,
+                      transition: "transform 0.2s ease, background 0.2s ease, border-color 0.2s ease",
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span
+                            style={{
+                              padding: "2px 7px",
+                              borderRadius: "4px",
+                              background: oBg,
+                              border: `1px solid ${oBorder}`,
+                              color: oColor,
+                              fontSize: "0.72rem",
+                              fontWeight: 700,
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            {rep.outcome || "Spiel"}
+                          </span>
+                          <span style={{ fontSize: "0.76rem", color: "#64748B" }}>
+                            vs. {rep.opponent}
+                          </span>
+                        </div>
+
+                        {rep.result && (
+                          <span
+                            style={{
+                              fontSize: "1rem",
+                              fontWeight: 800,
+                              color: "#FFFFFF",
+                              fontFamily: "monospace",
+                            }}
+                          >
+                            {rep.result}
+                          </span>
+                        )}
+                      </div>
+
+                      <h4
+                        style={{
+                          fontSize: "1.08rem",
+                          fontWeight: 700,
+                          color: "#FFFFFF",
+                          lineHeight: 1.35,
+                          marginBottom: "8px",
+                        }}
+                      >
+                        {rep.title}
+                      </h4>
+
+                      <p
+                        style={{
+                          fontSize: "0.86rem",
+                          lineHeight: 1.55,
+                          color: "#94A3B8",
+                          margin: 0,
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {rep.excerpt}
+                      </p>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        paddingTop: "14px",
+                        marginTop: "14px",
+                        borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+                      }}
+                    >
+                      <span style={{ fontSize: "0.74rem", color: "#64748B" }}>
+                        {rep.date} {rep.author ? `• ${rep.author}` : ""}
+                      </span>
+
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          fontSize: "0.8rem",
+                          fontWeight: 600,
+                          color: accentBright,
+                        }}
+                      >
+                        <span>Vollständigen Bericht lesen</span>
+                        <ChevronRight size={12} />
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div
+              style={{
+                padding: "24px 20px",
+                borderRadius: "12px",
+                background: "rgba(255, 255, 255, 0.02)",
+                border: "1px dashed rgba(255, 255, 255, 0.08)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "14px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <FileText size={22} color="#64748B" />
+                <div>
+                  <div style={{ color: "#E2E8F0", fontSize: "0.9rem", fontWeight: 600 }}>
+                    Noch keine Berichte für diese Saison hinterlegt
+                  </div>
+                  <div style={{ color: "#94A3B8", fontSize: "0.8rem" }}>
+                    Spielberichte werden zeitnah nach den Spieltagen durch das Trainerteam veröffentlicht.
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                href={`/teams/${team.slug}/spielberichte`}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "0.82rem",
+                  fontWeight: 600,
+                  color: accentBright,
+                  textDecoration: "none",
+                }}
+              >
+                <span>Zur Spielberichte-Seite</span>
+                <ChevronRight size={14} />
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Section 3: nuLiga Tabelle */}

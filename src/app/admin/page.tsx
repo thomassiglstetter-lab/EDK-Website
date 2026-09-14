@@ -46,10 +46,27 @@ import {
   EyeOff,
   Send,
   MessageSquare,
+  FileText,
 } from "lucide-react";
 import ImageCropModal from "@/components/ImageCropModal";
 
 // Types
+export interface MatchReport {
+  id: string;
+  teamSlug: string;
+  teamName: string;
+  title: string;
+  date: string;
+  opponent: string;
+  result?: string;
+  isHome?: boolean;
+  outcome?: "Sieg" | "Niederlage" | "Remis";
+  excerpt: string;
+  content: string;
+  image?: string;
+  author?: string;
+  createdAt?: string;
+}
 export interface Article {
   id: string;
   category: "Spielbetrieb" | "Jugend" | "Verein";
@@ -171,7 +188,7 @@ export default function AdminPage() {
   const [authError, setAuthError] = useState<string>("");
 
   // Navigation Tab State
-  const [activeTab, setActiveTab] = useState<"news" | "teams" | "sponsors" | "nuliga" | "contact">("news");
+  const [activeTab, setActiveTab] = useState<"news" | "reports" | "teams" | "sponsors" | "nuliga" | "contact">("news");
 
   // ==========================================
   // NEWS STATE
@@ -206,6 +223,50 @@ export default function AdminPage() {
   const [newsSaving, setNewsSaving] = useState<boolean>(false);
   const [articleToDelete, setArticleToDelete] = useState<Article | null>(null);
   const [deletingArticle, setDeletingArticle] = useState<boolean>(false);
+
+  // ==========================================
+  // REPORTS (SPIELBERICHTE) STATE
+  // ==========================================
+  const [reports, setReports] = useState<MatchReport[]>([]);
+  const [reportsLoading, setReportsLoading] = useState<boolean>(true);
+  const [reportSearchQuery, setReportSearchQuery] = useState<string>("");
+  const [reportTeamFilter, setReportTeamFilter] = useState<string>("Alle");
+  const [reportOutcomeFilter, setReportOutcomeFilter] = useState<string>("Alle");
+
+  // Report Modal State
+  const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
+  const [editingReport, setEditingReport] = useState<MatchReport | null>(null);
+  const [reportFormData, setReportFormData] = useState<{
+    teamSlug: string;
+    teamName: string;
+    title: string;
+    date: string;
+    opponent: string;
+    result: string;
+    isHome: boolean;
+    outcome: "Sieg" | "Niederlage" | "Remis";
+    image: string;
+    excerpt: string;
+    content: string;
+    author: string;
+  }>({
+    teamSlug: "herren-1",
+    teamName: "Herren 1",
+    title: "",
+    date: "",
+    opponent: "",
+    result: "",
+    isHome: true,
+    outcome: "Sieg",
+    image: "",
+    excerpt: "",
+    content: "",
+    author: "",
+  });
+  const [reportSaving, setReportSaving] = useState<boolean>(false);
+  const [reportFormError, setReportFormError] = useState<string>("");
+  const [reportToDelete, setReportToDelete] = useState<MatchReport | null>(null);
+  const [deletingReport, setDeletingReport] = useState<boolean>(false);
 
   // ==========================================
   // TEAMS STATE
@@ -411,6 +472,18 @@ export default function AdminPage() {
       .catch((err) => {
         console.error("News fetch error:", err);
         setArticlesLoading(false);
+      });
+
+    // Fetch Spielberichte (Reports)
+    fetch("/api/reports", { cache: "no-store", headers: { "Cache-Control": "no-cache", Pragma: "no-cache" } })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setReports(data);
+        setReportsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Reports fetch error:", err);
+        setReportsLoading(false);
       });
 
     // Fetch Teams
@@ -658,6 +731,109 @@ export default function AdminPage() {
       showToast("Fehler beim Löschen des Artikels.", "error");
     } finally {
       setDeletingArticle(false);
+    }
+  };
+
+  // ==========================================
+  // REPORTS (SPIELBERICHTE) HANDLERS
+  // ==========================================
+  const openNewReportModal = () => {
+    setEditingReport(null);
+    setReportFormData({
+      teamSlug: teams[0]?.slug || "herren-1",
+      teamName: teams[0]?.name || "Herren 1",
+      title: "",
+      date: "",
+      opponent: "",
+      result: "",
+      isHome: true,
+      outcome: "Sieg",
+      image: "",
+      excerpt: "",
+      content: "",
+      author: "",
+    });
+    setReportFormError("");
+    setReportModalOpen(true);
+  };
+
+  const openEditReportModal = (rep: MatchReport) => {
+    setEditingReport(rep);
+    setReportFormData({
+      teamSlug: rep.teamSlug,
+      teamName: rep.teamName || rep.teamSlug,
+      title: rep.title,
+      date: rep.date,
+      opponent: rep.opponent,
+      result: rep.result || "",
+      isHome: rep.isHome !== undefined ? rep.isHome : true,
+      outcome: rep.outcome || "Sieg",
+      image: rep.image || "",
+      excerpt: rep.excerpt,
+      content: rep.content || rep.excerpt,
+      author: rep.author || "",
+    });
+    setReportFormError("");
+    setReportModalOpen(true);
+  };
+
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reportFormData.title.trim() || !reportFormData.opponent.trim() || !reportFormData.excerpt.trim()) {
+      setReportFormError("Titel, Gegner und Kurzbeschreibung sind erforderlich.");
+      return;
+    }
+
+    setReportSaving(true);
+    setReportFormError("");
+
+    try {
+      if (editingReport) {
+        // PUT update
+        const res = await fetch("/api/reports", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: editingReport.id, ...reportFormData }),
+        });
+        if (!res.ok) throw new Error("Aktualisierung fehlgeschlagen.");
+        const updated = await res.json();
+        setReports(reports.map((r) => (r.id === updated.id ? updated : r)));
+        showToast("Spielbericht erfolgreich aktualisiert!");
+      } else {
+        // POST create
+        const res = await fetch("/api/reports", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(reportFormData),
+        });
+        if (!res.ok) throw new Error("Erstellung fehlgeschlagen.");
+        const created = await res.json();
+        setReports([created, ...reports]);
+        showToast("Spielbericht erfolgreich gespeichert!");
+      }
+      setReportModalOpen(false);
+    } catch (err) {
+      console.error("Report submit error:", err);
+      setReportFormError("Fehler beim Speichern des Spielberichts.");
+    } finally {
+      setReportSaving(false);
+    }
+  };
+
+  const handleDeleteReport = async () => {
+    if (!reportToDelete) return;
+    setDeletingReport(true);
+    try {
+      const res = await fetch(`/api/reports?id=${reportToDelete.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Löschen fehlgeschlagen.");
+      setReports(reports.filter((r) => r.id !== reportToDelete.id));
+      showToast("Spielbericht gelöscht.", "success");
+      setReportToDelete(null);
+    } catch (err) {
+      console.error(err);
+      showToast("Fehler beim Löschen des Spielberichts.", "error");
+    } finally {
+      setDeletingReport(false);
     }
   };
 
@@ -2081,6 +2257,39 @@ export default function AdminPage() {
             </span>
           </button>
 
+          {/* TAB: SPIELBERICHTE (TEAMS) */}
+          <button
+            onClick={() => setActiveTab("reports")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px 18px",
+              borderRadius: "var(--radius-sm)",
+              border: "none",
+              background: activeTab === "reports" ? "rgba(255, 255, 255, 0.1)" : "transparent",
+              color: activeTab === "reports" ? "#FFFFFF" : "var(--color-text-dim)",
+              fontWeight: activeTab === "reports" ? 600 : 500,
+              fontSize: "0.92rem",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <FileText size={16} color={activeTab === "reports" ? "#38BDF8" : "currentColor"} />
+            <span>Spielberichte</span>
+            <span
+              style={{
+                fontSize: "0.72rem",
+                padding: "2px 7px",
+                borderRadius: "10px",
+                background: "rgba(255, 255, 255, 0.08)",
+                color: "#FFFFFF",
+              }}
+            >
+              {reports.length}
+            </span>
+          </button>
+
           {/* TAB 2: TEAMS */}
           <button
             onClick={() => setActiveTab("teams")}
@@ -2570,6 +2779,461 @@ export default function AdminPage() {
                   );
                 })}
               </div>
+            )}
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB: SPIELBERICHTE (REPORTS) MANAGEMENT                        */}
+        {/* ============================================================== */}
+        {activeTab === "reports" && (
+          <div>
+            {/* Quick Stats Grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: "16px",
+                marginBottom: "32px",
+              }}
+            >
+              <div
+                className="glass-panel"
+                style={{
+                  padding: "20px 24px",
+                  background: "rgba(14, 18, 28, 0.7)",
+                  borderLeft: "3px solid var(--color-azure)",
+                }}
+              >
+                <div style={{ fontSize: "0.78rem", color: "var(--color-text-dim)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Gesamt Spielberichte
+                </div>
+                <div style={{ fontSize: "1.8rem", fontWeight: 700, color: "#FFFFFF", marginTop: "4px" }}>
+                  {reports.length}
+                </div>
+              </div>
+
+              <div
+                className="glass-panel"
+                style={{
+                  padding: "20px 24px",
+                  background: "rgba(14, 18, 28, 0.7)",
+                  borderLeft: "3px solid #10B981",
+                }}
+              >
+                <div style={{ fontSize: "0.78rem", color: "var(--color-text-dim)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Siege
+                </div>
+                <div style={{ fontSize: "1.8rem", fontWeight: 700, color: "#34D399", marginTop: "4px" }}>
+                  {reports.filter((r) => r.outcome === "Sieg").length}
+                </div>
+              </div>
+
+              <div
+                className="glass-panel"
+                style={{
+                  padding: "20px 24px",
+                  background: "rgba(14, 18, 28, 0.7)",
+                  borderLeft: "3px solid var(--color-crimson)",
+                }}
+              >
+                <div style={{ fontSize: "0.78rem", color: "var(--color-text-dim)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Niederlagen
+                </div>
+                <div style={{ fontSize: "1.8rem", fontWeight: 700, color: "#F87171", marginTop: "4px" }}>
+                  {reports.filter((r) => r.outcome === "Niederlage").length}
+                </div>
+              </div>
+
+              <div
+                className="glass-panel"
+                style={{
+                  padding: "20px 24px",
+                  background: "rgba(14, 18, 28, 0.7)",
+                  borderLeft: "3px solid #F59E0B",
+                }}
+              >
+                <div style={{ fontSize: "0.78rem", color: "var(--color-text-dim)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Unentschieden
+                </div>
+                <div style={{ fontSize: "1.8rem", fontWeight: 700, color: "#FBBF24", marginTop: "4px" }}>
+                  {reports.filter((r) => r.outcome === "Remis").length}
+                </div>
+              </div>
+            </div>
+
+            {/* Action & Filter Bar */}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "16px",
+                marginBottom: "28px",
+                padding: "20px",
+                borderRadius: "var(--radius-md)",
+                background: "rgba(14, 18, 28, 0.6)",
+                border: "1px solid rgba(255, 255, 255, 0.06)",
+              }}
+            >
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "12px", flex: 1 }}>
+                {/* Search */}
+                <div style={{ position: "relative", minWidth: "240px", maxWidth: "340px", width: "100%" }}>
+                  <Search
+                    size={16}
+                    style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#64748B" }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Gegner, Titel oder Text suchen..."
+                    value={reportSearchQuery}
+                    onChange={(e) => setReportSearchQuery(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "8px 12px 8px 36px",
+                      borderRadius: "8px",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      color: "#FFFFFF",
+                      fontSize: "0.86rem",
+                      outline: "none",
+                    }}
+                  />
+                  {reportSearchQuery && (
+                    <button
+                      onClick={() => setReportSearchQuery("")}
+                      style={{
+                        position: "absolute",
+                        right: "10px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "transparent",
+                        border: "none",
+                        color: "#94A3B8",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Team Filter Dropdown */}
+                <select
+                  value={reportTeamFilter}
+                  onChange={(e) => setReportTeamFilter(e.target.value)}
+                  style={{
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    background: "#0D111A",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    color: "#FFFFFF",
+                    fontSize: "0.86rem",
+                    outline: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <option value="Alle">Alle Mannschaften</option>
+                  {teams.map((t) => (
+                    <option key={t.slug} value={t.slug}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Outcome Filter */}
+                <div style={{ display: "flex", gap: "6px" }}>
+                  {["Alle", "Sieg", "Niederlage", "Remis"].map((item) => (
+                    <button
+                      key={item}
+                      onClick={() => setReportOutcomeFilter(item)}
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: "8px",
+                        border:
+                          reportOutcomeFilter === item
+                            ? "1px solid var(--color-azure)"
+                            : "1px solid rgba(255, 255, 255, 0.08)",
+                        background:
+                          reportOutcomeFilter === item
+                            ? "rgba(72, 156, 216, 0.2)"
+                            : "rgba(255, 255, 255, 0.03)",
+                        color: reportOutcomeFilter === item ? "#FFFFFF" : "#94A3B8",
+                        fontSize: "0.8rem",
+                        fontWeight: reportOutcomeFilter === item ? 600 : 500,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Add New Report Button */}
+              <button
+                onClick={openNewReportModal}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "9px 18px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "var(--color-azure)",
+                  color: "#07090D",
+                  fontWeight: 700,
+                  fontSize: "0.88rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 4px 14px rgba(72, 156, 216, 0.3)",
+                }}
+              >
+                <Plus size={16} />
+                <span>Neuer Spielbericht</span>
+              </button>
+            </div>
+
+            {/* Reports List / Grid */}
+            {reportsLoading ? (
+              <div style={{ padding: "60px 0", textAlign: "center", color: "var(--color-text-dim)" }}>
+                Spielberichte werden geladen...
+              </div>
+            ) : (
+              (() => {
+                const filtered = reports.filter((r) => {
+                  if (reportTeamFilter !== "Alle" && r.teamSlug !== reportTeamFilter) return false;
+                  if (reportOutcomeFilter !== "Alle" && r.outcome !== reportOutcomeFilter) return false;
+                  if (reportSearchQuery.trim() !== "") {
+                    const q = reportSearchQuery.toLowerCase();
+                    const matchTitle = r.title.toLowerCase().includes(q);
+                    const matchOpponent = r.opponent.toLowerCase().includes(q);
+                    const matchContent = r.content?.toLowerCase().includes(q);
+                    const matchExcerpt = r.excerpt?.toLowerCase().includes(q);
+                    return matchTitle || matchOpponent || matchContent || matchExcerpt;
+                  }
+                  return true;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div
+                      style={{
+                        padding: "60px 24px",
+                        textAlign: "center",
+                        borderRadius: "var(--radius-md)",
+                        background: "rgba(14, 18, 28, 0.4)",
+                        border: "1px dashed rgba(255, 255, 255, 0.08)",
+                      }}
+                    >
+                      <FileText size={40} style={{ color: "#475569", margin: "0 auto 16px auto" }} />
+                      <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#FFFFFF", marginBottom: "8px" }}>
+                        Keine Spielberichte gefunden
+                      </h3>
+                      <p style={{ color: "var(--color-text-dim)", fontSize: "0.9rem", margin: "0 auto 20px auto", maxWidth: "450px" }}>
+                        Erstelle jetzt den ersten Spielbericht für eine Mannschaft oder passe die Filtereinstellungen an.
+                      </p>
+                      <button
+                        onClick={openNewReportModal}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          padding: "8px 16px",
+                          borderRadius: "8px",
+                          border: "none",
+                          background: "var(--color-azure)",
+                          color: "#07090D",
+                          fontWeight: 600,
+                          fontSize: "0.85rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <Plus size={15} />
+                        <span>Neuen Bericht anlegen</span>
+                      </button>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
+                      gap: "20px",
+                    }}
+                  >
+                    {filtered.map((rep) => {
+                      const isWin = rep.outcome === "Sieg";
+                      const isLoss = rep.outcome === "Niederlage";
+                      const outColor = isWin ? "#34D399" : isLoss ? "#F87171" : "#FBBF24";
+
+                      return (
+                        <div
+                          key={rep.id}
+                          className="glass-panel"
+                          style={{
+                            padding: "22px",
+                            background: "rgba(14, 18, 28, 0.8)",
+                            borderRadius: "14px",
+                            border: "1px solid rgba(255, 255, 255, 0.08)",
+                            borderTop: `3px solid ${outColor}`,
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <div>
+                            {/* Meta Top */}
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                marginBottom: "12px",
+                              }}
+                            >
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <span
+                                  style={{
+                                    padding: "3px 8px",
+                                    borderRadius: "4px",
+                                    background: "rgba(72, 156, 216, 0.15)",
+                                    border: "1px solid rgba(72, 156, 216, 0.3)",
+                                    color: "#38BDF8",
+                                    fontSize: "0.72rem",
+                                    fontWeight: 700,
+                                    textTransform: "uppercase",
+                                  }}
+                                >
+                                  {rep.teamName || rep.teamSlug}
+                                </span>
+
+                                <span
+                                  style={{
+                                    padding: "3px 7px",
+                                    borderRadius: "4px",
+                                    background: "rgba(255, 255, 255, 0.05)",
+                                    color: outColor,
+                                    fontSize: "0.72rem",
+                                    fontWeight: 700,
+                                  }}
+                                >
+                                  {rep.outcome} {rep.result ? `(${rep.result})` : ""}
+                                </span>
+                              </div>
+
+                              <span style={{ fontSize: "0.76rem", color: "#64748B" }}>
+                                {rep.date}
+                              </span>
+                            </div>
+
+                            <div style={{ fontSize: "0.82rem", color: "#94A3B8", marginBottom: "6px" }}>
+                              vs. <strong style={{ color: "#E2E8F0" }}>{rep.opponent}</strong> ({rep.isHome ? "Heim" : "Auswärts"})
+                            </div>
+
+                            <h4
+                              style={{
+                                fontSize: "1.1rem",
+                                fontWeight: 700,
+                                color: "#FFFFFF",
+                                lineHeight: 1.35,
+                                marginBottom: "8px",
+                              }}
+                            >
+                              {rep.title}
+                            </h4>
+
+                            <p
+                              style={{
+                                fontSize: "0.84rem",
+                                lineHeight: 1.55,
+                                color: "#94A3B8",
+                                margin: "0 0 16px 0",
+                                display: "-webkit-box",
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: "vertical",
+                                overflow: "hidden",
+                              }}
+                            >
+                              {rep.excerpt}
+                            </p>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div
+                            style={{
+                              paddingTop: "14px",
+                              borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Link
+                              href={`/teams/${rep.teamSlug}/spielberichte`}
+                              target="_blank"
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "5px",
+                                color: "#38BDF8",
+                                fontSize: "0.78rem",
+                                textDecoration: "none",
+                                fontWeight: 500,
+                              }}
+                            >
+                              <span>Im Team ansehen</span>
+                              <ExternalLink size={12} />
+                            </Link>
+
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              <button
+                                onClick={() => openEditReportModal(rep)}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "5px",
+                                  padding: "6px 10px",
+                                  borderRadius: "6px",
+                                  background: "rgba(255, 255, 255, 0.05)",
+                                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                                  color: "#E2E8F0",
+                                  fontSize: "0.78rem",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <Edit2 size={13} />
+                                <span>Bearbeiten</span>
+                              </button>
+
+                              <button
+                                onClick={() => setReportToDelete(rep)}
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  width: "30px",
+                                  height: "30px",
+                                  borderRadius: "6px",
+                                  background: "rgba(239, 68, 68, 0.1)",
+                                  border: "1px solid rgba(239, 68, 68, 0.25)",
+                                  color: "#F87171",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()
             )}
           </div>
         )}
@@ -5673,6 +6337,388 @@ export default function AdminPage() {
       )}
 
       {/* ============================================================== */}
+      {/* MODAL: CREATE / EDIT SPIELBERICHT (REPORT)                     */}
+      {/* ============================================================== */}
+      {reportModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 100,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(4, 7, 12, 0.85)",
+            backdropFilter: "blur(14px)",
+            padding: "20px",
+            overflowY: "auto",
+          }}
+          onClick={() => setReportModalOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel"
+            style={{
+              width: "100%",
+              maxWidth: "720px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              background: "rgba(12, 17, 26, 0.98)",
+              border: "1px solid rgba(255, 255, 255, 0.14)",
+              borderRadius: "18px",
+              boxShadow: "0 28px 70px rgba(0, 0, 0, 0.8)",
+              padding: "32px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <FileText size={20} color="var(--color-azure-bright)" />
+                <h3 style={{ fontSize: "1.35rem", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
+                  {editingReport ? "Spielbericht bearbeiten" : "Neuen Spielbericht erfassen"}
+                </h3>
+              </div>
+              <button
+                onClick={() => setReportModalOpen(false)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#94A3B8",
+                  cursor: "pointer",
+                  padding: "4px",
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {reportFormError && (
+              <div
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "var(--radius-sm)",
+                  background: "rgba(239, 68, 68, 0.15)",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  color: "#F87171",
+                  fontSize: "0.85rem",
+                  marginBottom: "20px",
+                }}
+              >
+                {reportFormError}
+              </div>
+            )}
+
+            <form onSubmit={handleReportSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              {/* Row 1: Team & Outcome */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                    Mannschaft *
+                  </label>
+                  <select
+                    value={reportFormData.teamSlug}
+                    onChange={(e) => {
+                      const selectedTeam = teams.find((t) => t.slug === e.target.value);
+                      setReportFormData({
+                        ...reportFormData,
+                        teamSlug: e.target.value,
+                        teamName: selectedTeam ? selectedTeam.name : e.target.value,
+                      });
+                    }}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "var(--radius-sm)",
+                      background: "#0D111A",
+                      border: "1px solid rgba(255, 255, 255, 0.14)",
+                      color: "#FFFFFF",
+                      fontSize: "0.88rem",
+                      outline: "none",
+                    }}
+                  >
+                    {teams.map((t) => (
+                      <option key={t.slug} value={t.slug}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                    Spielausgang *
+                  </label>
+                  <select
+                    value={reportFormData.outcome}
+                    onChange={(e) =>
+                      setReportFormData({
+                        ...reportFormData,
+                        outcome: e.target.value as "Sieg" | "Niederlage" | "Remis",
+                      })
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "var(--radius-sm)",
+                      background: "#0D111A",
+                      border: "1px solid rgba(255, 255, 255, 0.14)",
+                      color: "#FFFFFF",
+                      fontSize: "0.88rem",
+                      outline: "none",
+                    }}
+                  >
+                    <option value="Sieg">Sieg</option>
+                    <option value="Niederlage">Niederlage</option>
+                    <option value="Remis">Unentschieden (Remis)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 2: Opponent & Result */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                    Gegner * (z.B. TSV Allach 09 II)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="TSV Allach 09 II"
+                    value={reportFormData.opponent}
+                    onChange={(e) => setReportFormData({ ...reportFormData, opponent: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "var(--radius-sm)",
+                      background: "rgba(255, 255, 255, 0.04)",
+                      border: "1px solid rgba(255, 255, 255, 0.14)",
+                      color: "#FFFFFF",
+                      fontSize: "0.88rem",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                    Ergebnis (z.B. 28:26)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="28:26"
+                    value={reportFormData.result}
+                    onChange={(e) => setReportFormData({ ...reportFormData, result: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "var(--radius-sm)",
+                      background: "rgba(255, 255, 255, 0.04)",
+                      border: "1px solid rgba(255, 255, 255, 0.14)",
+                      color: "#FFFFFF",
+                      fontSize: "0.88rem",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Row 3: Date, Home/Away, Author */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                    Spieldatum (z.B. 06.09.2026)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="06.09.2026"
+                    value={reportFormData.date}
+                    onChange={(e) => setReportFormData({ ...reportFormData, date: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "var(--radius-sm)",
+                      background: "rgba(255, 255, 255, 0.04)",
+                      border: "1px solid rgba(255, 255, 255, 0.14)",
+                      color: "#FFFFFF",
+                      fontSize: "0.88rem",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                    Spielort
+                  </label>
+                  <select
+                    value={reportFormData.isHome ? "home" : "away"}
+                    onChange={(e) => setReportFormData({ ...reportFormData, isHome: e.target.value === "home" })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "var(--radius-sm)",
+                      background: "#0D111A",
+                      border: "1px solid rgba(255, 255, 255, 0.14)",
+                      color: "#FFFFFF",
+                      fontSize: "0.88rem",
+                      outline: "none",
+                    }}
+                  >
+                    <option value="home">Heimspiel</option>
+                    <option value="away">Auswärtsspiel</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                    Autor / Redaktion
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Trainerteam"
+                    value={reportFormData.author}
+                    onChange={(e) => setReportFormData({ ...reportFormData, author: e.target.value })}
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "var(--radius-sm)",
+                      background: "rgba(255, 255, 255, 0.04)",
+                      border: "1px solid rgba(255, 255, 255, 0.14)",
+                      color: "#FFFFFF",
+                      fontSize: "0.88rem",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Title */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                  Titel der Partie *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Nervenstark im Derby-Krimi: Herren 1 siegen..."
+                  value={reportFormData.title}
+                  onChange={(e) => setReportFormData({ ...reportFormData, title: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "rgba(255, 255, 255, 0.04)",
+                    border: "1px solid rgba(255, 255, 255, 0.14)",
+                    color: "#FFFFFF",
+                    fontSize: "0.88rem",
+                    outline: "none",
+                  }}
+                />
+              </div>
+
+              {/* Optional Image */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                  Optionales Beitragsbild (URL oder Pfad, z.B. /news-match.jpg)
+                </label>
+                <input
+                  type="text"
+                  placeholder="/news-match.jpg"
+                  value={reportFormData.image}
+                  onChange={(e) => setReportFormData({ ...reportFormData, image: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "rgba(255, 255, 255, 0.04)",
+                    border: "1px solid rgba(255, 255, 255, 0.14)",
+                    color: "#FFFFFF",
+                    fontSize: "0.88rem",
+                    outline: "none",
+                  }}
+                />
+              </div>
+
+              {/* Excerpt */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                  Kurzbeschreibung / Fazit *
+                </label>
+                <textarea
+                  required
+                  rows={2}
+                  placeholder="Kompakte Zusammenfassung der wichtigsten Schlüsselszenen..."
+                  value={reportFormData.excerpt}
+                  onChange={(e) => setReportFormData({ ...reportFormData, excerpt: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "rgba(255, 255, 255, 0.04)",
+                    border: "1px solid rgba(255, 255, 255, 0.14)",
+                    color: "#FFFFFF",
+                    fontSize: "0.88rem",
+                    outline: "none",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
+
+              {/* Content */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "6px" }}>
+                  Ausführlicher Spielbericht
+                </label>
+                <textarea
+                  rows={6}
+                  placeholder="Detaillierter Verlauf: 1. Halbzeit, Auszeiten, Torschützen, Schlussphase..."
+                  value={reportFormData.content}
+                  onChange={(e) => setReportFormData({ ...reportFormData, content: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "rgba(255, 255, 255, 0.04)",
+                    border: "1px solid rgba(255, 255, 255, 0.14)",
+                    color: "#FFFFFF",
+                    fontSize: "0.88rem",
+                    outline: "none",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
+
+              {/* Form Buttons */}
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "12px" }}>
+                <button
+                  type="button"
+                  onClick={() => setReportModalOpen(false)}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "transparent",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    color: "#CBD5E1",
+                    fontSize: "0.88rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="submit"
+                  disabled={reportSaving}
+                  className="btn-primary"
+                  style={{ padding: "10px 24px", fontSize: "0.88rem", opacity: reportSaving ? 0.7 : 1 }}
+                >
+                  <span>{reportSaving ? "Wird gespeichert..." : editingReport ? "Änderungen speichern" : "Spielbericht speichern"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
       {/* MODAL 2: CREATE / EDIT TEAM                                    */}
       {/* ============================================================== */}
       {teamModalOpen && (
@@ -7109,6 +8155,96 @@ export default function AdminPage() {
                 }}
               >
                 {deletingArticle ? "Wird gelöscht..." : "Ja, löschen"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* DELETE CONFIRMATION: SPIELBERICHT (REPORT)                     */}
+      {/* ============================================================== */}
+      {reportToDelete && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 110,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(4, 7, 12, 0.85)",
+            backdropFilter: "blur(14px)",
+            padding: "20px",
+          }}
+          onClick={() => setReportToDelete(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel"
+            style={{
+              width: "100%",
+              maxWidth: "460px",
+              background: "rgba(14, 18, 28, 0.98)",
+              border: "1px solid rgba(239, 68, 68, 0.3)",
+              borderRadius: "16px",
+              padding: "28px",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                width: "48px",
+                height: "48px",
+                margin: "0 auto 16px auto",
+                borderRadius: "50%",
+                background: "rgba(239, 68, 68, 0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#F87171",
+              }}
+            >
+              <Trash2 size={22} />
+            </div>
+
+            <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#FFFFFF", marginBottom: "8px" }}>
+              Spielbericht wirklich löschen?
+            </h3>
+            <p style={{ fontSize: "0.88rem", color: "#CBD5E1", lineHeight: 1.5, marginBottom: "24px" }}>
+              Möchtest du den Spielbericht <strong>"{reportToDelete.title}"</strong> ({reportToDelete.teamName || reportToDelete.teamSlug}) unwiderruflich von der Website entfernen?
+            </p>
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+              <button
+                onClick={() => setReportToDelete(null)}
+                style={{
+                  padding: "9px 20px",
+                  borderRadius: "var(--radius-sm)",
+                  background: "transparent",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  color: "#CBD5E1",
+                  fontSize: "0.86rem",
+                  cursor: "pointer",
+                }}
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={handleDeleteReport}
+                disabled={deletingReport}
+                style={{
+                  padding: "9px 20px",
+                  borderRadius: "var(--radius-sm)",
+                  background: "#EF4444",
+                  border: "none",
+                  color: "#FFFFFF",
+                  fontSize: "0.86rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                {deletingReport ? "Wird gelöscht..." : "Ja, löschen"}
               </button>
             </div>
           </div>
