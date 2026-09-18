@@ -31,19 +31,22 @@ import { getCachedLeagueTable, syncLeagueTable } from "@/lib/tables";
 import { readCachedMatches, parseGermanDate } from "@/lib/nuliga";
 import { triggerBackgroundSyncIfNeeded } from "@/lib/sync";
 
+import { getSiteData } from "@/lib/supabase";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 async function getMatchReports(teamSlug: string): Promise<any[]> {
   try {
-    const filePath = path.join(process.cwd(), "src", "data", "reports.json");
-    const tmpFilePath = path.join("/tmp", "reports.json");
-    let raw = "";
-    try {
-      raw = await fs.readFile(tmpFilePath, "utf8");
-    } catch {
-      raw = await fs.readFile(filePath, "utf8");
+    const reports = await getSiteData<any[]>("reports", []);
+    if (Array.isArray(reports) && reports.length > 0) {
+      return reports.filter((r: any) => r.teamSlug === teamSlug);
     }
+  } catch {}
+
+  try {
+    const filePath = path.join(process.cwd(), "src", "data", "reports.json");
+    const raw = await fs.readFile(filePath, "utf8");
     const reports = JSON.parse(raw);
     return Array.isArray(reports) ? reports.filter((r: any) => r.teamSlug === teamSlug) : [];
   } catch {
@@ -52,6 +55,13 @@ async function getMatchReports(teamSlug: string): Promise<any[]> {
 }
 
 async function getTeams(): Promise<any[]> {
+  try {
+    const teams = await getSiteData<any[]>("teams", teamsData);
+    if (Array.isArray(teams) && teams.length > 0) {
+      return teams;
+    }
+  } catch {}
+
   try {
     const filePath = path.join(process.cwd(), "src", "data", "teams.json");
     const raw = await fs.readFile(filePath, "utf8");

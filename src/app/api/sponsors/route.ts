@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
+import { getSiteData, setSiteData } from "@/lib/supabase";
+
 const DATA_FILE = path.join(process.cwd(), "src", "data", "sponsors.json");
-const TMP_DATA_FILE = path.join("/tmp", "sponsors.json");
 
 export type SponsorTier = "gold" | "silver" | "partner" | "none";
 
@@ -18,18 +19,17 @@ export interface Sponsor {
 }
 
 async function getSponsors(): Promise<Sponsor[]> {
-  // 1. Try reading from /tmp (latest updates in serverless environment)
+  // 1. Try reading from Supabase site_data
   try {
-    const tmpRaw = await fs.readFile(TMP_DATA_FILE, "utf8");
-    const parsed = JSON.parse(tmpRaw);
-    if (Array.isArray(parsed)) {
-      return parsed;
+    const fromDb = await getSiteData<Sponsor[]>("sponsors", []);
+    if (Array.isArray(fromDb) && fromDb.length > 0) {
+      return fromDb;
     }
-  } catch {
-    // /tmp does not exist yet, fallback to bundled file
+  } catch (err) {
+    console.warn("Could not read sponsors from Supabase, falling back to local file:", err);
   }
 
-  // 2. Read from bundled src/data/sponsors.json
+  // 2. Fallback to bundled src/data/sponsors.json
   try {
     const raw = await fs.readFile(DATA_FILE, "utf8");
     return JSON.parse(raw);
@@ -40,25 +40,17 @@ async function getSponsors(): Promise<Sponsor[]> {
 }
 
 async function saveSponsors(sponsors: Sponsor[]): Promise<boolean> {
-  let saved = false;
+  // 1. Save to Supabase (persistent on Vercel)
+  const dbSaved = await setSiteData("sponsors", sponsors);
 
-  // 1. Try writing to src/data/sponsors.json (local dev, VPS)
+  // 2. Also try writing to local file if writable (local dev or backup)
   try {
     await fs.writeFile(DATA_FILE, JSON.stringify(sponsors, null, 2), "utf8");
-    saved = true;
-  } catch (err) {
-    console.warn("Could not write to src/data/sponsors.json (read-only on Vercel):", err);
+  } catch {
+    // Expected on Vercel serverless read-only filesystem
   }
 
-  // 2. Also write to /tmp/sponsors.json (writable on Vercel serverless)
-  try {
-    await fs.writeFile(TMP_DATA_FILE, JSON.stringify(sponsors, null, 2), "utf8");
-    saved = true;
-  } catch (tmpErr) {
-    console.warn("Could not write to /tmp/sponsors.json:", tmpErr);
-  }
-
-  return saved;
+  return dbSaved;
 }
 
 export const dynamic = "force-dynamic";

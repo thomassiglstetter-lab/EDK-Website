@@ -72,53 +72,42 @@ export async function POST(req: NextRequest) {
       .slice(0, 40)
       .replace(/^-|-$/g, "") || "upload";
 
-    const filename = `${safeSlug}-${Date.now()}.${ext}`;
-    
-    let publicUrl = "";
-    let savedToDisk = false;
+    const filename = `${safeFolder}-${safeSlug}-${Date.now()}.${ext}`;
+    const mime =
+      file.type ||
+      (ext === "png"
+        ? "image/png"
+        : ext === "webp"
+        ? "image/webp"
+        : ext === "svg"
+        ? "image/svg+xml"
+        : "image/jpeg");
 
-    // 1. Try saving to public/uploads/<folder>/... (works in local dev, VPS, Docker)
+    let publicUrl = "";
+
+    // 1. Upload to Supabase Storage (primary persistent storage for both dev & Vercel)
+    try {
+      const { uploadToSupabaseStorage } = await import("@/lib/supabase");
+      publicUrl = await uploadToSupabaseStorage(buffer, filename, mime);
+    } catch (sbErr) {
+      console.error("Supabase Storage upload error, attempting fallback:", sbErr);
+    }
+
+    // 2. Also save to local public/uploads (in local development or VPS) if possible
     try {
       const uploadsDir = path.join(process.cwd(), "public", "uploads", safeFolder);
       const uploadsPath = path.join(uploadsDir, filename);
       await fs.mkdir(uploadsDir, { recursive: true });
       await fs.writeFile(uploadsPath, buffer);
-      publicUrl = `/uploads/${safeFolder}/${filename}`;
-      savedToDisk = true;
-
-      // Also try legacy public/<folder>/...
-      try {
-        const legacyDir = path.join(process.cwd(), "public", safeFolder);
-        await fs.mkdir(legacyDir, { recursive: true });
-        await fs.writeFile(path.join(legacyDir, filename), buffer);
-      } catch {
-        // Non-fatal
+      if (!publicUrl) {
+        publicUrl = `/uploads/${safeFolder}/${filename}`;
       }
     } catch (fsErr) {
-      console.warn("Public filesystem write failed (likely Vercel serverless read-only):", fsErr);
+      // Expected in Vercel serverless read-only environment
     }
 
-    // 2. Fallback for serverless environments (Vercel):
-    // Write to /tmp if possible, and encode as self-contained Base64 Data URL
-    if (!savedToDisk) {
-      try {
-        const tmpDir = path.join("/tmp", "uploads", safeFolder);
-        await fs.mkdir(tmpDir, { recursive: true });
-        await fs.writeFile(path.join(tmpDir, filename), buffer);
-      } catch (tmpErr) {
-        console.warn("Writing to /tmp failed:", tmpErr);
-      }
-
-      // Generate Data URL
-      const mime =
-        file.type ||
-        (ext === "png"
-          ? "image/png"
-          : ext === "webp"
-          ? "image/webp"
-          : ext === "svg"
-          ? "image/svg+xml"
-          : "image/jpeg");
+    // 3. Fallback to base64 only if Supabase and local disk both failed
+    if (!publicUrl) {
       publicUrl = `data:${mime};base64,${buffer.toString("base64")}`;
     }
 

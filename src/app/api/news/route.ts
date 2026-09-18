@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
+import { getSiteData, setSiteData } from "@/lib/supabase";
+
 const DATA_FILE = path.join(process.cwd(), "src", "data", "news.json");
 
 export interface Article {
@@ -17,6 +19,17 @@ export interface Article {
 }
 
 async function getNews(): Promise<Article[]> {
+  // 1. Try reading from Supabase site_data
+  try {
+    const fromDb = await getSiteData<Article[]>("news", []);
+    if (Array.isArray(fromDb) && fromDb.length > 0) {
+      return fromDb;
+    }
+  } catch (err) {
+    console.warn("Could not read news from Supabase, falling back to local file:", err);
+  }
+
+  // 2. Fallback to local news.json
   try {
     const raw = await fs.readFile(DATA_FILE, "utf8");
     return JSON.parse(raw);
@@ -27,13 +40,17 @@ async function getNews(): Promise<Article[]> {
 }
 
 async function saveNews(news: Article[]): Promise<boolean> {
+  // 1. Save to Supabase (persistent on Vercel)
+  const dbSaved = await setSiteData("news", news);
+
+  // 2. Also try writing to local file if writable (local dev or backup)
   try {
     await fs.writeFile(DATA_FILE, JSON.stringify(news, null, 2), "utf8");
-    return true;
-  } catch (err) {
-    console.error("Error writing news.json:", err);
-    return false;
+  } catch {
+    // Expected on Vercel serverless read-only filesystem
   }
+
+  return dbSaved;
 }
 
 export const dynamic = "force-dynamic";

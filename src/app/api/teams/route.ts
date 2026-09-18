@@ -3,6 +3,8 @@ import fs from "fs/promises";
 import path from "path";
 import { syncLeagueTable } from "@/lib/tables";
 
+import { getSiteData, setSiteData } from "@/lib/supabase";
+
 const DATA_FILE = path.join(process.cwd(), "src", "data", "teams.json");
 
 export type TeamCategory = "Herren" | "Damen" | "Jugend männlich" | "Jugend weiblich" | "Kinderhandball" | "Minis";
@@ -48,6 +50,17 @@ export interface Team {
 }
 
 async function getTeams(): Promise<Team[]> {
+  // 1. Try reading from Supabase site_data
+  try {
+    const fromDb = await getSiteData<Team[]>("teams", []);
+    if (Array.isArray(fromDb) && fromDb.length > 0) {
+      return fromDb;
+    }
+  } catch (err) {
+    console.warn("Could not read teams from Supabase, falling back to local file:", err);
+  }
+
+  // 2. Fallback to local teams.json
   try {
     const raw = await fs.readFile(DATA_FILE, "utf8");
     return JSON.parse(raw);
@@ -58,13 +71,17 @@ async function getTeams(): Promise<Team[]> {
 }
 
 async function saveTeams(teams: Team[]): Promise<boolean> {
+  // 1. Save to Supabase (persistent on Vercel)
+  const dbSaved = await setSiteData("teams", teams);
+
+  // 2. Also try writing to local file if writable (local dev or backup)
   try {
     await fs.writeFile(DATA_FILE, JSON.stringify(teams, null, 2), "utf8");
-    return true;
-  } catch (err) {
-    console.error("Error writing teams.json:", err);
-    return false;
+  } catch {
+    // Expected on Vercel serverless read-only filesystem
   }
+
+  return dbSaved;
 }
 
 export const dynamic = "force-dynamic";
@@ -148,7 +165,10 @@ export async function POST(req: NextRequest) {
     };
 
     teams.push(newTeam);
-    await saveTeams(teams);
+    const saved = await saveTeams(teams);
+    if (!saved) {
+      return NextResponse.json({ error: "Fehler beim Speichern des Teams in der Datenbank." }, { status: 500 });
+    }
 
     // If groupUrl is provided, trigger sync of the nuLiga table in the background
     if (newTeam.groupUrl && newTeam.groupUrl.startsWith("http")) {
@@ -228,7 +248,10 @@ export async function PUT(req: NextRequest) {
     };
 
     teams[index] = updated;
-    await saveTeams(teams);
+    const saved = await saveTeams(teams);
+    if (!saved) {
+      return NextResponse.json({ error: "Fehler beim Speichern der Änderungen in der Datenbank." }, { status: 500 });
+    }
 
     // If groupUrl is provided, trigger sync of the nuLiga table in the background
     if (updated.groupUrl && updated.groupUrl.startsWith("http")) {
@@ -261,7 +284,10 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Team nicht gefunden." }, { status: 404 });
     }
 
-    await saveTeams(filtered);
+    const saved = await saveTeams(filtered);
+    if (!saved) {
+      return NextResponse.json({ error: "Fehler beim Löschen des Teams in der Datenbank." }, { status: 500 });
+    }
     return NextResponse.json({ success: true, deletedId: id });
   } catch (err) {
     console.error("DELETE /api/teams error:", err);

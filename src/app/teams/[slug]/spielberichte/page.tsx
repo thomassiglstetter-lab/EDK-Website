@@ -47,12 +47,27 @@ export default function TeamSpielberichtePage({
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
 
-  const team = teamsData.find((t) => t.slug === slug || t.id === slug);
-  if (!team) {
+  const initialTeam = teamsData.find((t) => t.slug === slug || t.id === slug) || null;
+  const [team, setTeam] = useState<any>(initialTeam);
+
+  useEffect(() => {
+    fetch("/api/teams")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const found = data.find((t: any) => t.slug === slug || t.id === slug);
+          if (found) setTeam(found);
+        }
+      })
+      .catch(() => {});
+  }, [slug]);
+
+  if (!team && !initialTeam) {
     notFound();
   }
 
-  const isCrimson = team.accentType === "crimson";
+  const activeTeam = team || initialTeam;
+  const isCrimson = activeTeam?.accentType === "crimson";
   const accentColor = isCrimson ? "var(--color-crimson)" : "var(--color-azure)";
   const accentBright = isCrimson ? "var(--color-crimson-bright)" : "var(--color-azure-bright)";
   const badgeBg = isCrimson ? "rgba(230, 57, 70, 0.14)" : "rgba(14, 165, 233, 0.14)";

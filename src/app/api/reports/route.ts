@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
+import { getSiteData, setSiteData } from "@/lib/supabase";
+
 const DATA_FILE = path.join(process.cwd(), "src", "data", "reports.json");
-const TMP_DATA_FILE = path.join("/tmp", "reports.json");
 
 export interface MatchReport {
   id: string;
@@ -23,18 +24,17 @@ export interface MatchReport {
 }
 
 async function getReports(): Promise<MatchReport[]> {
-  // 1. Try reading from /tmp (latest updates in serverless environment)
+  // 1. Try reading from Supabase site_data
   try {
-    const tmpRaw = await fs.readFile(TMP_DATA_FILE, "utf8");
-    const parsed = JSON.parse(tmpRaw);
-    if (Array.isArray(parsed)) {
-      return parsed;
+    const fromDb = await getSiteData<MatchReport[]>("reports", []);
+    if (Array.isArray(fromDb) && fromDb.length > 0) {
+      return fromDb;
     }
-  } catch {
-    // /tmp does not exist yet
+  } catch (err) {
+    console.warn("Could not read reports from Supabase, falling back to local file:", err);
   }
 
-  // 2. Read from bundled src/data/reports.json
+  // 2. Fallback to bundled src/data/reports.json
   try {
     const raw = await fs.readFile(DATA_FILE, "utf8");
     return JSON.parse(raw);
@@ -45,25 +45,17 @@ async function getReports(): Promise<MatchReport[]> {
 }
 
 async function saveReports(reports: MatchReport[]): Promise<boolean> {
-  let saved = false;
+  // 1. Save to Supabase (persistent on Vercel)
+  const dbSaved = await setSiteData("reports", reports);
 
-  // 1. Try writing to src/data/reports.json (local dev)
+  // 2. Also try writing to local file if writable (local dev or backup)
   try {
     await fs.writeFile(DATA_FILE, JSON.stringify(reports, null, 2), "utf8");
-    saved = true;
-  } catch (err) {
-    console.warn("Could not write to src/data/reports.json (read-only on Vercel):", err);
+  } catch {
+    // Expected on Vercel serverless read-only filesystem
   }
 
-  // 2. Also write to /tmp/reports.json (writable on Vercel serverless)
-  try {
-    await fs.writeFile(TMP_DATA_FILE, JSON.stringify(reports, null, 2), "utf8");
-    saved = true;
-  } catch (tmpErr) {
-    console.warn("Could not write to /tmp/reports.json:", tmpErr);
-  }
-
-  return saved;
+  return dbSaved;
 }
 
 export const dynamic = "force-dynamic";
