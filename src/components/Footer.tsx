@@ -270,6 +270,19 @@ export default function Footer() {
             </li>
             <li>
               <a
+                href="https://bavarian-handball-cup.de/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#94A3B8", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px", transition: "color 0.2s ease" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}
+              >
+                <span>Bavarian Handball Cup</span>
+                <ExternalLink size={12} />
+              </a>
+            </li>
+            <li>
+              <a
                 href="https://www.tsvdachau1865.de/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -357,6 +370,17 @@ export default function Footer() {
           >
             <WhatsAppIcon size={14} />
             <span>WhatsApp Community</span>
+          </a>
+          <a
+            href="https://bavarian-handball-cup.de/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#94A3B8", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px", transition: "color 0.2s ease" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}
+          >
+            <span>Bavarian Handball Cup</span>
+            <ExternalLink size={10} style={{ opacity: 0.6 }} />
           </a>
           <Link
             href="/hallen"

@@ -178,6 +178,12 @@ function getNavItems(teamCategories: NavCategory[]): NavItem[] {
               subtitle: "Starke Partnerschaft zwischen TSV Dachau & TSV Eintracht Karlsfeld",
               href: "/verein#stammvereine",
             },
+            {
+              title: "Bavarian Handball Cup",
+              subtitle: "Internationales Oster-Jugendturnier in Dachau & Karlsfeld",
+              href: "https://bavarian-handball-cup.de/",
+              isExternal: true,
+            },
           ],
         },
         {
