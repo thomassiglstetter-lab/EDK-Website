@@ -38,8 +38,8 @@ export const revalidate = 0;
 
 async function getMatchReports(teamSlug: string): Promise<any[]> {
   try {
-    const reports = await getSiteData<any[]>("reports", []);
-    if (Array.isArray(reports) && reports.length > 0) {
+    const reports = await getSiteData<any[] | null>("reports", null);
+    if (reports !== null && Array.isArray(reports)) {
       return reports.filter((r: any) => r.teamSlug === teamSlug);
     }
   } catch {}

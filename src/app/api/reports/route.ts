@@ -26,18 +26,19 @@ export interface MatchReport {
 async function getReports(): Promise<MatchReport[]> {
   // 1. Try reading from Supabase site_data
   try {
-    const fromDb = await getSiteData<MatchReport[]>("reports", []);
-    if (Array.isArray(fromDb) && fromDb.length > 0) {
+    const fromDb = await getSiteData<MatchReport[] | null>("reports", null);
+    if (fromDb !== null && Array.isArray(fromDb)) {
       return fromDb;
     }
   } catch (err) {
     console.warn("Could not read reports from Supabase, falling back to local file:", err);
   }
 
-  // 2. Fallback to bundled src/data/reports.json
+  // 2. Fallback to bundled src/data/reports.json only if DB entry does not exist
   try {
     const raw = await fs.readFile(DATA_FILE, "utf8");
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     console.error("Error reading reports.json, falling back:", err);
     return [];
