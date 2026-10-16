@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import { getSiteData, setSiteData } from "@/lib/supabase";
 
 const DATA_FILE = path.join(process.cwd(), "src", "data", "contact.json");
 const MESSAGES_FILE = path.join(process.cwd(), "src", "data", "contact-messages.json");
@@ -65,6 +66,17 @@ const DEFAULT_SETTINGS: ContactSettings = {
 };
 
 async function getContactSettings(): Promise<ContactSettings> {
+  // 1. Try reading from Supabase site_data
+  try {
+    const fromDb = await getSiteData<ContactSettings | null>("contact_settings", null);
+    if (fromDb && Array.isArray(fromDb.categories)) {
+      return fromDb;
+    }
+  } catch (err) {
+    console.warn("Could not read contact_settings from Supabase:", err);
+  }
+
+  // 2. Fallback to bundled contact.json
   try {
     const raw = await fs.readFile(DATA_FILE, "utf8");
     return JSON.parse(raw);
@@ -75,32 +87,48 @@ async function getContactSettings(): Promise<ContactSettings> {
 }
 
 async function saveContactSettings(settings: ContactSettings): Promise<boolean> {
+  // 1. Save to Supabase (persistent across Vercel deployments)
+  const dbSaved = await setSiteData("contact_settings", settings);
+
+  // 2. Also try writing to local file if writable
   try {
     await fs.writeFile(DATA_FILE, JSON.stringify(settings, null, 2), "utf8");
-    return true;
-  } catch (err) {
-    console.error("Error writing contact.json:", err);
-    return false;
-  }
+  } catch {}
+
+  return dbSaved;
 }
 
 async function getMessages(): Promise<ContactMessage[]> {
+  // 1. Try reading from Supabase site_data
+  try {
+    const fromDb = await getSiteData<ContactMessage[] | null>("contact_messages", null);
+    if (fromDb !== null && Array.isArray(fromDb)) {
+      return fromDb;
+    }
+  } catch (err) {
+    console.warn("Could not read contact_messages from Supabase:", err);
+  }
+
+  // 2. Fallback to bundled contact-messages.json only if DB entry does not exist
   try {
     const raw = await fs.readFile(MESSAGES_FILE, "utf8");
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
 }
 
 async function saveMessages(messages: ContactMessage[]): Promise<boolean> {
+  // 1. Save to Supabase (persistent across Vercel deployments)
+  const dbSaved = await setSiteData("contact_messages", messages);
+
+  // 2. Also try writing to local file if writable
   try {
     await fs.writeFile(MESSAGES_FILE, JSON.stringify(messages, null, 2), "utf8");
-    return true;
-  } catch (err) {
-    console.error("Error writing contact-messages.json:", err);
-    return false;
-  }
+  } catch {}
+
+  return dbSaved;
 }
 
 export const dynamic = "force-dynamic";
