@@ -253,77 +253,11 @@ export function ScheduleSection() {
     return data.results.filter((r) => r.category === resultsCategoryFilter);
   }, [data, resultsCategoryFilter]);
 
-  const getOutcomeBadge = (outcome: "win" | "loss" | "draw" | null) => {
-    if (outcome === "win") {
-      return (
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            padding: "4px 9px",
-            borderRadius: "6px",
-            background: "rgba(16, 185, 129, 0.15)",
-            border: "1px solid rgba(16, 185, 129, 0.35)",
-            color: "#34D399",
-            fontSize: "0.75rem",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-          }}
-        >
-          <CheckCircle2 size={12} />
-          Sieg
-        </span>
-      );
-    }
-    if (outcome === "loss") {
-      return (
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            padding: "4px 9px",
-            borderRadius: "6px",
-            background: "rgba(239, 68, 68, 0.15)",
-            border: "1px solid rgba(239, 68, 68, 0.35)",
-            color: "#F87171",
-            fontSize: "0.75rem",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-          }}
-        >
-          <XCircle size={12} />
-          Niederlage
-        </span>
-      );
-    }
-    if (outcome === "draw") {
-      return (
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            padding: "4px 9px",
-            borderRadius: "6px",
-            background: "rgba(234, 179, 8, 0.15)",
-            border: "1px solid rgba(234, 179, 8, 0.35)",
-            color: "#FACC15",
-            fontSize: "0.75rem",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-          }}
-        >
-          <MinusCircle size={12} />
-          Unentschieden
-        </span>
-      );
-    }
-    return null;
+  const getOutcomeColor = (outcome: "win" | "loss" | "draw" | null) => {
+    if (outcome === "win") return "#34D399";
+    if (outcome === "loss") return "#F87171";
+    if (outcome === "draw") return "#FACC15";
+    return "#FFFFFF";
   };
 
   return (
@@ -1192,20 +1126,17 @@ export function ScheduleSection() {
                       >
                         {/* Result & Outcome */}
                         <td style={{ padding: "18px 20px", whiteSpace: "nowrap" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                            <span
-                              style={{
-                                fontSize: "1.2rem",
-                                fontWeight: 900,
-                                color: "#FFFFFF",
-                                fontVariantNumeric: "tabular-nums",
-                                letterSpacing: "0.02em",
-                              }}
-                            >
-                              {m.result || `${m.homeScore ?? "-"} : ${m.guestScore ?? "-"}`}
-                            </span>
-                            {getOutcomeBadge(m.outcome)}
-                          </div>
+                          <span
+                            style={{
+                              fontSize: "1.25rem",
+                              fontWeight: 900,
+                              color: getOutcomeColor(m.outcome),
+                              fontVariantNumeric: "tabular-nums",
+                              letterSpacing: "0.02em",
+                            }}
+                          >
+                            {m.result || `${m.homeScore ?? "-"} : ${m.guestScore ?? "-"}`}
+                          </span>
                         </td>
 
                         {/* Datum & Zeit */}
@@ -1387,7 +1318,7 @@ export function ScheduleSection() {
                     gap: "12px",
                   }}
                 >
-                  {/* Card Header: Category, Date & Outcome */}
+                  {/* Card Header: Category & Date */}
                   <div
                     style={{
                       display: "flex",
@@ -1413,7 +1344,6 @@ export function ScheduleSection() {
                         {m.date}
                       </span>
                     </div>
-                    {getOutcomeBadge(m.outcome)}
                   </div>
 
                   {/* Teams & Score Box */}
@@ -1451,9 +1381,9 @@ export function ScheduleSection() {
 
                     <div
                       style={{
-                        fontSize: "1.3rem",
+                        fontSize: "1.35rem",
                         fontWeight: 900,
-                        color: "#FFFFFF",
+                        color: getOutcomeColor(m.outcome),
                         fontVariantNumeric: "tabular-nums",
                         textAlign: "right",
                         letterSpacing: "0.04em",

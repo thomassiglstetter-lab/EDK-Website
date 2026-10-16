@@ -1316,29 +1316,6 @@ export default async function TeamDetailPage({
                       >
                         {m.result}
                       </div>
-                      <span
-                        style={{
-                          fontSize: "0.68rem",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          padding: "1px 6px",
-                          borderRadius: "4px",
-                          background:
-                            m.outcome === "win"
-                              ? "rgba(16, 185, 129, 0.16)"
-                              : m.outcome === "loss"
-                              ? "rgba(239, 68, 68, 0.16)"
-                              : "rgba(245, 158, 11, 0.16)",
-                          color:
-                            m.outcome === "win"
-                              ? "#34D399"
-                              : m.outcome === "loss"
-                              ? "#F87171"
-                              : "#FBBF24",
-                        }}
-                      >
-                        {m.outcome === "win" ? "Sieg" : m.outcome === "loss" ? "Niederlage" : "Remis"}
-                      </span>
                     </div>
                   </div>
                 ))}
