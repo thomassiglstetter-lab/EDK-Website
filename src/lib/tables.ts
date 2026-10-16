@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { getSiteData, setSiteData } from "@/lib/supabase";
 
 export interface LeagueTableRow {
   rank: number;
@@ -22,11 +23,18 @@ export interface LeagueTableData {
 
 const TABLES_FILE = path.join(process.cwd(), "src", "data", "tables.json");
 
+let memoryCachedTables: Record<string, LeagueTableData> | null = null;
+
 export function getCachedLeagueTable(slug: string): LeagueTableData | null {
+  if (memoryCachedTables && memoryCachedTables[slug]) {
+    return memoryCachedTables[slug];
+  }
+
   try {
     if (fs.existsSync(TABLES_FILE)) {
       const raw = fs.readFileSync(TABLES_FILE, "utf-8");
       const data = JSON.parse(raw) as Record<string, LeagueTableData>;
+      memoryCachedTables = data;
       return data[slug] || null;
     }
   } catch (err) {
@@ -35,16 +43,58 @@ export function getCachedLeagueTable(slug: string): LeagueTableData | null {
   return null;
 }
 
+export async function getLeagueTable(slug: string): Promise<LeagueTableData | null> {
+  if (memoryCachedTables && memoryCachedTables[slug]) {
+    return memoryCachedTables[slug];
+  }
+
+  try {
+    const fromDb = await getSiteData<Record<string, LeagueTableData> | null>("tables", null);
+    if (fromDb && typeof fromDb === "object") {
+      memoryCachedTables = fromDb;
+      return fromDb[slug] || null;
+    }
+  } catch (err) {
+    console.warn("Could not read tables from Supabase:", err);
+  }
+
+  return getCachedLeagueTable(slug);
+}
+
 export function getAllCachedLeagueTables(): Record<string, LeagueTableData> {
+  if (memoryCachedTables && Object.keys(memoryCachedTables).length > 0) {
+    return memoryCachedTables;
+  }
+
   try {
     if (fs.existsSync(TABLES_FILE)) {
       const raw = fs.readFileSync(TABLES_FILE, "utf-8");
-      return JSON.parse(raw);
+      const data = JSON.parse(raw);
+      memoryCachedTables = data;
+      return data;
     }
   } catch (err) {
     console.error("Error reading tables.json:", err);
   }
   return {};
+}
+
+export async function getAllLeagueTables(): Promise<Record<string, LeagueTableData>> {
+  if (memoryCachedTables && Object.keys(memoryCachedTables).length > 0) {
+    return memoryCachedTables;
+  }
+
+  try {
+    const fromDb = await getSiteData<Record<string, LeagueTableData> | null>("tables", null);
+    if (fromDb && typeof fromDb === "object" && Object.keys(fromDb).length > 0) {
+      memoryCachedTables = fromDb;
+      return fromDb;
+    }
+  } catch (err) {
+    console.warn("Could not read all tables from Supabase:", err);
+  }
+
+  return getAllCachedLeagueTables();
 }
 
 export async function syncLeagueTable(slug: string, groupUrl: string): Promise<LeagueTableData | null> {
@@ -145,8 +195,18 @@ export async function syncLeagueTable(slug: string, groupUrl: string): Promise<L
         rows,
       };
       allTables[slug] = updatedEntry;
+      memoryCachedTables = allTables;
 
-      fs.writeFileSync(TABLES_FILE, JSON.stringify(allTables, null, 2), "utf-8");
+      try {
+        await setSiteData("tables", allTables);
+      } catch (dbErr) {
+        console.error("Failed to save tables to Supabase:", dbErr);
+      }
+
+      try {
+        fs.writeFileSync(TABLES_FILE, JSON.stringify(allTables, null, 2), "utf-8");
+      } catch {}
+
       return updatedEntry;
     }
   } catch (err) {

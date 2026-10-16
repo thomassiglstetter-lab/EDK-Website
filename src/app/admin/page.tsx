@@ -1188,6 +1188,7 @@ export default function AdminPage() {
         setEditingTeam(null);
         try {
           localStorage.setItem("teams_updated", Date.now().toString());
+          window.dispatchEvent(new Event("teams_updated"));
         } catch {}
         showToast("Team erfolgreich aktualisiert!");
       } else {
@@ -1203,6 +1204,7 @@ export default function AdminPage() {
         setEditingTeam(null);
         try {
           localStorage.setItem("teams_updated", Date.now().toString());
+          window.dispatchEvent(new Event("teams_updated"));
         } catch {}
         showToast("Neues Team erfolgreich hinzugefügt!");
       }
@@ -1222,6 +1224,10 @@ export default function AdminPage() {
       const res = await fetch(`/api/teams?id=${teamToDelete.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Löschen fehlgeschlagen.");
       setTeams(teams.filter((t) => t.id !== teamToDelete.id));
+      try {
+        localStorage.setItem("teams_updated", Date.now().toString());
+        window.dispatchEvent(new Event("teams_updated"));
+      } catch {}
       showToast("Team gelöscht.", "success");
       setTeamToDelete(null);
     } catch (err) {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { readCachedMatches, parseGermanDate } from "@/lib/nuliga";
-import { syncAllNuLigaData, triggerBackgroundSyncIfNeeded, getSyncStatus } from "@/lib/sync";
+import { getMatchesData, parseGermanDate } from "@/lib/nuliga";
+import { syncAllNuLigaData, getSyncStatusAsync, AUTO_SYNC_THRESHOLD_MS } from "@/lib/sync";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -10,15 +10,23 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const forceSync = searchParams.get("sync") === "true";
 
-    if (forceSync) {
-      await syncAllNuLigaData(true);
-    } else {
-      // Non-blocking auto-refresh in background if cache is older than 30 minutes
-      triggerBackgroundSyncIfNeeded();
+    // Check freshness: if older than threshold (30m) or empty, automatically sync now
+    const currentStatus = await getSyncStatusAsync();
+    const elapsed = currentStatus.lastSuccessfulSync
+      ? Date.now() - new Date(currentStatus.lastSuccessfulSync).getTime()
+      : Infinity;
+    const isStale = elapsed >= AUTO_SYNC_THRESHOLD_MS || currentStatus.matchesCount === 0;
+
+    if (forceSync || isStale) {
+      try {
+        await syncAllNuLigaData(true);
+      } catch (syncErr) {
+        console.error("Auto-sync error in /api/matches:", syncErr);
+      }
     }
 
-    const data = readCachedMatches();
-    const syncStatus = getSyncStatus();
+    const data = await getMatchesData();
+    const syncStatus = await getSyncStatusAsync();
 
     // Separate into upcoming and results
     const results = data.matches.filter((m) => m.result !== null);
@@ -38,21 +46,30 @@ export async function GET(request: Request) {
       return dateA.getTime() - dateB.getTime();
     });
 
-    return NextResponse.json({
-      success: true,
-      clubId: data.clubId,
-      clubName: data.clubName,
-      lastSynced: syncStatus.lastSuccessfulSync || data.lastSynced,
-      nuLigaUrl: data.nuLigaUrl,
-      halls: data.halls,
-      totalMatches: data.totalMatches,
-      upcomingCount: upcoming.length,
-      resultsCount: results.length,
-      upcoming,
-      results,
-      allMatches: data.matches,
-      syncStatus,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        clubId: data.clubId,
+        clubName: data.clubName,
+        lastSynced: syncStatus.lastSuccessfulSync || data.lastSynced,
+        nuLigaUrl: data.nuLigaUrl,
+        halls: data.halls,
+        totalMatches: data.totalMatches,
+        upcomingCount: upcoming.length,
+        resultsCount: results.length,
+        upcoming,
+        results,
+        allMatches: data.matches,
+        syncStatus,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error) {
     console.error("GET /api/matches error:", error);
     return NextResponse.json(
@@ -65,7 +82,7 @@ export async function GET(request: Request) {
 export async function POST() {
   try {
     const result = await syncAllNuLigaData(true);
-    const syncStatus = getSyncStatus();
+    const syncStatus = await getSyncStatusAsync();
     return NextResponse.json({
       success: result.success,
       message: "nuLiga-Daten (Spiele, Ergebnisse & Tabellen) erfolgreich automatisch synchronisiert",

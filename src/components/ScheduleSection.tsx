@@ -10,8 +10,14 @@ import {
   Shield,
   Activity,
   MapPin,
+  Trophy,
+  CheckCircle2,
+  XCircle,
+  MinusCircle,
+  ChevronRight,
 } from "lucide-react";
 import initialMatchesJson from "@/data/matches.json";
+import teamsData from "@/data/teams.json";
 
 export interface NuLigaMatch {
   id: string;
@@ -33,7 +39,7 @@ export interface NuLigaMatch {
   outcome: "win" | "loss" | "draw" | null;
 }
 
-interface MatchesApiResponse {
+export interface MatchesApiResponse {
   success: boolean;
   clubId: string;
   clubName: string;
@@ -41,7 +47,9 @@ interface MatchesApiResponse {
   nuLigaUrl: string;
   totalMatches: number;
   upcomingCount: number;
+  resultsCount?: number;
   upcoming: NuLigaMatch[];
+  results?: NuLigaMatch[];
 }
 
 const CATEGORY_TO_SLUG: Record<string, string> = {
@@ -76,6 +84,12 @@ const isOurClub = (name: string) =>
 // Prepare initial state from bundled matches.json
 const rawMatches = (initialMatchesJson.matches || []) as NuLigaMatch[];
 const initialUpcoming = rawMatches.filter((m) => m.result === null);
+const initialResults = rawMatches.filter((m) => m.result !== null);
+initialResults.sort((a, b) => {
+  const tA = parseDateParts(a.date, a.time).getTime();
+  const tB = parseDateParts(b.date, b.time).getTime();
+  return tB - tA;
+});
 
 const initialMatchesState: MatchesApiResponse = {
   success: true,
@@ -85,18 +99,57 @@ const initialMatchesState: MatchesApiResponse = {
   nuLigaUrl: initialMatchesJson.nuLigaUrl || "",
   totalMatches: rawMatches.length,
   upcomingCount: initialUpcoming.length,
+  resultsCount: initialResults.length,
   upcoming: initialUpcoming,
+  results: initialResults,
 };
 
 export function ScheduleSection() {
   const [data, setData] = useState<MatchesApiResponse>(initialMatchesState);
   const [loading, setLoading] = useState<boolean>(false);
+  const [activeTeams, setActiveTeams] = useState<any[]>(teamsData);
+  const [activeTab, setActiveTab] = useState<"upcoming" | "results">("upcoming");
+  const [resultsCategoryFilter, setResultsCategoryFilter] = useState<string>("Alle");
+
+  useEffect(() => {
+    const loadTeams = () => {
+      fetch(`/api/teams?_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+      })
+        .then((res) => res.json())
+        .then((teams) => {
+          if (Array.isArray(teams)) {
+            setActiveTeams(teams);
+          }
+        })
+        .catch(() => {});
+    };
+    loadTeams();
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "teams_updated") loadTeams();
+    };
+    const handleTeamsUpdated = () => loadTeams();
+    window.addEventListener("focus", loadTeams);
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("teams_updated", handleTeamsUpdated);
+    return () => {
+      window.removeEventListener("focus", loadTeams);
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("teams_updated", handleTeamsUpdated);
+    };
+  }, []);
+
+  const validTeamSlugs = useMemo(
+    () => new Set(activeTeams.map((t) => t.slug)),
+    [activeTeams]
+  );
 
   useEffect(() => {
     fetch("/api/matches")
       .then((res) => res.json())
       .then((json: MatchesApiResponse) => {
-        if (json.success && json.upcoming) {
+        if (json.success) {
           setData(json);
         }
       })
@@ -184,6 +237,92 @@ export function ScheduleSection() {
     };
   }, [data]);
 
+  // Categories in results
+  const resultCategories = useMemo(() => {
+    if (!data || !data.results) return ["Alle"];
+    const cats = Array.from(new Set(data.results.map((r) => r.category).filter(Boolean)));
+    return ["Alle", ...cats];
+  }, [data]);
+
+  const filteredResults = useMemo(() => {
+    if (!data || !data.results) return [];
+    if (resultsCategoryFilter === "Alle") return data.results;
+    return data.results.filter((r) => r.category === resultsCategoryFilter);
+  }, [data, resultsCategoryFilter]);
+
+  const getOutcomeBadge = (outcome: "win" | "loss" | "draw" | null) => {
+    if (outcome === "win") {
+      return (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            padding: "4px 9px",
+            borderRadius: "6px",
+            background: "rgba(16, 185, 129, 0.15)",
+            border: "1px solid rgba(16, 185, 129, 0.35)",
+            color: "#34D399",
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+          }}
+        >
+          <CheckCircle2 size={12} />
+          Sieg
+        </span>
+      );
+    }
+    if (outcome === "loss") {
+      return (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            padding: "4px 9px",
+            borderRadius: "6px",
+            background: "rgba(239, 68, 68, 0.15)",
+            border: "1px solid rgba(239, 68, 68, 0.35)",
+            color: "#F87171",
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+          }}
+        >
+          <XCircle size={12} />
+          Niederlage
+        </span>
+      );
+    }
+    if (outcome === "draw") {
+      return (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            padding: "4px 9px",
+            borderRadius: "6px",
+            background: "rgba(234, 179, 8, 0.15)",
+            border: "1px solid rgba(234, 179, 8, 0.35)",
+            color: "#FACC15",
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+          }}
+        >
+          <MinusCircle size={12} />
+          Unentschieden
+        </span>
+      );
+    }
+    return null;
+  };
+
   return (
     <section
       id="spielplan"
@@ -197,7 +336,105 @@ export function ScheduleSection() {
     >
       {/* Header Container */}
       <div style={{ marginBottom: "28px" }}>
+        {/* Tab Switcher Pills */}
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            background: "rgba(15, 23, 42, 0.6)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            borderRadius: "14px",
+            padding: "4px",
+            marginBottom: "20px",
+            gap: "4px",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setActiveTab("upcoming")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px 16px",
+              borderRadius: "10px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.88rem",
+              fontWeight: 700,
+              transition: "all 0.2s ease",
+              background:
+                activeTab === "upcoming"
+                  ? "var(--color-primary, #0284c7)"
+                  : "transparent",
+              color: activeTab === "upcoming" ? "#FFFFFF" : "#94A3B8",
+              boxShadow:
+                activeTab === "upcoming"
+                  ? "0 4px 12px rgba(2, 132, 199, 0.35)"
+                  : "none",
+            }}
+          >
+            <Calendar size={15} />
+            <span>Kommende Spiele</span>
+            <span
+              style={{
+                fontSize: "0.72rem",
+                padding: "2px 7px",
+                borderRadius: "999px",
+                background:
+                  activeTab === "upcoming"
+                    ? "rgba(255, 255, 255, 0.25)"
+                    : "rgba(255, 255, 255, 0.08)",
+                color: "#FFFFFF",
+              }}
+            >
+              {weekendMatches.length}
+            </span>
+          </button>
 
+          <button
+            type="button"
+            onClick={() => setActiveTab("results")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px 16px",
+              borderRadius: "10px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.88rem",
+              fontWeight: 700,
+              transition: "all 0.2s ease",
+              background:
+                activeTab === "results"
+                  ? "var(--color-primary, #0284c7)"
+                  : "transparent",
+              color: activeTab === "results" ? "#FFFFFF" : "#94A3B8",
+              boxShadow:
+                activeTab === "results"
+                  ? "0 4px 12px rgba(2, 132, 199, 0.35)"
+                  : "none",
+            }}
+          >
+            <Trophy size={15} />
+            <span>Letzte Ergebnisse</span>
+            <span
+              style={{
+                fontSize: "0.72rem",
+                padding: "2px 7px",
+                borderRadius: "999px",
+                background:
+                  activeTab === "results"
+                    ? "rgba(255, 255, 255, 0.25)"
+                    : "rgba(255, 255, 255, 0.08)",
+                color: "#FFFFFF",
+              }}
+            >
+              {data.results?.length || 0}
+            </span>
+          </button>
+        </div>
 
         <div
           style={{
@@ -219,9 +456,9 @@ export function ScheduleSection() {
                 margin: 0,
               }}
             >
-              {weekendTitle}
+              {activeTab === "upcoming" ? weekendTitle : "Aktuelle Spielergebnisse"}
             </h2>
-            {weekendDateLabel && (
+            {activeTab === "upcoming" && weekendDateLabel && (
               <p
                 style={{
                   fontSize: "1rem",
@@ -241,6 +478,24 @@ export function ScheduleSection() {
                       ({weekendMatches.length} {weekendMatches.length === 1 ? "Spiel" : "Spiele"})
                     </span>
                   )}
+                </span>
+              </p>
+            )}
+            {activeTab === "results" && (
+              <p
+                style={{
+                  fontSize: "0.95rem",
+                  color: "#94A3B8",
+                  marginTop: "8px",
+                  marginBottom: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <Trophy size={16} style={{ color: "var(--color-azure-bright)" }} />
+                <span>
+                  Ausgetragene Saisonspiele mit Endständen und Spielergebnissen aller Teams
                 </span>
               </p>
             )}
@@ -276,10 +531,51 @@ export function ScheduleSection() {
             <ArrowRight size={15} />
           </Link>
         </div>
+
+        {/* Category Filters for Results Tab */}
+        {activeTab === "results" && resultCategories.length > 1 && (
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "8px",
+              marginTop: "20px",
+            }}
+          >
+            {resultCategories.map((cat) => {
+              const isSelected = resultsCategoryFilter === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setResultsCategoryFilter(cat)}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: "8px",
+                    border: isSelected
+                      ? "1px solid var(--color-azure-bright, #38bdf8)"
+                      : "1px solid rgba(255, 255, 255, 0.1)",
+                    background: isSelected
+                      ? "rgba(56, 189, 248, 0.15)"
+                      : "rgba(255, 255, 255, 0.04)",
+                    color: isSelected ? "#38bdf8" : "#94A3B8",
+                    fontSize: "0.82rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Match Display: Desktop Table + Mobile Cards */}
-      {weekendMatches.length === 0 ? (
+      {activeTab === "upcoming" ? (
+        weekendMatches.length === 0 ? (
         <div
           style={{
             padding: "48px 32px",
@@ -514,7 +810,7 @@ export function ScheduleSection() {
 
                         {/* Aktion / Mannschaftsseite */}
                         <td style={{ padding: "18px 20px", textAlign: "right", whiteSpace: "nowrap" }}>
-                          {teamSlug ? (
+                          {teamSlug && validTeamSlugs.has(teamSlug) ? (
                             <Link
                               href={`/teams/${teamSlug}`}
                               style={{
@@ -782,7 +1078,7 @@ export function ScheduleSection() {
                       </span>
                     ) : <div />}
 
-                    {teamSlug && (
+                    {teamSlug && validTeamSlugs.has(teamSlug) && (
                       <Link
                         href={`/teams/${teamSlug}`}
                         style={{
@@ -802,6 +1098,409 @@ export function ScheduleSection() {
                       >
                         <span>Teamseite</span>
                         <ArrowRight size={13} />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )) : filteredResults.length === 0 ? (
+        <div
+          style={{
+            padding: "48px 32px",
+            textAlign: "center",
+            background: "rgba(15, 23, 42, 0.5)",
+            borderRadius: "20px",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+          }}
+        >
+          <Trophy size={36} style={{ color: "#64748B", margin: "0 auto 16px auto" }} />
+          <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#FFFFFF", marginBottom: "8px" }}>
+            Keine Ergebnisse gefunden
+          </h3>
+          <p style={{ fontSize: "0.9rem", color: "#94A3B8", maxWidth: "500px", margin: "0 auto" }}>
+            Für die ausgewählte Kategorie liegen aktuell noch keine ausgetragenen Spiele vor.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Results Table View */}
+          <div
+            className="desktop-schedule-view"
+            style={{
+              background: "linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.5))",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: "16px",
+              boxShadow: "0 14px 34px -10px rgba(0, 0, 0, 0.5)",
+              overflow: "hidden",
+            }}
+          >
+            <div style={{ overflowX: "auto", width: "100%" }}>
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  textAlign: "left",
+                  minWidth: "820px",
+                }}
+              >
+                <thead>
+                  <tr
+                    style={{
+                      borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                      background: "rgba(255, 255, 255, 0.03)",
+                      fontSize: "0.78rem",
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      color: "#94A3B8",
+                    }}
+                  >
+                    <th style={{ padding: "16px 20px" }}>Ergebnis</th>
+                    <th style={{ padding: "16px 16px" }}>Datum & Zeit</th>
+                    <th style={{ padding: "16px 16px" }}>Team & Liga</th>
+                    <th style={{ padding: "16px 16px" }}>Begegnung</th>
+                    <th style={{ padding: "16px 16px", textAlign: "center" }}>Spielort</th>
+                    <th style={{ padding: "16px 20px", textAlign: "right" }}>Mannschaft</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredResults.map((m, idx) => {
+                    const teamSlug = CATEGORY_TO_SLUG[m.category];
+                    const isLast = idx === filteredResults.length - 1;
+                    const isHomeOurClub = isOurClub(m.home);
+                    const isGuestOurClub = isOurClub(m.guest);
+
+                    return (
+                      <tr
+                        key={m.id || `result-${idx}`}
+                        style={{
+                          borderBottom: isLast ? "none" : "1px solid rgba(255, 255, 255, 0.05)",
+                          transition: "background-color 0.15s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.04)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                      >
+                        {/* Result & Outcome */}
+                        <td style={{ padding: "18px 20px", whiteSpace: "nowrap" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <span
+                              style={{
+                                fontSize: "1.2rem",
+                                fontWeight: 900,
+                                color: "#FFFFFF",
+                                fontVariantNumeric: "tabular-nums",
+                                letterSpacing: "0.02em",
+                              }}
+                            >
+                              {m.result || `${m.homeScore ?? "-"} : ${m.guestScore ?? "-"}`}
+                            </span>
+                            {getOutcomeBadge(m.outcome)}
+                          </div>
+                        </td>
+
+                        {/* Datum & Zeit */}
+                        <td style={{ padding: "18px 16px", whiteSpace: "nowrap" }}>
+                          <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "#FFFFFF" }}>
+                            {m.date}
+                          </div>
+                          <div style={{ fontSize: "0.78rem", color: "#94A3B8", marginTop: "2px" }}>
+                            {m.day ? `${m.day}, ` : ""}{m.time ? `${m.time} Uhr` : ""}
+                          </div>
+                        </td>
+
+                        {/* Team & Liga */}
+                        <td style={{ padding: "18px 16px", whiteSpace: "nowrap" }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                            <span
+                              style={{
+                                display: "inline-block",
+                                padding: "3px 10px",
+                                borderRadius: "6px",
+                                background: "rgba(255, 255, 255, 0.08)",
+                                color: "#FFFFFF",
+                                fontWeight: 700,
+                                fontSize: "0.82rem",
+                                width: "fit-content",
+                              }}
+                            >
+                              {m.category}
+                            </span>
+                            <span style={{ fontSize: "0.76rem", color: "#64748B", fontWeight: 500 }}>
+                              {m.league}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Begegnung */}
+                        <td style={{ padding: "18px 16px" }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "10px",
+                              fontSize: "0.95rem",
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontWeight: isHomeOurClub ? 800 : 500,
+                                color: isHomeOurClub ? "#FFFFFF" : "#CBD5E1",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                              }}
+                            >
+                              {isHomeOurClub && (
+                                <span
+                                  style={{
+                                    width: "6px",
+                                    height: "6px",
+                                    borderRadius: "50%",
+                                    background: "var(--color-primary, #0ea5e9)",
+                                    display: "inline-block",
+                                  }}
+                                />
+                              )}
+                              {m.home}
+                            </span>
+                            <span style={{ color: "#64748B", fontSize: "0.85rem", fontWeight: 600 }}>
+                              vs.
+                            </span>
+                            <span
+                              style={{
+                                fontWeight: isGuestOurClub ? 800 : 500,
+                                color: isGuestOurClub ? "#FFFFFF" : "#CBD5E1",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                              }}
+                            >
+                              {isGuestOurClub && (
+                                <span
+                                  style={{
+                                    width: "6px",
+                                    height: "6px",
+                                    borderRadius: "50%",
+                                    background: "var(--color-primary, #0ea5e9)",
+                                    display: "inline-block",
+                                  }}
+                                />
+                              )}
+                              {m.guest}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Spielort */}
+                        <td style={{ padding: "18px 16px", textAlign: "center", whiteSpace: "nowrap" }}>
+                          <span
+                            style={{
+                              display: "inline-block",
+                              padding: "4px 10px",
+                              borderRadius: "6px",
+                              background: m.isHome
+                                ? "rgba(14, 165, 233, 0.15)"
+                                : "rgba(148, 163, 184, 0.1)",
+                              border: m.isHome
+                                ? "1px solid rgba(14, 165, 233, 0.3)"
+                                : "1px solid rgba(148, 163, 184, 0.2)",
+                              color: m.isHome ? "#38BDF8" : "#94A3B8",
+                              fontSize: "0.78rem",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {m.isHome ? "Heim" : "Auswärts"}
+                          </span>
+                        </td>
+
+                        {/* Teamseite */}
+                        <td style={{ padding: "18px 20px", textAlign: "right", whiteSpace: "nowrap" }}>
+                          {teamSlug && validTeamSlugs.has(teamSlug) ? (
+                            <Link
+                              href={`/teams/${teamSlug}`}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                padding: "7px 14px",
+                                borderRadius: "8px",
+                                background: "rgba(14, 165, 233, 0.12)",
+                                border: "1px solid rgba(14, 165, 233, 0.25)",
+                                color: "var(--color-azure-bright, #38bdf8)",
+                                fontSize: "0.82rem",
+                                fontWeight: 600,
+                                textDecoration: "none",
+                                transition: "all 0.2s ease",
+                              }}
+                            >
+                              <span>Teamseite</span>
+                              <ChevronRight size={14} />
+                            </Link>
+                          ) : (
+                            <span style={{ color: "#475569", fontSize: "0.8rem" }}>—</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Mobile Results Cards View */}
+          <div className="mobile-schedule-view">
+            {filteredResults.map((m, idx) => {
+              const teamSlug = CATEGORY_TO_SLUG[m.category];
+              const isHomeOurClub = isOurClub(m.home);
+              const isGuestOurClub = isOurClub(m.guest);
+              const outcomeBorderColor =
+                m.outcome === "win"
+                  ? "#10B981"
+                  : m.outcome === "loss"
+                  ? "#EF4444"
+                  : m.outcome === "draw"
+                  ? "#EAB308"
+                  : "rgba(255, 255, 255, 0.15)";
+
+              return (
+                <div
+                  key={m.id || `mob-res-${idx}`}
+                  style={{
+                    background: "linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.6))",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    borderLeft: `4px solid ${outcomeBorderColor}`,
+                    borderRadius: "14px",
+                    padding: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                  }}
+                >
+                  {/* Card Header: Category, Date & Outcome */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "8px",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span
+                        style={{
+                          padding: "3px 9px",
+                          borderRadius: "6px",
+                          background: "rgba(255, 255, 255, 0.08)",
+                          color: "#FFFFFF",
+                          fontWeight: 700,
+                          fontSize: "0.78rem",
+                        }}
+                      >
+                        {m.category}
+                      </span>
+                      <span style={{ fontSize: "0.76rem", color: "#94A3B8" }}>
+                        {m.date}
+                      </span>
+                    </div>
+                    {getOutcomeBadge(m.outcome)}
+                  </div>
+
+                  {/* Teams & Score Box */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "10px 14px",
+                      background: "rgba(0, 0, 0, 0.25)",
+                      borderRadius: "10px",
+                      gap: "10px",
+                    }}
+                  >
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px", flex: 1 }}>
+                      <div
+                        style={{
+                          fontSize: "0.88rem",
+                          fontWeight: isHomeOurClub ? 800 : 500,
+                          color: isHomeOurClub ? "#FFFFFF" : "#CBD5E1",
+                        }}
+                      >
+                        {m.home}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "0.88rem",
+                          fontWeight: isGuestOurClub ? 800 : 500,
+                          color: isGuestOurClub ? "#FFFFFF" : "#CBD5E1",
+                        }}
+                      >
+                        {m.guest}
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: "1.3rem",
+                        fontWeight: 900,
+                        color: "#FFFFFF",
+                        fontVariantNumeric: "tabular-nums",
+                        textAlign: "right",
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      {m.result || `${m.homeScore ?? "-"} : ${m.guestScore ?? "-"}`}
+                    </div>
+                  </div>
+
+                  {/* Card Footer: Spielort & Team Link */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "10px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        padding: "3px 8px",
+                        borderRadius: "5px",
+                        background: m.isHome ? "rgba(14, 165, 233, 0.12)" : "rgba(148, 163, 184, 0.1)",
+                        color: m.isHome ? "#38BDF8" : "#94A3B8",
+                        fontSize: "0.74rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {m.isHome ? "Heimspiel" : "Auswärts"}
+                    </span>
+
+                    {teamSlug && validTeamSlugs.has(teamSlug) && (
+                      <Link
+                        href={`/teams/${teamSlug}`}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          padding: "5px 10px",
+                          borderRadius: "6px",
+                          background: "rgba(14, 165, 233, 0.12)",
+                          border: "1px solid rgba(14, 165, 233, 0.25)",
+                          color: "var(--color-azure-bright, #38bdf8)",
+                          fontSize: "0.78rem",
+                          fontWeight: 600,
+                          textDecoration: "none",
+                        }}
+                      >
+                        <span>Teamseite</span>
+                        <ChevronRight size={13} />
                       </Link>
                     )}
                   </div>

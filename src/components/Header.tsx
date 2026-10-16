@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -18,6 +18,7 @@ import {
   Sparkles,
   ExternalLink,
 } from "lucide-react";
+import teamsData from "@/data/teams.json";
 
 interface SubLink {
   title: string;
@@ -44,188 +45,212 @@ interface NavItem {
   };
 }
 
-const navItems: NavItem[] = [
-  { id: "uebersicht", label: "Übersicht", href: "/#uebersicht" },
-  {
-    id: "news",
-    label: "Aktuelles",
-    href: "/#news",
-    categories: [
-      {
-        name: "News & Berichte",
-        items: [
-          {
-            title: "Aktuelle Berichte",
-            subtitle: "Die neuesten 5 Meldungen von der Eintracht",
-            href: "/#news",
-          },
-          {
-            title: "News-Archiv",
-            subtitle: "Alle Berichte & Mitteilungen im durchsuchbaren Archiv",
-            href: "/news",
-            badge: "Archiv",
-            badgeType: "azure",
-          },
-        ],
+function buildTeamCategories(teams: any[]): NavCategory[] {
+  const herren = teams.filter((t) => t.category === "Herren");
+  const damen = teams.filter((t) => t.category === "Damen");
+  const jugend = teams.filter(
+    (t) =>
+      t.category === "Jugend männlich" ||
+      t.category === "Jugend weiblich" ||
+      (t.category && t.category.toLowerCase().includes("jugend"))
+  );
+  const kinder = teams.filter(
+    (t) =>
+      t.category === "Kinderhandball" ||
+      t.category === "Minis" ||
+      (t.category && (t.category.toLowerCase().includes("kinder") || t.category.toLowerCase().includes("mini")))
+  );
+  const others = teams.filter(
+    (t) =>
+      !herren.includes(t) &&
+      !damen.includes(t) &&
+      !jugend.includes(t) &&
+      !kinder.includes(t)
+  );
+
+  const categories: NavCategory[] = [];
+
+  if (herren.length > 0) {
+    categories.push({
+      name: "Herren",
+      items: herren.map((t) => ({
+        title: t.name,
+        subtitle: t.league || "Spielbetrieb",
+        href: `/teams/${t.slug || t.id}`,
+      })),
+    });
+  }
+
+  if (damen.length > 0) {
+    categories.push({
+      name: "Damen",
+      items: damen.map((t) => ({
+        title: t.name,
+        subtitle: t.league || "Spielbetrieb",
+        href: `/teams/${t.slug || t.id}`,
+      })),
+    });
+  }
+
+  if (jugend.length > 0) {
+    categories.push({
+      name: "Jugend",
+      items: jugend.map((t) => ({
+        title: t.name,
+        subtitle: t.league || "Nachwuchs",
+        href: `/teams/${t.slug || t.id}`,
+      })),
+    });
+  }
+
+  if (kinder.length > 0) {
+    categories.push({
+      name: "Kinderhandball",
+      items: kinder.map((t) => ({
+        title: t.name,
+        subtitle: t.league || "Spiel & Spaß",
+        href: `/teams/${t.slug || t.id}`,
+      })),
+    });
+  }
+
+  if (others.length > 0) {
+    categories.push({
+      name: "Weitere Teams",
+      items: others.map((t) => ({
+        title: t.name,
+        subtitle: t.league || "",
+        href: `/teams/${t.slug || t.id}`,
+      })),
+    });
+  }
+
+  return categories;
+}
+
+function getNavItems(teamCategories: NavCategory[]): NavItem[] {
+  return [
+    { id: "uebersicht", label: "Übersicht", href: "/#uebersicht" },
+    {
+      id: "news",
+      label: "Aktuelles",
+      href: "/#news",
+      categories: [
+        {
+          name: "News & Berichte",
+          items: [
+            {
+              title: "Aktuelle Berichte",
+              subtitle: "Die neuesten 5 Meldungen von der Eintracht",
+              href: "/#news",
+            },
+            {
+              title: "News-Archiv",
+              subtitle: "Alle Berichte & Mitteilungen im durchsuchbaren Archiv",
+              href: "/news",
+              badge: "Archiv",
+              badgeType: "azure",
+            },
+          ],
+        },
+      ],
+      bottomAction: {
+        label: "Zum kompletten News-Archiv →",
+        href: "/news",
       },
-    ],
-    bottomAction: {
-      label: "Zum kompletten News-Archiv →",
-      href: "/news",
     },
-  },
-  {
-    id: "verein",
-    label: "Verein",
-    href: "/#verein",
-    categories: [
-      {
-        name: "Vereinsleben & Werte",
-        items: [
-          {
-            title: "Philosophie & Gemeinschaft",
-            subtitle: "Teamgeist, Respekt & Leidenschaft seit 1996",
-            href: "/verein",
-          },
-          {
-            title: "Stammvereine Dachau & Karlsfeld",
-            subtitle: "Starke Partnerschaft zwischen TSV Dachau & TSV Eintracht Karlsfeld",
-            href: "/verein#stammvereine",
-          },
-        ],
+    {
+      id: "verein",
+      label: "Verein",
+      href: "/#verein",
+      categories: [
+        {
+          name: "Vereinsleben & Werte",
+          items: [
+            {
+              title: "Philosophie & Gemeinschaft",
+              subtitle: "Teamgeist, Respekt & Leidenschaft seit 1996",
+              href: "/verein",
+            },
+            {
+              title: "Stammvereine Dachau & Karlsfeld",
+              subtitle: "Starke Partnerschaft zwischen TSV Dachau & TSV Eintracht Karlsfeld",
+              href: "/verein#stammvereine",
+            },
+          ],
+        },
+        {
+          name: "Standorte & Infrastruktur",
+          items: [
+            {
+              title: "Hallen & Anfahrtswege",
+              subtitle: "5 moderne Hallen mit Hallennummern & Adressen",
+              href: "/hallen",
+            },
+            {
+              title: "Vereinsübersicht",
+              subtitle: "Die 3 Säulen unseres Handballsports auf einen Blick",
+              href: "/#verein",
+            },
+          ],
+        },
+      ],
+      bottomAction: {
+        label: "Ausführliche Vereinsseite öffnen →",
+        href: "/verein",
       },
-      {
-        name: "Standorte & Infrastruktur",
-        items: [
-          {
-            title: "Hallen & Anfahrtswege",
-            subtitle: "5 moderne Hallen mit Hallennummern & Adressen",
-            href: "/hallen",
-          },
-          {
-            title: "Vereinsübersicht",
-            subtitle: "Die 3 Säulen unseres Handballsports auf einen Blick",
-            href: "/#verein",
-          },
-        ],
-      },
-    ],
-    bottomAction: {
-      label: "Ausführliche Vereinsseite öffnen →",
-      href: "/verein",
     },
-  },
-  {
-    id: "teams",
-    label: "Mannschaften",
-    href: "/#teams",
-    categories: [
-      {
-        name: "Herren",
-        items: [
-          {
-            title: "Herren 1",
-            subtitle: "Bezirksliga Männer West",
-            href: "/teams/herren-1",
-          },
-          {
-            title: "Herren 2",
-            subtitle: "Bezirksklasse Männer",
-            href: "/teams/herren-2",
-          },
-        ],
+    {
+      id: "teams",
+      label: "Mannschaften",
+      href: "/#teams",
+      categories: teamCategories,
+      bottomAction: {
+        label: "Zur Team-Übersicht & Trainingszeiten →",
+        href: "/#teams",
       },
-      {
-        name: "Damen",
-        items: [
-          {
-            title: "Damen 1",
-            subtitle: "Bezirksoberliga Frauen",
-            href: "/teams/damen-1",
-          },
-          {
-            title: "Damen 2",
-            subtitle: "Bezirksklasse Frauen West",
-            href: "/teams/damen-2",
-          },
-        ],
-      },
-      {
-        name: "Jugend",
-        items: [
-          {
-            title: "Männliche B-Jugend",
-            subtitle: "BL männl. B-Jugend",
-            href: "/teams/m-b1",
-          },
-          {
-            title: "Männliche C-Jugend",
-            subtitle: "BL männl. C-Jugend",
-            href: "/teams/m-c1",
-          },
-          {
-            title: "Weibliche C-Jugend",
-            subtitle: "Oberliga weibl. C-Jugend",
-            href: "/teams/w-c1",
-          },
-          {
-            title: "Weibliche B-Jugend",
-            subtitle: "BL weibl. B-Jugend",
-            href: "/teams/w-b1",
-          },
-        ],
-      },
-      {
-        name: "Kinderhandball",
-        items: [
-          {
-            title: "Minis & Ballschule",
-            subtitle: "Spiel & Spaß ab 5 Jahren",
-            href: "/teams/minis",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "spielplan",
-    label: "Spielplan",
-    href: "/#spielplan",
-    categories: [
-      {
-        name: "Spielbetrieb",
-        items: [
-          {
-            title: "Aktueller Spielplan",
-            subtitle: "Nächste Spiele & Heimpieltage aller Teams",
-            href: "/#spielplan",
-          },
-          {
-            title: "nuLiga Verbandsportal",
-            subtitle: "Offizielle Tabellen, Bilanzen & Spielberichte",
-            href: "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/clubInfoDisplay?club=105665",
-          },
-        ],
-      },
-      {
-        name: "Spielstätten",
-        items: [
-          {
-            title: "Hallen & Anfahrtswege",
-            subtitle: "Wegweiser & Hallennummern für Gastmannschaften & Fans",
-            href: "/hallen",
-          },
-        ],
-      },
-    ],
-    bottomAction: {
-      label: "Zum interaktiven Spielplan auf der Startseite →",
+    },
+    {
+      id: "spielplan",
+      label: "Spielplan",
       href: "/#spielplan",
+      categories: [
+        {
+          name: "Spielbetrieb",
+          items: [
+            {
+              title: "Aktueller Spielplan",
+              subtitle: "Nächste Spiele & Heimpieltage aller Teams",
+              href: "/#spielplan",
+            },
+            {
+              title: "nuLiga Verbandsportal",
+              subtitle: "Offizielle Tabellen, Bilanzen & Spielberichte",
+              href: "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/clubInfoDisplay?club=105665",
+              isExternal: true,
+            },
+          ],
+        },
+        {
+          name: "Spielstätten",
+          items: [
+            {
+              title: "Hallen & Anfahrtswege",
+              subtitle: "Wegweiser & Hallennummern für Gastmannschaften & Fans",
+              href: "/hallen",
+            },
+          ],
+        },
+      ],
+      bottomAction: {
+        label: "Zum interaktiven Spielplan auf der Startseite →",
+        href: "/#spielplan",
+      },
     },
-  },
-  { id: "kontakt", label: "Kontakt", href: "/#kontakt" },
-  { id: "partner", label: "Partner & Sponsoren", href: "/#partner" },
-];
+    { id: "kontakt", label: "Kontakt", href: "/#kontakt" },
+    { id: "partner", label: "Partner & Sponsoren", href: "/#partner" },
+  ];
+}
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -233,6 +258,46 @@ export default function Header() {
   const [activeSection, setActiveSection] = useState<string>("/#uebersicht");
   const [activeFlyout, setActiveFlyout] = useState<string | null>(null);
   const [mobileSubmenu, setMobileSubmenu] = useState<string | null>(null);
+
+  // Dynamic Teams: Initialized from local cache, reactively updated via /api/teams & storage events
+  const [teams, setTeams] = useState<any[]>(teamsData);
+
+  const loadTeams = () => {
+    fetch(`/api/teams?_t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setTeams(data);
+        }
+      })
+      .catch((err) => console.error("Error fetching teams for header:", err));
+  };
+
+  useEffect(() => {
+    loadTeams();
+
+    const handleFocus = () => loadTeams();
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "teams_updated") loadTeams();
+    };
+    const handleTeamsUpdated = () => loadTeams();
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("teams_updated", handleTeamsUpdated);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("teams_updated", handleTeamsUpdated);
+    };
+  }, []);
+
+  const teamCategories = useMemo(() => buildTeamCategories(teams), [teams]);
+  const navItems = useMemo(() => getNavItems(teamCategories), [teamCategories]);
 
   const headerRef = useRef<HTMLElement>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -257,7 +322,7 @@ export default function Header() {
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [navItems]);
 
   // Close flyout on click outside or escape key
   useEffect(() => {
@@ -706,7 +771,7 @@ export default function Header() {
               display: "grid",
               gridTemplateColumns:
                 currentFlyoutItem.id === "teams"
-                  ? "repeat(4, 1fr)"
+                  ? `repeat(${Math.max(1, Math.min(4, currentFlyoutItem.categories.length))}, 1fr)`
                   : currentFlyoutItem.id === "verein"
                   ? "repeat(2, 1fr)"
                   : "repeat(2, 1fr)",

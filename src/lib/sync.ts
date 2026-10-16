@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { syncNuLigaData, readCachedMatches, NuLigaData } from "@/lib/nuliga";
 import { syncLeagueTable, getAllCachedLeagueTables, LeagueTableData } from "@/lib/tables";
+import { getSiteData, setSiteData } from "@/lib/supabase";
 
 const TEAMS_FILE = path.join(process.cwd(), "src", "data", "teams.json");
 const SYNC_STATUS_FILE = path.join(process.cwd(), "src", "data", "sync_status.json");
@@ -22,12 +23,21 @@ export const AUTO_SYNC_INTERVAL_MINUTES = 30;
 export const AUTO_SYNC_THRESHOLD_MS = AUTO_SYNC_INTERVAL_MINUTES * 60 * 1000;
 
 let inMemorySyncing = false;
+let memorySyncStatus: SyncStatus | null = null;
 
 export function getSyncStatus(): SyncStatus {
+  if (memorySyncStatus) {
+    return {
+      ...memorySyncStatus,
+      isSyncing: inMemorySyncing,
+    };
+  }
+
   try {
     if (fs.existsSync(SYNC_STATUS_FILE)) {
       const raw = fs.readFileSync(SYNC_STATUS_FILE, "utf-8");
       const parsed = JSON.parse(raw);
+      memorySyncStatus = parsed;
       return {
         ...parsed,
         isSyncing: inMemorySyncing,
@@ -52,6 +62,30 @@ export function getSyncStatus(): SyncStatus {
   };
 }
 
+export async function getSyncStatusAsync(): Promise<SyncStatus> {
+  if (memorySyncStatus) {
+    return {
+      ...memorySyncStatus,
+      isSyncing: inMemorySyncing,
+    };
+  }
+
+  try {
+    const fromDb = await getSiteData<SyncStatus | null>("sync_status", null);
+    if (fromDb && typeof fromDb === "object") {
+      memorySyncStatus = fromDb;
+      return {
+        ...fromDb,
+        isSyncing: inMemorySyncing,
+      };
+    }
+  } catch (err) {
+    console.warn("Could not read sync_status from Supabase:", err);
+  }
+
+  return getSyncStatus();
+}
+
 export function saveSyncStatus(partial: Partial<SyncStatus>): SyncStatus {
   const current = getSyncStatus();
   const updated: SyncStatus = {
@@ -59,6 +93,12 @@ export function saveSyncStatus(partial: Partial<SyncStatus>): SyncStatus {
     ...partial,
     isSyncing: inMemorySyncing,
   };
+  memorySyncStatus = updated;
+
+  // Persist to Supabase asynchronously
+  setSiteData("sync_status", updated).catch((err) =>
+    console.error("Failed to save sync_status to Supabase:", err)
+  );
 
   try {
     const dir = path.dirname(SYNC_STATUS_FILE);
@@ -66,8 +106,8 @@ export function saveSyncStatus(partial: Partial<SyncStatus>): SyncStatus {
       fs.mkdirSync(dir, { recursive: true });
     }
     fs.writeFileSync(SYNC_STATUS_FILE, JSON.stringify(updated, null, 2), "utf-8");
-  } catch (err) {
-    console.error("Error writing sync_status.json:", err);
+  } catch {
+    // Expected on read-only serverless filesystems
   }
 
   return updated;
@@ -128,14 +168,24 @@ export async function syncAllNuLigaData(force: boolean = false): Promise<{
     // 2. Sync league tables for all teams with valid nuLiga groupUrl
     let tablesCount = 0;
     try {
-      if (fs.existsSync(TEAMS_FILE)) {
-        const teamsRaw = fs.readFileSync(TEAMS_FILE, "utf-8");
-        const teams = JSON.parse(teamsRaw) as Array<{ slug: string; name: string; groupUrl?: string }>;
-        const teamsWithUrls = teams.filter(
-          (t) => t.groupUrl && t.groupUrl.startsWith("http") && t.groupUrl.includes("groupPage")
-        );
+      let teams: Array<{ slug: string; name: string; groupUrl?: string }> = [];
+      try {
+        const fromDb = await getSiteData<any[]>("teams", []);
+        if (Array.isArray(fromDb) && fromDb.length > 0) {
+          teams = fromDb;
+        }
+      } catch {}
 
-        console.log(`[nuLiga AutoSync] Syncing tables for ${teamsWithUrls.length} teams...`);
+      if (teams.length === 0 && fs.existsSync(TEAMS_FILE)) {
+        const teamsRaw = fs.readFileSync(TEAMS_FILE, "utf-8");
+        teams = JSON.parse(teamsRaw);
+      }
+
+      const teamsWithUrls = teams.filter(
+        (t) => t.groupUrl && t.groupUrl.startsWith("http") && t.groupUrl.includes("groupPage")
+      );
+
+      console.log(`[nuLiga AutoSync] Syncing tables for ${teamsWithUrls.length} teams...`);
 
         // Sync tables concurrently with timeout safety
         const tablePromises = teamsWithUrls.map(async (t) => {
@@ -153,10 +203,9 @@ export async function syncAllNuLigaData(force: boolean = false): Promise<{
         const results = await Promise.allSettled(tablePromises);
         tablesCount = results.filter((r) => r.status === "fulfilled" && r.value === true).length;
         console.log(`[nuLiga AutoSync] Successfully synced ${tablesCount} league tables.`);
+      } catch (teamErr) {
+        console.error("[nuLiga AutoSync] Error reading teams for table sync:", teamErr);
       }
-    } catch (teamErr) {
-      console.error("[nuLiga AutoSync] Error reading teams for table sync:", teamErr);
-    }
 
     const durationMs = Date.now() - startTime;
     saveSyncStatus({

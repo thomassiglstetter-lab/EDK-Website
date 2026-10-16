@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { getSiteData, setSiteData } from "@/lib/supabase";
 
 export interface NuLigaMatch {
   id: string;
@@ -42,6 +43,8 @@ const DATA_FILE = path.join(process.cwd(), "src", "data", "matches.json");
 const CLUB_ID = "105665";
 const BASE_URL = "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa";
 
+let memoryCachedMatches: NuLigaData | null = null;
+
 function cleanText(s: string): string {
   if (!s) return "";
   return s
@@ -72,10 +75,18 @@ export function parseGermanDate(dateStr: string, timeStr?: string): Date {
 }
 
 export function readCachedMatches(): NuLigaData {
+  if (memoryCachedMatches && memoryCachedMatches.matches && memoryCachedMatches.matches.length > 0) {
+    return memoryCachedMatches;
+  }
+
   try {
     if (fs.existsSync(DATA_FILE)) {
       const raw = fs.readFileSync(DATA_FILE, "utf-8");
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.matches) && parsed.matches.length > 0) {
+        memoryCachedMatches = parsed;
+        return parsed;
+      }
     }
   } catch (err) {
     console.error("Error reading matches cache:", err);
@@ -91,6 +102,24 @@ export function readCachedMatches(): NuLigaData {
     totalMatches: 0,
     matches: [],
   };
+}
+
+export async function getMatchesData(): Promise<NuLigaData> {
+  if (memoryCachedMatches && memoryCachedMatches.matches && memoryCachedMatches.matches.length > 0) {
+    return memoryCachedMatches;
+  }
+
+  try {
+    const fromDb = await getSiteData<NuLigaData | null>("matches", null);
+    if (fromDb && Array.isArray(fromDb.matches) && fromDb.matches.length > 0) {
+      memoryCachedMatches = fromDb;
+      return fromDb;
+    }
+  } catch (err) {
+    console.warn("Could not read matches from Supabase:", err);
+  }
+
+  return readCachedMatches();
 }
 
 export async function syncNuLigaData(): Promise<NuLigaData> {
@@ -314,10 +343,20 @@ export async function syncNuLigaData(): Promise<NuLigaData> {
     matches,
   };
 
+  memoryCachedMatches = updatedData;
+
+  // 1. Save to Supabase (persistent across Vercel deployments & serverless cold starts)
+  try {
+    await setSiteData("matches", updatedData);
+  } catch (dbErr) {
+    console.error("Failed to save matches to Supabase:", dbErr);
+  }
+
+  // 2. Also write to local file if writable
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(updatedData, null, 2), "utf-8");
-  } catch (err) {
-    console.error("Failed to save matches cache:", err);
+  } catch {
+    // Expected on read-only serverless filesystems
   }
 
   return updatedData;

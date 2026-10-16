@@ -27,8 +27,8 @@ import fs from "fs/promises";
 import path from "path";
 import teamsData from "@/data/teams.json";
 import hallsData from "@/data/halls.json";
-import { getCachedLeagueTable, syncLeagueTable } from "@/lib/tables";
-import { readCachedMatches, parseGermanDate } from "@/lib/nuliga";
+import { getLeagueTable, getCachedLeagueTable, syncLeagueTable } from "@/lib/tables";
+import { getMatchesData, readCachedMatches, parseGermanDate } from "@/lib/nuliga";
 import { triggerBackgroundSyncIfNeeded } from "@/lib/sync";
 
 import { getSiteData } from "@/lib/supabase";
@@ -109,13 +109,13 @@ export default async function TeamDetailPage({
   triggerBackgroundSyncIfNeeded();
 
   // 1. League Table Data (auto-sync if not yet cached)
-  let tableData = getCachedLeagueTable(team.slug);
+  let tableData = await getLeagueTable(team.slug);
   if (!tableData && team.groupUrl && team.groupUrl.startsWith("http") && team.groupUrl.includes("groupPage")) {
     tableData = await syncLeagueTable(team.slug, team.groupUrl);
   }
 
-  // 2. Matches for this team (dynamically read from cache)
-  const currentMatchesData = readCachedMatches();
+  // 2. Matches for this team (dynamically read from cache or Supabase)
+  const currentMatchesData = await getMatchesData();
   const rawMatches = (currentMatchesData.matches || []).filter((m: any) => {
     if (m.category === team.nuligaCategory) return true;
     if (m.category.toLowerCase() === team.name.toLowerCase()) return true;
