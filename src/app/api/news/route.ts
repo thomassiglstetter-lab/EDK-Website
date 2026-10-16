@@ -44,11 +44,13 @@ async function saveNews(news: Article[]): Promise<boolean> {
   // 1. Save to Supabase (persistent on Vercel)
   const dbSaved = await setSiteData("news", news);
 
-  // 2. Also try writing to local file if writable (local dev or backup)
-  try {
-    await fs.writeFile(DATA_FILE, JSON.stringify(news, null, 2), "utf8");
-  } catch {
-    // Expected on Vercel serverless read-only filesystem
+  // 2. Only write to local file if not in Vercel serverless environment
+  if (!process.env.VERCEL) {
+    try {
+      await fs.writeFile(DATA_FILE, JSON.stringify(news, null, 2), "utf8");
+    } catch {
+      // Ignore local write errors
+    }
   }
 
   return dbSaved;
@@ -179,11 +181,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     const news = await getNews();
-    const filtered = news.filter((item) => item.id !== id);
-
-    if (filtered.length === news.length) {
-      return NextResponse.json({ error: "Artikel nicht gefunden." }, { status: 404 });
-    }
+    const filtered = news.filter((item) => String(item.id) !== String(id));
 
     await saveNews(filtered);
     return NextResponse.json({ success: true, deletedId: id });

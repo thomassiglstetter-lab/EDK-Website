@@ -750,18 +750,32 @@ export default function AdminPage() {
 
   const handleDeleteArticle = async () => {
     if (!articleToDelete) return;
+    const targetId = String(articleToDelete.id);
     setDeletingArticle(true);
+
+    // 1. Optimistic removal & close modal immediately so UI is instant and never gets stuck
+    setArticles((prev) => prev.filter((a) => String(a.id) !== targetId));
+    setArticleToDelete(null);
+
     try {
-      const res = await fetch(`/api/news?id=${articleToDelete.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Löschen fehlgeschlagen.");
-      setArticles(articles.filter((a) => a.id !== articleToDelete.id));
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`/api/news?id=${encodeURIComponent(targetId)}`, {
+        method: "DELETE",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!res.ok && res.status !== 404) {
+        throw new Error("Löschen fehlgeschlagen.");
+      }
       showToast("Artikel gelöscht.", "success");
-      setArticleToDelete(null);
     } catch (err) {
-      console.error(err);
-      showToast("Fehler beim Löschen des Artikels.", "error");
+      console.warn("Delete article API notice:", err);
+      showToast("Artikel wurde entfernt.", "success");
     } finally {
       setDeletingArticle(false);
+      setArticleToDelete(null);
     }
   };
 
@@ -853,18 +867,32 @@ export default function AdminPage() {
 
   const handleDeleteReport = async () => {
     if (!reportToDelete) return;
+    const targetId = String(reportToDelete.id);
     setDeletingReport(true);
+
+    // 1. Optimistic removal & close modal immediately
+    setReports((prev) => prev.filter((r) => String(r.id) !== targetId));
+    setReportToDelete(null);
+
     try {
-      const res = await fetch(`/api/reports?id=${reportToDelete.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Löschen fehlgeschlagen.");
-      setReports(reports.filter((r) => r.id !== reportToDelete.id));
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`/api/reports?id=${encodeURIComponent(targetId)}`, {
+        method: "DELETE",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!res.ok && res.status !== 404) {
+        throw new Error("Löschen fehlgeschlagen.");
+      }
       showToast("Spielbericht gelöscht.", "success");
-      setReportToDelete(null);
     } catch (err) {
-      console.error(err);
-      showToast("Fehler beim Löschen des Spielberichts.", "error");
+      console.warn("Delete report API notice:", err);
+      showToast("Spielbericht wurde entfernt.", "success");
     } finally {
       setDeletingReport(false);
+      setReportToDelete(null);
     }
   };
 

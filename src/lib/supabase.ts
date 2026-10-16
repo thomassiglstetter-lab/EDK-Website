@@ -28,6 +28,7 @@ export async function getSiteData<T>(key: string, fallback: T): Promise<T> {
         Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY}`,
       },
       cache: "no-store",
+      signal: AbortSignal.timeout(6000),
     });
 
     if (!res.ok) {
@@ -62,6 +63,8 @@ export async function setSiteData<T>(key: string, data: T): Promise<boolean> {
         "Content-Type": "application/json",
         Prefer: "resolution=merge-duplicates",
       },
+      cache: "no-store",
+      signal: AbortSignal.timeout(6000),
       body: JSON.stringify({
         key,
         data,

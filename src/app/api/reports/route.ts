@@ -49,11 +49,13 @@ async function saveReports(reports: MatchReport[]): Promise<boolean> {
   // 1. Save to Supabase (persistent on Vercel)
   const dbSaved = await setSiteData("reports", reports);
 
-  // 2. Also try writing to local file if writable (local dev or backup)
-  try {
-    await fs.writeFile(DATA_FILE, JSON.stringify(reports, null, 2), "utf8");
-  } catch {
-    // Expected on Vercel serverless read-only filesystem
+  // 2. Only write to local file if not in Vercel serverless environment
+  if (!process.env.VERCEL) {
+    try {
+      await fs.writeFile(DATA_FILE, JSON.stringify(reports, null, 2), "utf8");
+    } catch {
+      // Ignore local write errors
+    }
   }
 
   return dbSaved;
@@ -215,11 +217,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     const reports = await getReports();
-    const filtered = reports.filter((item) => item.id !== id);
-
-    if (filtered.length === reports.length) {
-      return NextResponse.json({ error: "Spielbericht nicht gefunden." }, { status: 404 });
-    }
+    const filtered = reports.filter((item) => String(item.id) !== String(id));
 
     await saveReports(filtered);
     return NextResponse.json({ success: true, deletedId: id });
