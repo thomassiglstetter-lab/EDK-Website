@@ -78,5 +78,22 @@
     "resinNote": "Haftmittel nicht erlaubt",
     "phone": "08131-900 961",
     "notes": "Parkplatz Sesamstr. 2 / Zufahrt über Bajuwarenstraße."
+  },
+  {
+    "id": "gym-karlsfeld",
+    "courtId": null,
+    "name": "Sporthalle Gymnasium Karlsfeld",
+    "fullName": "Karlsfeld, Sporthalle des Gymnasiums Karlsfeld",
+    "city": "Karlsfeld",
+    "postalCode": "85757",
+    "street": "Zugspitzstraße 3",
+    "fullAddress": "Zugspitzstraße 3, 85757 Karlsfeld",
+    "mapsUrl": "https://www.google.com/maps/dir/?api=1&destination=Zugspitzstra%C3%9Fe+3,85757+Karlsfeld,DEU",
+    "nuLigaUrl": null,
+    "resinAllowed": false,
+    "resinNote": "Haftmittel nicht erlaubt",
+    "phone": null,
+    "notes": "Reine Trainingshalle – kein Spielbetrieb.",
+    "isTrainingOnly": true
   }
 ]

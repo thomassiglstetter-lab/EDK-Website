@@ -102,8 +102,8 @@ export default function HallenPage() {
               maxWidth: "760px",
             }}
           >
-            Die Eintracht Dachau-Karlsfeld trägt ihre Heimspiele und Trainingseinheiten in 5
-            offiziellen Sportstätten der Stadt Dachau und der Gemeinde Karlsfeld aus.
+            Die Eintracht Dachau-Karlsfeld trägt ihre Heimspiele und Trainingseinheiten in 6
+            Sportstätten der Stadt Dachau und der Gemeinde Karlsfeld aus.
             Hier findest du alle Anschriften, Routenplaner, Anfahrt und Hinweise für Gastmannschaften.
           </p>
         </div>
@@ -129,8 +129,8 @@ export default function HallenPage() {
             </span>
             {[
               { id: "all", label: `Alle Hallen (${hallsData.length})` },
-              { id: "Dachau", label: "Dachau (3)" },
-              { id: "Karlsfeld", label: "Karlsfeld (2)" },
+              { id: "Dachau", label: `Dachau (${hallsData.filter((h) => h.city === "Dachau").length})` },
+              { id: "Karlsfeld", label: `Karlsfeld (${hallsData.filter((h) => h.city === "Karlsfeld").length})` },
             ].map((c) => (
               <button
                 key={c.id}
@@ -170,11 +170,11 @@ export default function HallenPage() {
             }}
           >
             <ShieldAlert size={16} />
-            <span>Haftmittel (Harz) in allen 5 Hallen nicht erlaubt</span>
+            <span>Haftmittel (Harz) in allen 6 Hallen nicht erlaubt</span>
           </div>
         </div>
 
-        {/* 5 Halls Grid */}
+        {/* Halls Grid */}
         <div
           style={{
             display: "grid",
@@ -228,7 +228,23 @@ export default function HallenPage() {
                       {hall.city}
                     </span>
 
-
+                    {(hall as any).isTrainingOnly && (
+                      <span
+                        style={{
+                          padding: "4px 10px",
+                          borderRadius: "6px",
+                          fontSize: "0.72rem",
+                          fontWeight: 700,
+                          background: "rgba(245, 158, 11, 0.15)",
+                          border: "1px solid rgba(245, 158, 11, 0.35)",
+                          color: "#FBBF24",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        Nur Training • Kein Spielbetrieb
+                      </span>
+                    )}
                   </div>
 
                   {/* Hall Name */}
@@ -341,38 +357,58 @@ export default function HallenPage() {
                     <ExternalLink size={12} />
                   </a>
 
-                  <a
-                    href={hall.nuLigaUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "6px",
-                      padding: "10px 14px",
-                      borderRadius: "8px",
-                      background: "rgba(255, 255, 255, 0.05)",
-                      border: "1px solid rgba(255, 255, 255, 0.12)",
-                      color: "#CBD5E1",
-                      fontSize: "0.88rem",
-                      fontWeight: 500,
-                      textDecoration: "none",
-                      transition: "all 0.2s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = "#FFFFFF";
-                      e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.25)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = "#CBD5E1";
-                      e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
-                    }}
-                  >
-                    <Calendar size={15} />
-                    <span>Hallenspielplan</span>
-                    <ExternalLink size={12} />
-                  </a>
+                  {hall.nuLigaUrl ? (
+                    <a
+                      href={hall.nuLigaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px",
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        background: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        color: "#CBD5E1",
+                        fontSize: "0.88rem",
+                        fontWeight: 500,
+                        textDecoration: "none",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = "#FFFFFF";
+                        e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.25)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = "#CBD5E1";
+                        e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                      }}
+                    >
+                      <Calendar size={15} />
+                      <span>Hallenspielplan</span>
+                      <ExternalLink size={12} />
+                    </a>
+                  ) : (
+                    <div
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px",
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        background: "rgba(255, 255, 255, 0.03)",
+                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        color: "#94A3B8",
+                        fontSize: "0.85rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      <span>Kein Spielbetrieb</span>
+                    </div>
+                  )}
                 </div>
               </div>
             );
