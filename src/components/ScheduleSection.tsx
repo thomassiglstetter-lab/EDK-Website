@@ -161,58 +161,121 @@ export function ScheduleSection() {
   }, []);
 
   // Filter for the upcoming weekend matches
+  // Filter for the upcoming weekend matches based on current date
   const { weekendMatches, weekendTitle, weekendDateLabel } = useMemo(() => {
     if (!data || !data.upcoming || data.upcoming.length === 0) {
       return { weekendMatches: [], weekendTitle: "Spiele am kommenden Wochenende", weekendDateLabel: "" };
     }
 
-    // Sort upcoming ascending
-    const sortedUpcoming = [...data.upcoming].sort((a, b) => {
+    // Filter out entries with invalid date or "Termin offen"
+    const validUpcoming = data.upcoming.filter(
+      (m) => m.date && m.date !== "Termin offen" && m.day !== "Termin offen"
+    );
+
+    if (validUpcoming.length === 0) {
+      return { weekendMatches: [], weekendTitle: "Spiele am kommenden Wochenende", weekendDateLabel: "" };
+    }
+
+    // Sort upcoming ascending by date and time
+    const sortedUpcoming = [...validUpcoming].sort((a, b) => {
       const tA = parseDateParts(a.date, a.time).getTime();
       const tB = parseDateParts(b.date, b.time).getTime();
       return tA - tB;
     });
 
-    const firstMatch = sortedUpcoming[0];
-    const firstDt = parseDateParts(firstMatch.date, firstMatch.time);
+    const now = new Date();
+    // Today at 00:00:00
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
 
-    // Calculate weekend window: Friday to Sunday of the next game's matchday
-    const jsDay = firstDt.getDay();
-    let fri = new Date(firstDt);
+    // Calculate this coming weekend window (Friday to Sunday, plus Monday for long weekends)
+    const jsDay = now.getDay(); // 0 = Sun, 1 = Mon, ..., 5 = Fri, 6 = Sat
+    let fri = new Date(todayStart);
 
     if (jsDay === 5) {
-      // Friday
-      fri = new Date(firstDt);
+      // Today is Friday
+      fri = new Date(todayStart);
     } else if (jsDay === 6) {
       // Saturday -> Friday was yesterday
-      fri.setDate(firstDt.getDate() - 1);
+      fri.setDate(todayStart.getDate() - 1);
     } else if (jsDay === 0) {
       // Sunday -> Friday was 2 days ago
-      fri.setDate(firstDt.getDate() - 2);
+      fri.setDate(todayStart.getDate() - 2);
     } else {
-      // Monday (1) - Thursday (4) -> next Friday
+      // Monday (1) to Thursday (4) -> next Friday
       const daysUntilFri = 5 - jsDay;
-      fri.setDate(firstDt.getDate() + daysUntilFri);
+      fri.setDate(todayStart.getDate() + daysUntilFri);
     }
 
-    const sat = new Date(fri);
-    sat.setDate(fri.getDate() + 1);
-
-    const sun = new Date(fri);
-    sun.setDate(fri.getDate() + 2);
+    const sat = new Date(fri); sat.setDate(fri.getDate() + 1);
+    const sun = new Date(fri); sun.setDate(fri.getDate() + 2);
+    const mon = new Date(fri); mon.setDate(fri.getDate() + 3);
 
     const formatShort = (d: Date) =>
       `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
 
-    const weekendDatesSet = new Set([
+    let weekendDatesSet = new Set([
       formatShort(fri),
       formatShort(sat),
       formatShort(sun),
+      formatShort(mon),
     ]);
 
-    const matchesForWeekend = sortedUpcoming.filter((m) =>
+    let matchesForWeekend = sortedUpcoming.filter((m) =>
       weekendDatesSet.has(m.date)
     );
+
+    let displayFri = fri;
+    let displaySun = sun;
+
+    // If there are no games this weekend, find the NEXT future weekend with games (never look into the past!)
+    if (matchesForWeekend.length === 0) {
+      const nextFutureMatch = sortedUpcoming.find((m) => {
+        const dt = parseDateParts(m.date, m.time);
+        return dt.getTime() >= todayStart.getTime();
+      });
+
+      if (nextFutureMatch) {
+        const nextDt = parseDateParts(nextFutureMatch.date, nextFutureMatch.time);
+        const nextDay = nextDt.getDay();
+        let nextFri = new Date(nextDt.getFullYear(), nextDt.getMonth(), nextDt.getDate(), 0, 0, 0);
+
+        if (nextDay === 5) {
+          nextFri = new Date(nextDt.getFullYear(), nextDt.getMonth(), nextDt.getDate(), 0, 0, 0);
+        } else if (nextDay === 6) {
+          nextFri.setDate(nextDt.getDate() - 1);
+        } else if (nextDay === 0) {
+          nextFri.setDate(nextDt.getDate() - 2);
+        } else {
+          const dFri = 5 - nextDay;
+          nextFri.setDate(nextDt.getDate() + dFri);
+        }
+
+        const nextSat = new Date(nextFri); nextSat.setDate(nextFri.getDate() + 1);
+        const nextSun = new Date(nextFri); nextSun.setDate(nextFri.getDate() + 2);
+        const nextMon = new Date(nextFri); nextMon.setDate(nextFri.getDate() + 3);
+
+        weekendDatesSet = new Set([
+          formatShort(nextFri),
+          formatShort(nextSat),
+          formatShort(nextSun),
+          formatShort(nextMon),
+        ]);
+
+        matchesForWeekend = sortedUpcoming.filter((m) =>
+          weekendDatesSet.has(m.date)
+        );
+
+        displayFri = nextFri;
+        displaySun = nextSun;
+      }
+    }
+
+    // Sort matches chronologically
+    matchesForWeekend.sort((a, b) => {
+      const tA = parseDateParts(a.date, a.time).getTime();
+      const tB = parseDateParts(b.date, b.time).getTime();
+      return tA - tB;
+    });
 
     // Human readable date label
     const datesInMatches = Array.from(new Set(matchesForWeekend.map((m) => m.date)));
@@ -228,9 +291,14 @@ export function ScheduleSection() {
     } else if (datesInMatches.length > 1) {
       const d1 = parseDateParts(datesInMatches[0]);
       const d2 = parseDateParts(datesInMatches[datesInMatches.length - 1]);
-      dateLabel = `${d1.getDate()}. – ${d2.getDate()}. ${d2.toLocaleDateString("de-DE", { month: "long", year: "numeric" })}`;
+      if (d1.getMonth() === d2.getMonth()) {
+        dateLabel = `${d1.getDate()}. – ${d2.getDate()}. ${d2.toLocaleDateString("de-DE", { month: "long", year: "numeric" })}`;
+      } else {
+        dateLabel = `${d1.getDate()}. ${d1.toLocaleDateString("de-DE", { month: "short" })} – ${d2.getDate()}. ${d2.toLocaleDateString("de-DE", { month: "long", year: "numeric" })}`;
+      }
     } else {
-      dateLabel = `${sat.getDate()}. – ${sun.getDate()}. ${sun.toLocaleDateString("de-DE", { month: "long", year: "numeric" })}`;
+      const sat = new Date(displayFri); sat.setDate(displayFri.getDate() + 1);
+      dateLabel = `${sat.getDate()}. – ${displaySun.getDate()}. ${displaySun.toLocaleDateString("de-DE", { month: "long", year: "numeric" })}`;
     }
 
     return {

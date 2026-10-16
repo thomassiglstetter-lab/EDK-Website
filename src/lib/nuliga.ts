@@ -145,43 +145,59 @@ export async function syncNuLigaData(): Promise<NuLigaData> {
 
         for (const row of rows) {
           const tds = row.match(/<td[^>]*>([\s\S]*?)<\/td>/g) || [];
-          if (tds.length < 8) continue;
+          if (tds.length < 7) continue;
 
-          const dRaw = cleanText(tds[0]!.replace(/<[^>]+>/g, " "));
-          const dtRaw = cleanText(tds[1]!.replace(/<[^>]+>/g, " "));
-          if (dRaw) currentDay = dRaw;
-          if (dtRaw) currentDate = dtRaw;
+          const isColspan2 = /colspan="?2"?/i.test(tds[0]!);
+          let colIdx = 0;
 
-          const timeRaw = cleanText(tds[2]!.replace(/<[^>]+>/g, " "));
+          if (isColspan2) {
+            const rawCol = cleanText(tds[0]!.replace(/<[^>]+>/g, " "));
+            currentDay = rawCol || "Termin offen";
+            currentDate = currentDay;
+            colIdx = 1;
+          } else {
+            const dRaw = cleanText(tds[0]!.replace(/<[^>]+>/g, " "));
+            const dtRaw = cleanText(tds[1]!.replace(/<[^>]+>/g, " "));
+            if (dRaw) currentDay = dRaw;
+            if (dtRaw) currentDate = dtRaw;
+            colIdx = 2;
+          }
+
+          const timeTd = tds[colIdx];
+          const timeRaw = timeTd ? cleanText(timeTd.replace(/<[^>]+>/g, " ")) : "";
           const timeMatch = timeRaw.match(/\d{2}:\d{2}/);
-          const timeStr = timeMatch ? timeMatch[0] : timeRaw;
+          const timeStr = timeMatch ? timeMatch[0] : (timeRaw.includes(":") ? timeRaw : "");
 
           // Hallen info
-          const hallNameMatch = tds[3]!.match(/title="([^"]+)"/);
+          const hallTd = tds[colIdx + 1];
+          const hallNameMatch = hallTd ? hallTd.match(/title="([^"]+)"/) : null;
           const hallName = hallNameMatch ? cleanText(hallNameMatch[1]) : "";
-          const hallNr = cleanText(tds[3]!.replace(/<[^>]+>/g, " "));
+          const hallNr = hallTd ? cleanText(hallTd.replace(/<[^>]+>/g, " ")) : "";
 
-          const courtUrlMatch = tds[3]!.match(/href="([^"]+)"/);
+          const courtUrlMatch = hallTd ? hallTd.match(/href="([^"]+)"/) : null;
           const courtUrl = courtUrlMatch
             ? `https://bhv-handball.liga.nu${courtUrlMatch[1]}`.replace(/&amp;/g, "&")
             : null;
 
-          const matchNr = cleanText(tds[4]!.replace(/<[^>]+>/g, " "));
-          const league = cleanText(tds[5]!.replace(/<[^>]+>/g, " "));
-          const home = cleanText(tds[6]!.replace(/<[^>]+>/g, " "));
-          const guest = cleanText(tds[7]!.replace(/<[^>]+>/g, " "));
+          const matchNr = tds[colIdx + 2] ? cleanText(tds[colIdx + 2]!.replace(/<[^>]+>/g, " ")) : "";
+          const league = tds[colIdx + 3] ? cleanText(tds[colIdx + 3]!.replace(/<[^>]+>/g, " ")) : "";
+          const home = tds[colIdx + 4] ? cleanText(tds[colIdx + 4]!.replace(/<[^>]+>/g, " ")) : "";
+          const guest = tds[colIdx + 5] ? cleanText(tds[colIdx + 5]!.replace(/<[^>]+>/g, " ")) : "";
 
           let result: string | null = null;
           let homeScore: number | null = null;
           let guestScore: number | null = null;
 
-          for (let i = 8; i < tds.length; i++) {
+          for (let i = colIdx + 6; i < tds.length; i++) {
             const txt = cleanText(tds[i]!.replace(/<[^>]+>/g, " "));
             const sm = txt.match(/^(\d+)\s*:\s*(\d+)$/);
             if (sm) {
               homeScore = parseInt(sm[1], 10);
               guestScore = parseInt(sm[2], 10);
               result = `${homeScore}:${guestScore}`;
+              break;
+            } else if (txt === "NG" || txt.toLowerCase().includes("nicht gewertet")) {
+              result = "NG";
               break;
             }
           }

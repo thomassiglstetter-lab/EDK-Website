@@ -2,7 +2,7 @@
   "clubId": "105665",
   "clubName": "Eintracht Dachau-Karlsfeld",
   "federation": "BHV",
-  "lastSynced": "2026-10-16T11:44:26.004Z",
+  "lastSynced": "2026-10-16T12:09:07.789Z",
   "nuLigaUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/clubInfoDisplay?club=105665",
   "halls": [
     {
@@ -47,10 +47,10 @@
       "hallName": "Ismaning, Isarena",
       "hallNr": "280166",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=38493",
-      "result": null,
+      "result": "NG",
       "homeScore": null,
       "guestScore": null,
-      "outcome": null
+      "outcome": "draw"
     },
     {
       "id": "20241201",
@@ -737,19 +737,19 @@
       "outcome": null
     },
     {
-      "id": "BZK M",
-      "matchNr": "BZK M",
+      "id": "26014015",
+      "matchNr": "26014015",
       "day": "Termin offen",
-      "date": "18.10.2026",
-      "time": "260181",
-      "league": "Eintracht Dachau-Karlsfeld II",
-      "home": "HSG Schwabkirchen II (a.K.)",
-      "guest": "",
-      "isHome": false,
-      "category": "Jugend",
-      "hallName": "",
-      "hallNr": "26014015",
-      "courtUrl": null,
+      "date": "Termin offen",
+      "time": "",
+      "league": "BZK M",
+      "home": "Eintracht Dachau-Karlsfeld II",
+      "guest": "HSG Schwabkirchen II (a.K.)",
+      "isHome": true,
+      "category": "Herren 2",
+      "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
+      "hallNr": "260181",
+      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=43209",
       "result": null,
       "homeScore": null,
       "guestScore": null,
