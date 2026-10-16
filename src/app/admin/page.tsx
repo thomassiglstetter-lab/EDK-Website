@@ -188,7 +188,24 @@ export default function AdminPage() {
   const [authError, setAuthError] = useState<string>("");
 
   // Navigation Tab State
-  const [activeTab, setActiveTab] = useState<"news" | "reports" | "teams" | "sponsors" | "nuliga" | "contact">("news");
+  const [activeTab, setActiveTab] = useState<"news" | "reports" | "teams" | "sponsors" | "nuliga" | "contact" | "hero">("news");
+
+  // ==========================================
+  // LANDING PAGE HERO STATS STATE
+  // ==========================================
+  const [heroStats, setHeroStats] = useState<Array<{
+    id: string;
+    value: string;
+    label: string;
+    accent: "crimson" | "white" | "azure" | "gold" | "emerald";
+    link?: string;
+  }>>([
+    { id: "teams", value: "20+", label: "Teams im Spielbetrieb", accent: "crimson", link: "#teams" },
+    { id: "players", value: "350+", label: "Aktive Handballer", accent: "white", link: "/verein" },
+    { id: "halls", value: "6", label: "Moderne Hallen", accent: "azure", link: "/hallen" },
+  ]);
+  const [heroStatsLoading, setHeroStatsLoading] = useState<boolean>(true);
+  const [heroStatsSaving, setHeroStatsSaving] = useState<boolean>(false);
 
   // ==========================================
   // NEWS STATE
@@ -613,6 +630,20 @@ export default function AdminPage() {
       .catch((err) => {
         console.error("Contact fetch error:", err);
         setContactLoading(false);
+      });
+
+    // Fetch Landing Page Hero Stats
+    fetch("/api/hero-stats", { cache: "no-store", headers: { "Cache-Control": "no-cache", Pragma: "no-cache" } })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setHeroStats(data);
+        }
+        setHeroStatsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Hero stats fetch error:", err);
+        setHeroStatsLoading(false);
       });
   }, [isAuthenticated]);
 
@@ -1912,6 +1943,41 @@ export default function AdminPage() {
     partner: sponsors.filter((s) => s.tier === "partner").length,
   };
 
+  // ==========================================
+  // LANDING PAGE HERO STATS HANDLERS
+  // ==========================================
+  const handleSaveHeroStats = async () => {
+    setHeroStatsSaving(true);
+    try {
+      const res = await fetch("/api/hero-stats", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(heroStats),
+      });
+      if (!res.ok) throw new Error("Fehler beim Speichern");
+      const updated = await res.json();
+      if (Array.isArray(updated)) setHeroStats(updated);
+      showToast("Landing Page Kacheln erfolgreich gespeichert!", "success");
+    } catch (err) {
+      console.error("Save hero stats error:", err);
+      showToast("Fehler beim Speichern der Kacheln", "error");
+    } finally {
+      setHeroStatsSaving(false);
+    }
+  };
+
+  const handleResetHeroStats = () => {
+    if (confirm("Möchtest du die 3 Kacheln wirklich auf die Standardwerte zurücksetzen?")) {
+      const defaults = [
+        { id: "teams", value: "20+", label: "Teams im Spielbetrieb", accent: "crimson" as const, link: "#teams" },
+        { id: "players", value: "350+", label: "Aktive Handballer", accent: "white" as const, link: "/verein" },
+        { id: "halls", value: "6", label: "Moderne Hallen", accent: "azure" as const, link: "/hallen" },
+      ];
+      setHeroStats(defaults);
+      showToast("Auf Standardwerte zurückgesetzt (noch nicht gespeichert).");
+    }
+  };
+
   // ----------------------------------------------------
   // LOGIN SCREEN
   // ----------------------------------------------------
@@ -2444,6 +2510,40 @@ export default function AdminPage() {
             )}
           </button>
 
+          {/* TAB 6: LANDINGPAGE KACHELN */}
+          <button
+            onClick={() => setActiveTab("hero")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px 18px",
+              borderRadius: "var(--radius-sm)",
+              border: "none",
+              background: activeTab === "hero" ? "rgba(255, 255, 255, 0.1)" : "transparent",
+              color: activeTab === "hero" ? "#FFFFFF" : "var(--color-text-dim)",
+              fontWeight: activeTab === "hero" ? 600 : 500,
+              fontSize: "0.92rem",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <Sparkles size={16} color={activeTab === "hero" ? "#F43F5E" : "currentColor"} />
+            <span>Landing Page Kacheln</span>
+            <span
+              style={{
+                fontSize: "0.72rem",
+                padding: "2px 7px",
+                borderRadius: "10px",
+                background: activeTab === "hero" ? "rgba(244, 63, 94, 0.25)" : "rgba(255, 255, 255, 0.08)",
+                color: activeTab === "hero" ? "#FDA4AF" : "#FFFFFF",
+                fontWeight: 700,
+              }}
+            >
+              3
+            </span>
+          </button>
         </div>
 
         {/* ============================================================== */}
@@ -5988,6 +6088,469 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB 7 CONTENT: LANDING PAGE HERO TILES (3 KACHELN)             */}
+        {/* ============================================================== */}
+        {activeTab === "hero" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+            {/* Header & Actions Banner */}
+            <div
+              className="glass-panel"
+              style={{
+                padding: "28px 32px",
+                borderRadius: "16px",
+                background: "rgba(13, 17, 26, 0.85)",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "20px",
+              }}
+            >
+              <div>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", color: "#F43F5E", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+                  <Sparkles size={15} />
+                  <span>Landing Page • Startbereich</span>
+                </div>
+                <h2 style={{ fontSize: "1.6rem", fontWeight: 700, color: "#FFFFFF", marginBottom: "6px" }}>
+                  Die 3 Startbereich-Kacheln
+                </h2>
+                <p style={{ color: "#94A3B8", fontSize: "0.92rem", maxWidth: "680px", margin: 0, lineHeight: 1.5 }}>
+                  Passe die Werte, Bezeichnungen, Akzentfarben und optionale Verlinkungen der drei auffälligen Statistik-Kacheln im Hero-Bereich der Startseite an. Änderungen werden nach dem Speichern sofort live aktiv.
+                </p>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                <button
+                  onClick={handleResetHeroStats}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "10px 18px",
+                    borderRadius: "8px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    color: "#CBD5E1",
+                    fontSize: "0.88rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#CBD5E1")}
+                >
+                  <RefreshCw size={15} />
+                  <span>Auf Standard</span>
+                </button>
+
+                <button
+                  onClick={handleSaveHeroStats}
+                  disabled={heroStatsSaving}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "11px 24px",
+                    borderRadius: "8px",
+                    background: "linear-gradient(135deg, #0284C7 0%, #0369A1 100%)",
+                    border: "none",
+                    color: "#FFFFFF",
+                    fontSize: "0.92rem",
+                    fontWeight: 600,
+                    cursor: heroStatsSaving ? "not-allowed" : "pointer",
+                    opacity: heroStatsSaving ? 0.7 : 1,
+                    boxShadow: "0 4px 16px rgba(2, 132, 199, 0.35)",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  {heroStatsSaving ? (
+                    <>
+                      <RefreshCw size={16} className="animate-spin" />
+                      <span>Speichern...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check size={16} />
+                      <span>Kacheln speichern</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Live Preview Box */}
+            <div
+              className="glass-panel"
+              style={{
+                padding: "28px 32px",
+                borderRadius: "16px",
+                background: "rgba(7, 10, 16, 0.95)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Eye size={16} color="var(--color-azure-bright)" />
+                  <span style={{ fontSize: "0.88rem", fontWeight: 700, color: "#FFFFFF", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    Echtzeit-Vorschau (wie auf der Startseite)
+                  </span>
+                </div>
+                <span style={{ fontSize: "0.78rem", color: "#64748B" }}>
+                  Live-Darstellung bei Eingabe
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                  gap: "14px",
+                  maxWidth: "540px",
+                  padding: "18px",
+                  background: "rgba(15, 23, 42, 0.4)",
+                  borderRadius: "14px",
+                  border: "1px dashed rgba(255, 255, 255, 0.15)",
+                }}
+              >
+                {heroStats.map((stat, idx) => {
+                  const borderTopColor =
+                    stat.accent === "crimson"
+                      ? "var(--color-crimson)"
+                      : stat.accent === "azure"
+                      ? "var(--color-azure)"
+                      : stat.accent === "gold"
+                      ? "#F59E0B"
+                      : stat.accent === "emerald"
+                      ? "#10B981"
+                      : "rgba(255, 255, 255, 0.45)";
+
+                  return (
+                    <div
+                      key={stat.id || idx}
+                      style={{
+                        padding: "16px 18px",
+                        borderRadius: "var(--radius-md)",
+                        background: "rgba(11, 15, 23, 0.92)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        borderTop: `3px solid ${borderTopColor}`,
+                        boxShadow: "0 10px 24px rgba(0, 0, 0, 0.5)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontSize: "1.75rem",
+                          fontWeight: 700,
+                          color: "#FFFFFF",
+                          lineHeight: 1,
+                          marginBottom: "6px",
+                        }}
+                      >
+                        {stat.value || "0"}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "0.78rem",
+                          color: "#CBD5E1",
+                          fontWeight: 500,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
+                          lineHeight: 1.25,
+                        }}
+                      >
+                        {stat.label || "Bezeichnung"}
+                      </div>
+                      {stat.link && (
+                        <div style={{ marginTop: "8px", fontSize: "0.7rem", color: "var(--color-azure-bright)", display: "flex", alignItems: "center", gap: "4px" }}>
+                          <ExternalLink size={10} />
+                          <span>Link: {stat.link}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 3 Editor Cards */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                gap: "24px",
+              }}
+            >
+              {heroStats.map((stat, idx) => {
+                const positionNames = ["Linke Kachel (1)", "Mittlere Kachel (2)", "Rechte Kachel (3)"];
+                const colorOptions: Array<{ id: "crimson" | "azure" | "white" | "gold" | "emerald"; label: string; bg: string }> = [
+                  { id: "crimson", label: "Crimson Rot", bg: "var(--color-crimson)" },
+                  { id: "azure", label: "Azure Blau", bg: "var(--color-azure)" },
+                  { id: "white", label: "Silber / Weiß", bg: "rgba(255, 255, 255, 0.5)" },
+                  { id: "gold", label: "Bernstein Gold", bg: "#F59E0B" },
+                  { id: "emerald", label: "Smaragd Grün", bg: "#10B981" },
+                ];
+
+                return (
+                  <div
+                    key={stat.id || idx}
+                    className="glass-panel"
+                    style={{
+                      padding: "28px",
+                      borderRadius: "16px",
+                      background: "rgba(13, 17, 26, 0.85)",
+                      border: "1px solid rgba(255, 255, 255, 0.08)",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "20px",
+                    }}
+                  >
+                    {/* Card Title */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(255, 255, 255, 0.06)", paddingBottom: "14px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "50%",
+                            background: "rgba(255, 255, 255, 0.08)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "0.85rem",
+                            fontWeight: 700,
+                            color: "#FFFFFF",
+                          }}
+                        >
+                          {idx + 1}
+                        </span>
+                        <div>
+                          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
+                            {positionNames[idx]}
+                          </h3>
+                          <div style={{ fontSize: "0.78rem", color: "#64748B" }}>
+                            ID: {stat.id}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Field 1: Value / Number */}
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                        Wert / Statistik-Zahl *
+                      </label>
+                      <input
+                        type="text"
+                        value={stat.value}
+                        onChange={(e) => {
+                          const updated = [...heroStats];
+                          updated[idx] = { ...updated[idx], value: e.target.value };
+                          setHeroStats(updated);
+                        }}
+                        placeholder="z.B. 20+, 350+, 6"
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          borderRadius: "8px",
+                          background: "rgba(255, 255, 255, 0.04)",
+                          border: "1px solid rgba(255, 255, 255, 0.12)",
+                          color: "#FFFFFF",
+                          fontSize: "1.1rem",
+                          fontWeight: 700,
+                          outline: "none",
+                        }}
+                      />
+                      <span style={{ fontSize: "0.74rem", color: "#64748B", marginTop: "4px", display: "block" }}>
+                        Kann Zahlen mit Zusätzen enthalten (z.B. „20+“, „350+“, „6 Hallen“).
+                      </span>
+                    </div>
+
+                    {/* Field 2: Label / Description */}
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                        Bezeichnung / Titel *
+                      </label>
+                      <input
+                        type="text"
+                        value={stat.label}
+                        onChange={(e) => {
+                          const updated = [...heroStats];
+                          updated[idx] = { ...updated[idx], label: e.target.value };
+                          setHeroStats(updated);
+                        }}
+                        placeholder="z.B. Teams im Spielbetrieb"
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          borderRadius: "8px",
+                          background: "rgba(255, 255, 255, 0.04)",
+                          border: "1px solid rgba(255, 255, 255, 0.12)",
+                          color: "#FFFFFF",
+                          fontSize: "0.92rem",
+                          outline: "none",
+                        }}
+                      />
+                      <span style={{ fontSize: "0.74rem", color: "#64748B", marginTop: "4px", display: "block" }}>
+                        Wird direkt unter der Zahl in Großbuchstaben angezeigt.
+                      </span>
+                    </div>
+
+                    {/* Field 3: Accent Color Selector */}
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                        Akzentfarbe (Oberer Kachelrand)
+                      </label>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                        {colorOptions.map((c) => {
+                          const isSelected = stat.accent === c.id;
+                          return (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => {
+                                const updated = [...heroStats];
+                                updated[idx] = { ...updated[idx], accent: c.id };
+                                setHeroStats(updated);
+                              }}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                padding: "6px 12px",
+                                borderRadius: "8px",
+                                background: isSelected ? "rgba(255, 255, 255, 0.12)" : "rgba(255, 255, 255, 0.03)",
+                                border: isSelected ? `2px solid ${c.bg}` : "1px solid rgba(255, 255, 255, 0.08)",
+                                color: isSelected ? "#FFFFFF" : "#94A3B8",
+                                fontSize: "0.78rem",
+                                fontWeight: isSelected ? 700 : 500,
+                                cursor: "pointer",
+                                transition: "all 0.15s ease",
+                              }}
+                            >
+                              <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: c.bg }} />
+                              <span>{c.label}</span>
+                              {isSelected && <Check size={12} color="#FFFFFF" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Field 4: Optional Link */}
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#CBD5E1", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                        Optionale Verlinkung (URL / Anker)
+                      </label>
+                      <input
+                        type="text"
+                        value={stat.link || ""}
+                        onChange={(e) => {
+                          const updated = [...heroStats];
+                          updated[idx] = { ...updated[idx], link: e.target.value };
+                          setHeroStats(updated);
+                        }}
+                        placeholder="z.B. #teams, /hallen, /verein"
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          borderRadius: "8px",
+                          background: "rgba(255, 255, 255, 0.04)",
+                          border: "1px solid rgba(255, 255, 255, 0.12)",
+                          color: "#FFFFFF",
+                          fontSize: "0.88rem",
+                          outline: "none",
+                        }}
+                      />
+
+                      {/* Quick Chips for Links */}
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "8px" }}>
+                        <span style={{ fontSize: "0.72rem", color: "#64748B", alignSelf: "center", marginRight: "2px" }}>
+                          Vorschläge:
+                        </span>
+                        {[
+                          { label: "Kein Link", val: "" },
+                          { label: "#teams", val: "#teams" },
+                          { label: "/hallen", val: "/hallen" },
+                          { label: "/verein", val: "/verein" },
+                          { label: "#news", val: "#news" },
+                          { label: "#kontakt", val: "#kontakt" },
+                        ].map((chip, cIdx) => (
+                          <button
+                            key={cIdx}
+                            type="button"
+                            onClick={() => {
+                              const updated = [...heroStats];
+                              updated[idx] = { ...updated[idx], link: chip.val };
+                              setHeroStats(updated);
+                            }}
+                            style={{
+                              padding: "2px 8px",
+                              borderRadius: "6px",
+                              fontSize: "0.72rem",
+                              background: stat.link === chip.val ? "rgba(2, 132, 199, 0.3)" : "rgba(255, 255, 255, 0.05)",
+                              border: "1px solid rgba(255, 255, 255, 0.1)",
+                              color: stat.link === chip.val ? "var(--color-azure-bright)" : "#94A3B8",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {chip.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom Save Bar */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                gap: "12px",
+                padding: "20px 0",
+              }}
+            >
+              <button
+                onClick={handleSaveHeroStats}
+                disabled={heroStatsSaving}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "12px 28px",
+                  borderRadius: "8px",
+                  background: "linear-gradient(135deg, #0284C7 0%, #0369A1 100%)",
+                  border: "none",
+                  color: "#FFFFFF",
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                  cursor: heroStatsSaving ? "not-allowed" : "pointer",
+                  opacity: heroStatsSaving ? 0.7 : 1,
+                  boxShadow: "0 4px 16px rgba(2, 132, 199, 0.35)",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                {heroStatsSaving ? (
+                  <>
+                    <RefreshCw size={16} className="animate-spin" />
+                    <span>Speichern...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check size={16} />
+                    <span>Kacheln jetzt speichern</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         )}
       </main>

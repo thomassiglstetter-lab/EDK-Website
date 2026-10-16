@@ -1,0 +1,23 @@
+[
+  {
+    "id": "teams",
+    "value": "20+",
+    "label": "Teams im Spielbetrieb",
+    "accent": "crimson",
+    "link": "#teams"
+  },
+  {
+    "id": "players",
+    "value": "350+",
+    "label": "Aktive Handballer",
+    "accent": "white",
+    "link": "/verein"
+  },
+  {
+    "id": "halls",
+    "value": "6",
+    "label": "Moderne Hallen",
+    "accent": "azure",
+    "link": "/hallen"
+  }
+]

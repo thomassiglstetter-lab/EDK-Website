@@ -1,12 +1,35 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import HeroCrest3D from "./HeroCrest3D";
+import initialHeroStats from "@/data/hero-stats.json";
+
+interface HeroStatItem {
+  id: string;
+  value: string;
+  label: string;
+  accent: "crimson" | "white" | "azure" | "gold" | "emerald";
+  link?: string;
+}
 
 export default function HeroContent() {
   const { ref: heroRef, isRevealed } = useScrollReveal({ threshold: 0.15, rootMargin: "0px" });
+  const [stats, setStats] = useState<HeroStatItem[]>(initialHeroStats as HeroStatItem[]);
+
+  useEffect(() => {
+    fetch("/api/hero-stats", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setStats(data);
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not load dynamic hero stats:", err);
+      });
+  }, []);
 
   const handleScrollToNews = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -94,7 +117,7 @@ export default function HeroContent() {
             Zusammenhalt im Münchner Norden.
           </p>
 
-          {/* Stats Strip - Crisp typography & solid backdrop */}
+          {/* Stats Strip - Dynamic tiles with crisp typography & solid backdrop */}
           <div
             className="hero-stats-grid"
             style={{
@@ -105,122 +128,94 @@ export default function HeroContent() {
               pointerEvents: "auto",
             }}
           >
-            <div
-              className={`reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
-              style={{
-                padding: "16px 18px",
-                borderRadius: "var(--radius-md)",
-                background: "rgba(11, 15, 23, 0.90)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                borderTop: "3px solid var(--color-crimson)",
-                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
-                transitionDelay: "0.1s",
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "1.75rem",
-                  fontWeight: 700,
-                  color: "#FFFFFF",
-                  lineHeight: 1,
-                  marginBottom: "6px",
-                  textShadow: "0 2px 8px rgba(0,0,0,0.5)",
-                }}
-              >
-                20+
-              </div>
-              <div
-                style={{
-                  fontSize: "0.78rem",
-                  color: "#CBD5E1",
-                  fontWeight: 500,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                Teams im Spielbetrieb
-              </div>
-            </div>
+            {stats.map((stat, idx) => {
+              const borderTopColor =
+                stat.accent === "crimson"
+                  ? "var(--color-crimson)"
+                  : stat.accent === "azure"
+                  ? "var(--color-azure)"
+                  : stat.accent === "gold"
+                  ? "#F59E0B"
+                  : stat.accent === "emerald"
+                  ? "#10B981"
+                  : "rgba(255, 255, 255, 0.45)";
 
-            <div
-              className={`reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
-              style={{
-                padding: "16px 18px",
-                borderRadius: "var(--radius-md)",
-                background: "rgba(11, 15, 23, 0.90)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                borderTop: "3px solid rgba(255, 255, 255, 0.45)",
-                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
-                transitionDelay: "0.2s",
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "1.75rem",
-                  fontWeight: 700,
-                  color: "#FFFFFF",
-                  lineHeight: 1,
-                  marginBottom: "6px",
-                  textShadow: "0 2px 8px rgba(0,0,0,0.5)",
-                }}
-              >
-                350+
-              </div>
-              <div
-                style={{
-                  fontSize: "0.78rem",
-                  color: "#CBD5E1",
-                  fontWeight: 500,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                Aktive Handballer
-              </div>
-            </div>
+              const cardContent = (
+                <>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: "1.75rem",
+                      fontWeight: 700,
+                      color: "#FFFFFF",
+                      lineHeight: 1,
+                      marginBottom: "6px",
+                      textShadow: "0 2px 8px rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    {stat.value}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.78rem",
+                      color: "#CBD5E1",
+                      fontWeight: 500,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      lineHeight: 1.25,
+                    }}
+                  >
+                    {stat.label}
+                  </div>
+                </>
+              );
 
-            <div
-              className={`reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
-              style={{
+              const cardStyle: React.CSSProperties = {
                 padding: "16px 18px",
                 borderRadius: "var(--radius-md)",
                 background: "rgba(11, 15, 23, 0.90)",
                 backdropFilter: "blur(20px)",
                 border: "1px solid rgba(255, 255, 255, 0.1)",
-                borderTop: "3px solid var(--color-azure)",
+                borderTop: `3px solid ${borderTopColor}`,
                 boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
-                transitionDelay: "0.3s",
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "1.75rem",
-                  fontWeight: 700,
-                  color: "#FFFFFF",
-                  lineHeight: 1,
-                  marginBottom: "6px",
-                  textShadow: "0 2px 8px rgba(0,0,0,0.5)",
-                }}
-              >
-                5
-              </div>
-              <div
-                style={{
-                  fontSize: "0.78rem",
-                  color: "#CBD5E1",
-                  fontWeight: 500,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                Moderne Hallen
-              </div>
-            </div>
+                transitionDelay: `${(idx + 1) * 0.1}s`,
+                display: "block",
+                textDecoration: "none",
+                cursor: stat.link ? "pointer" : "default",
+                transition: "all 0.2s ease",
+              };
+
+              if (stat.link) {
+                return (
+                  <a
+                    key={stat.id || idx}
+                    href={stat.link}
+                    className={`reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
+                    style={cardStyle}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-3px)";
+                      e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.25)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "none";
+                      e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                    }}
+                  >
+                    {cardContent}
+                  </a>
+                );
+              }
+
+              return (
+                <div
+                  key={stat.id || idx}
+                  className={`reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
+                  style={cardStyle}
+                >
+                  {cardContent}
+                </div>
+              );
+            })}
           </div>
         </div>
 
