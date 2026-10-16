@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Mail, Phone, MapPin, Send, CheckCircle2, MessageSquare, Clock, Instagram, ArrowUpRight } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import defaultContactData from "@/data/contact.json";
 
@@ -393,7 +394,7 @@ export default function ContactSection() {
                       letterSpacing: "0.06em",
                     }}
                   >
-                    Social Media & Storys
+                    Social Media &amp; Storys
                   </div>
                   <div
                     style={{
@@ -438,6 +439,99 @@ export default function ContactSection() {
             </div>
             <p style={{ fontSize: "0.88rem", color: "#CBD5E1", lineHeight: 1.5, margin: 0 }}>
               Aktuelle Spieltags-Highlights, Trainings-Eindrücke und Vereins-News direkt auf deinem Smartphone.
+            </p>
+          </div>
+
+          {/* Channel Card 5: WhatsApp Community */}
+          <div
+            className="glass-panel"
+            style={{
+              padding: "24px 28px",
+              background: "rgba(13, 17, 26, 0.85)",
+              borderLeft: "3px solid #25D366",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+                flexWrap: "wrap",
+                marginBottom: "10px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "10px",
+                    background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#FFFFFF",
+                    boxShadow: "0 4px 14px rgba(37, 211, 102, 0.35)",
+                    flexShrink: 0,
+                  }}
+                >
+                  <WhatsAppIcon size={20} />
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "#94A3B8",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    Offizieller WhatsApp Kanal
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "1.05rem",
+                      fontWeight: 600,
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    WhatsApp Community
+                  </div>
+                </div>
+              </div>
+
+              <a
+                href="https://chat.whatsapp.com/H3hkraWI6naEsoT6CMxrdh"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "8px 16px",
+                  borderRadius: "var(--radius-full)",
+                  background: "rgba(37, 211, 102, 0.15)",
+                  border: "1px solid rgba(37, 211, 102, 0.4)",
+                  color: "#FFFFFF",
+                  fontSize: "0.82rem",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#25D366";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(37, 211, 102, 0.15)";
+                }}
+              >
+                <span>Community beitreten</span>
+                <ArrowUpRight size={13} />
+              </a>
+            </div>
+            <p style={{ fontSize: "0.88rem", color: "#CBD5E1", lineHeight: 1.5, margin: 0 }}>
+              Alle Spielankündigungen, Live-Ergebnisse, Events und Vereinsnachrichten schnell und unkompliziert per WhatsApp.
             </p>
           </div>
         </div>

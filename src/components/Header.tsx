@@ -18,6 +18,7 @@ import {
   Sparkles,
   ExternalLink,
 } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import teamsData from "@/data/teams.json";
 
 interface SubLink {
@@ -618,6 +619,44 @@ export default function Header() {
             }}
           >
             <Instagram size={17} />
+          </a>
+
+          {/* WhatsApp Community Button */}
+          <a
+            href="https://chat.whatsapp.com/H3hkraWI6naEsoT6CMxrdh"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Tritt unserer WhatsApp Community bei"
+            aria-label="WhatsApp Community"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "36px",
+              height: "36px",
+              borderRadius: "50%",
+              background: "rgba(255, 255, 255, 0.05)",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
+              color: "#CBD5E1",
+              textDecoration: "none",
+              transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#FFFFFF";
+              e.currentTarget.style.background =
+                "linear-gradient(135deg, #25D366 0%, #128C7E 100%)";
+              e.currentTarget.style.borderColor = "transparent";
+              e.currentTarget.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#CBD5E1";
+              e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+              e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+              e.currentTarget.style.transform = "none";
+            }}
+          >
+            <WhatsAppIcon size={17} />
           </a>
 
           <a
@@ -1222,6 +1261,30 @@ export default function Header() {
             >
               <Instagram size={17} />
               <span>@handballeintracht auf Instagram</span>
+              <ArrowUpRight size={14} />
+            </a>
+
+            <a
+              href="https://chat.whatsapp.com/H3hkraWI6naEsoT6CMxrdh"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                padding: "12px 16px",
+                borderRadius: "var(--radius-sm)",
+                background: "rgba(37, 211, 102, 0.15)",
+                border: "1px solid rgba(37, 211, 102, 0.35)",
+                color: "#FFFFFF",
+                fontSize: "0.9rem",
+                fontWeight: 600,
+                textDecoration: "none",
+              }}
+            >
+              <WhatsAppIcon size={17} />
+              <span>WhatsApp Community beitreten</span>
               <ArrowUpRight size={14} />
             </a>
 

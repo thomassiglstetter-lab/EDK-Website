@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { MapPin, ExternalLink, Instagram, Lock, ArrowRight } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import hallsData from "@/data/halls.json";
 
 export default function Footer() {
@@ -57,42 +58,79 @@ export default function Footer() {
                 fontWeight: 600,
               }}
             >
-              Social Media
+              Social Media &amp; Community
             </div>
-            <a
-              href="https://www.instagram.com/handballeintracht/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "10px",
-                padding: "8px 16px",
-                borderRadius: "var(--radius-full)",
-                background: "rgba(255, 255, 255, 0.05)",
-                border: "1px solid rgba(255, 255, 255, 0.12)",
-                color: "#FFFFFF",
-                textDecoration: "none",
-                fontSize: "0.85rem",
-                fontWeight: 500,
-                transition: "all 0.25s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background =
-                  "linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)";
-                e.currentTarget.style.borderColor = "transparent";
-                e.currentTarget.style.transform = "translateY(-1px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
-                e.currentTarget.style.transform = "none";
-              }}
-            >
-              <Instagram size={16} />
-              <span>@handballeintracht</span>
-              <ExternalLink size={12} style={{ opacity: 0.7 }} />
-            </a>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", alignItems: "flex-start" }}>
+              <a
+                href="https://www.instagram.com/handballeintracht/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "8px 16px",
+                  borderRadius: "var(--radius-full)",
+                  background: "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  color: "#FFFFFF",
+                  textDecoration: "none",
+                  fontSize: "0.85rem",
+                  fontWeight: 500,
+                  transition: "all 0.25s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background =
+                    "linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)";
+                  e.currentTarget.style.borderColor = "transparent";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                  e.currentTarget.style.transform = "none";
+                }}
+              >
+                <Instagram size={16} />
+                <span>@handballeintracht</span>
+                <ExternalLink size={12} style={{ opacity: 0.7 }} />
+              </a>
+
+              <a
+                href="https://chat.whatsapp.com/H3hkraWI6naEsoT6CMxrdh"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "8px 16px",
+                  borderRadius: "var(--radius-full)",
+                  background: "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  color: "#FFFFFF",
+                  textDecoration: "none",
+                  fontSize: "0.85rem",
+                  fontWeight: 500,
+                  transition: "all 0.25s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background =
+                    "linear-gradient(135deg, #25D366 0%, #128C7E 100%)";
+                  e.currentTarget.style.borderColor = "transparent";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                  e.currentTarget.style.transform = "none";
+                }}
+              >
+                <WhatsAppIcon size={16} />
+                <span>WhatsApp Community</span>
+                <ExternalLink size={12} style={{ opacity: 0.7 }} />
+              </a>
+            </div>
           </div>
         </div>
 
@@ -300,6 +338,25 @@ export default function Footer() {
           >
             <Instagram size={14} />
             <span>Instagram</span>
+          </a>
+          <a
+            href="https://chat.whatsapp.com/H3hkraWI6naEsoT6CMxrdh"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#94A3B8",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              fontWeight: 500,
+              transition: "color 0.2s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#25D366")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}
+          >
+            <WhatsAppIcon size={14} />
+            <span>WhatsApp Community</span>
           </a>
           <Link
             href="/hallen"
