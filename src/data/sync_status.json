@@ -1,9 +1,9 @@
 {
-  "lastSyncAttempt": "2026-10-16T11:17:46.659Z",
-  "lastSuccessfulSync": "2026-10-16T11:17:48.475Z",
+  "lastSyncAttempt": "2026-10-16T11:44:24.709Z",
+  "lastSuccessfulSync": "2026-10-16T11:44:26.916Z",
   "isSyncing": true,
   "matchesCount": 166,
-  "tablesSynced": 7,
+  "tablesSynced": 4,
   "autoSyncEnabled": true,
   "intervalMinutes": 30,
   "error": null

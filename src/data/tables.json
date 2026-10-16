@@ -1,7 +1,7 @@
 {
   "herren-1": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=AB+2026%2F27&group=495898",
-    "lastUpdated": "2026-10-16T11:17:48.092Z",
+    "lastUpdated": "2026-10-16T11:44:26.632Z",
     "rows": [
       {
         "rank": 1,
@@ -103,97 +103,85 @@
   },
   "herren-2": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=AB+2026%2F27&group=496013",
-    "lastUpdated": "2026-09-09T14:31:07.226Z",
+    "lastUpdated": "2026-10-16T11:44:26.594Z",
     "rows": [
       {
         "rank": 1,
-        "team": "TSV Indersdorf",
-        "matches": 0,
-        "won": 0,
+        "team": "ASV Dachau III",
+        "matches": 3,
+        "won": 3,
         "draw": 0,
         "lost": 0,
-        "goals": "0:0",
-        "diff": "0",
-        "points": "0:0",
+        "goals": "110:74",
+        "diff": "+36",
+        "points": "6:0",
         "isOwnClub": false
       },
       {
         "rank": 2,
         "team": "Eintracht Dachau-Karlsfeld II",
-        "matches": 0,
-        "won": 0,
-        "draw": 0,
-        "lost": 0,
-        "goals": "0:0",
-        "diff": "0",
-        "points": "0:0",
+        "matches": 3,
+        "won": 1,
+        "draw": 1,
+        "lost": 1,
+        "goals": "102:104",
+        "diff": "-2",
+        "points": "3:3",
         "isOwnClub": true
       },
       {
         "rank": 3,
         "team": "TSV Schleißheim II",
-        "matches": 0,
-        "won": 0,
+        "matches": 2,
+        "won": 1,
         "draw": 0,
-        "lost": 0,
-        "goals": "0:0",
-        "diff": "0",
-        "points": "0:0",
+        "lost": 1,
+        "goals": "59:63",
+        "diff": "-4",
+        "points": "2:2",
         "isOwnClub": false
       },
       {
         "rank": 4,
-        "team": "ASV Dachau III",
-        "matches": 0,
-        "won": 0,
+        "team": "TSV Indersdorf",
+        "matches": 2,
+        "won": 1,
         "draw": 0,
-        "lost": 0,
-        "goals": "0:0",
-        "diff": "0",
-        "points": "0:0",
+        "lost": 1,
+        "goals": "49:65",
+        "diff": "-16",
+        "points": "2:2",
         "isOwnClub": false
       },
       {
         "rank": 5,
-        "team": "SC Eching II",
-        "matches": 0,
+        "team": "SpVgg Altenerding III",
+        "matches": 1,
         "won": 0,
-        "draw": 0,
+        "draw": 1,
         "lost": 0,
-        "goals": "0:0",
+        "goals": "31:31",
         "diff": "0",
-        "points": "0:0",
+        "points": "1:1",
         "isOwnClub": false
       },
       {
         "rank": 6,
-        "team": "SC Freising II",
-        "matches": 0,
+        "team": "SC Eching II",
+        "matches": 3,
         "won": 0,
         "draw": 0,
-        "lost": 0,
-        "goals": "0:0",
-        "diff": "0",
-        "points": "0:0",
-        "isOwnClub": false
-      },
-      {
-        "rank": 7,
-        "team": "SpVgg Altenerding III",
-        "matches": 0,
-        "won": 0,
-        "draw": 0,
-        "lost": 0,
-        "goals": "0:0",
-        "diff": "0",
-        "points": "0:0",
+        "lost": 3,
+        "goals": "91:105",
+        "diff": "-14",
+        "points": "0:6",
         "isOwnClub": false
       }
     ]
   },
   "damen-1": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=AB+2026%2F27&group=496310",
-    "lastUpdated": "2026-10-16T11:17:48.448Z",
+    "lastUpdated": "2026-10-16T11:44:26.759Z",
     "rows": [
       {
         "rank": 1,
@@ -319,7 +307,7 @@
   },
   "damen-2": {
     "url": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/groupPage?championship=AB+2026%2F27&group=495861",
-    "lastUpdated": "2026-10-16T11:17:48.475Z",
+    "lastUpdated": "2026-10-16T11:44:26.692Z",
     "rows": [
       {
         "rank": 1,

@@ -146,7 +146,10 @@ export function ScheduleSection() {
   );
 
   useEffect(() => {
-    fetch("/api/matches")
+    fetch(`/api/matches?_t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+    })
       .then((res) => res.json())
       .then((json: MatchesApiResponse) => {
         if (json.success) {

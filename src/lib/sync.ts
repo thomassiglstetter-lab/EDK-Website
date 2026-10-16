@@ -208,11 +208,13 @@ export async function syncAllNuLigaData(force: boolean = false): Promise<{
       }
 
     const durationMs = Date.now() - startTime;
+    inMemorySyncing = false;
     saveSyncStatus({
       lastSuccessfulSync: new Date().toISOString(),
       matchesCount,
       tablesSynced: tablesCount,
       error: null,
+      isSyncing: false,
     });
 
     console.log(`[nuLiga AutoSync] Completed full sync in ${durationMs}ms.`);
