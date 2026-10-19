@@ -96,7 +96,7 @@ export default function VereinPage() {
               lineHeight: 1.65,
             }}
           >
-            Gemeinsam mehr erreichen: Die HSG Eintracht Dachau-Karlsfeld vereint die Handball-Leidenschaft,
+            Gemeinsam mehr erreichen: Die Eintracht Dachau-Karlsfeld vereint die Handball-Leidenschaft,
             Tradition und Ressourcen des <strong style={{ color: "#FFFFFF" }}>TSV Dachau 1865 e.V.</strong> und
             des <strong style={{ color: "#FFFFFF" }}>TSV Eintracht Karlsfeld e.V.</strong> zu einer starken,
             zukunftsorientierten Handball-Familie im Landkreis Dachau.
@@ -288,7 +288,7 @@ export default function VereinPage() {
             </h2>
           </div>
           <p style={{ color: "#94A3B8", fontSize: "1rem", lineHeight: 1.6, maxWidth: "760px", marginBottom: "32px" }}>
-            Die Geschichte der HSG Eintracht Dachau-Karlsfeld ist eine Erfolgsgeschichte der partnerschaftlichen
+            Die Geschichte der Eintracht Dachau-Karlsfeld ist eine Erfolgsgeschichte der partnerschaftlichen
             Zusammenarbeit im bayerischen Handball:
           </p>
 
@@ -426,7 +426,7 @@ export default function VereinPage() {
             </h2>
           </div>
           <p style={{ color: "#94A3B8", fontSize: "1rem", lineHeight: 1.6, maxWidth: "760px", marginBottom: "32px" }}>
-            Die HSG Eintracht Dachau-Karlsfeld baut auf der jahrzehntelangen Erfahrung und Infrastruktur
+            Die Eintracht Dachau-Karlsfeld baut auf der jahrzehntelangen Erfahrung und Infrastruktur
             zweier traditionsreicher Mehrspartenvereine auf:
           </p>
 

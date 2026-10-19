@@ -13,9 +13,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://edk-website-nu.vercel.app"),
   title: "Eintracht Dachau-Karlsfeld | Handball",
   description:
-    "Offizielle 3D-Webpräsenz der Eintracht Dachau-Karlsfeld. Leistungs- und Breitensport, Jugendförderung und Spielbetrieb im Münchner Norden.",
+    "Offizielle Webpräsenz der Eintracht Dachau-Karlsfeld. Spielpläne, Tabellen, Mannschaften und News.",
   icons: {
     icon: "/logo-dark.png",
     apple: "/logo-dark.png",
@@ -35,11 +36,26 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Eintracht Dachau-Karlsfeld | Handball",
     description:
-      "Offizielle Webpräsenz der HSG Eintracht Dachau-Karlsfeld. Spielpläne, Tabellen, Mannschaften und News.",
+      "Offizielle Webpräsenz der Eintracht Dachau-Karlsfeld. Spielpläne, Tabellen, Mannschaften und News.",
     url: "https://edk-website-nu.vercel.app",
     siteName: "Eintracht Dachau-Karlsfeld",
     locale: "de_DE",
     type: "website",
+    images: [
+      {
+        url: "/logo-dark-hd.png",
+        width: 1200,
+        height: 630,
+        alt: "Eintracht Dachau-Karlsfeld Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Eintracht Dachau-Karlsfeld | Handball",
+    description:
+      "Offizielle Webpräsenz der Eintracht Dachau-Karlsfeld. Spielpläne, Tabellen, Mannschaften und News.",
+    images: ["/logo-dark-hd.png"],
   },
   other: {
     "mobile-web-app-capable": "yes",

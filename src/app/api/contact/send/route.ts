@@ -311,14 +311,14 @@ ${message.trim()}
         // 2. Automated Confirmation Receipt to the Sender / Visitor
         try {
           await transporter.sendMail({
-            from: `"${smtp.fromName || "HSG Eintracht Dachau-Karlsfeld"}" <${smtp.fromEmail || smtp.user}>`,
+            from: `"${smtp.fromName || "Eintracht Dachau-Karlsfeld"}" <${smtp.fromEmail || smtp.user}>`,
             to: email.trim(),
-            subject: `Eingangsbestätigung: Deine Anfrage an die HSG Eintracht Dachau-Karlsfeld`,
-            text: `Hallo ${name.trim()},\n\nvielen Dank für deine Kontaktaufnahme mit der HSG Eintracht Dachau-Karlsfeld Handball!\n\nWir haben deine Nachricht zum Thema "${category}" erfolgreich erhalten. Unser Team prüft dein Anliegen und meldet sich in der Regel innerhalb von 1–2 Werktagen bei dir.\n\nZusammenfassung deiner Anfrage:\n- Datum: ${formattedDate} Uhr\n- Bereich: ${category}\n- Empfänger: ${targetEmail}\n\nDeine Nachricht:\n${message.trim()}\n\nSportliche Grüße,\nHSG Eintracht Dachau-Karlsfeld Handball`,
+            subject: `Eingangsbestätigung: Deine Anfrage an die Eintracht Dachau-Karlsfeld`,
+            text: `Hallo ${name.trim()},\n\nvielen Dank für deine Kontaktaufnahme mit der Eintracht Dachau-Karlsfeld Handball!\n\nWir haben deine Nachricht zum Thema "${category}" erfolgreich erhalten. Unser Team prüft dein Anliegen und meldet sich in der Regel innerhalb von 1–2 Werktagen bei dir.\n\nZusammenfassung deiner Anfrage:\n- Datum: ${formattedDate} Uhr\n- Bereich: ${category}\n- Empfänger: ${targetEmail}\n\nDeine Nachricht:\n${message.trim()}\n\nSportliche Grüße,\nEintracht Dachau-Karlsfeld Handball`,
             html: `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0c111a; color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #1e293b;">
                 <div style="background: linear-gradient(135deg, #0ea5e9 0%, #8f1838 100%); padding: 32px 24px; text-align: center;">
-                  <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 700;">HSG Eintracht Dachau-Karlsfeld</h1>
+                  <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 700;">Eintracht Dachau-Karlsfeld</h1>
                   <p style="color: #e2e8f0; margin: 8px 0 0 0; font-size: 14px;">Eingangsbestätigung deiner Kontaktanfrage</p>
                 </div>
 
@@ -327,7 +327,7 @@ ${message.trim()}
                     Hallo <strong>${name.trim()}</strong>,
                   </p>
                   <p>
-                    vielen Dank für dein Interesse und deine Nachricht an die <strong>HSG Eintracht Dachau-Karlsfeld Handball</strong>!
+                    vielen Dank für dein Interesse und deine Nachricht an die <strong>Eintracht Dachau-Karlsfeld Handball</strong>!
                   </p>
                   <p>
                     Deine Anfrage zum Thema <span style="color: #38bdf8; font-weight: 600;">${category}</span> ist erfolgreich bei uns eingegangen und wurde an unser zuständiges Team weitergeleitet. Wir bearbeiten dein Anliegen schnellstmöglich und melden uns in der Regel innerhalb von <strong>1–2 Werktagen</strong> bei dir.
@@ -360,7 +360,7 @@ ${message.trim()}
                 </div>
 
                 <div style="background: rgba(255, 255, 255, 0.02); padding: 18px 24px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 12px; color: #64748b;">
-                  <div>HSG Eintracht Dachau-Karlsfeld Handball</div>
+                  <div>Eintracht Dachau-Karlsfeld Handball</div>
                   <div style="margin-top: 4px;">Dachau & Karlsfeld • Spielgemeinschaft des TSV Dachau 1865 & TSV Eintracht Karlsfeld</div>
                 </div>
               </div>
