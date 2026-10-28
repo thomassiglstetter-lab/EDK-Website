@@ -16,20 +16,21 @@ export interface Sponsor {
   logo?: string;
   fit?: "cover" | "contain";
   scale?: number;
+  bg?: "white" | "dark" | "transparent";
 }
 
 async function getSponsors(): Promise<Sponsor[]> {
   // 1. Try reading from Supabase site_data
   try {
-    const fromDb = await getSiteData<Sponsor[]>("sponsors", []);
-    if (Array.isArray(fromDb) && fromDb.length > 0) {
+    const fromDb = await getSiteData<Sponsor[] | null>("sponsors", null);
+    if (fromDb !== null && Array.isArray(fromDb)) {
       return fromDb;
     }
   } catch (err) {
     console.warn("Could not read sponsors from Supabase, falling back to local file:", err);
   }
 
-  // 2. Fallback to bundled src/data/sponsors.json
+  // 2. Fallback to bundled src/data/sponsors.json only if DB has never been initialized
   try {
     const raw = await fs.readFile(DATA_FILE, "utf8");
     return JSON.parse(raw);
@@ -72,7 +73,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, tier, url, logo, fit, scale } = body;
+    const { name, tier, url, logo, fit, scale, bg } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -89,8 +90,9 @@ export async function POST(req: NextRequest) {
       tier: (tier as SponsorTier) || "none",
       url: url ? url.trim() : "",
       logo: logo ? logo.trim() : "",
-      fit: fit || (logo && !logo.endsWith(".svg") ? "cover" : "contain"),
+      fit: fit || "contain",
       scale: typeof scale === "number" ? scale : 1.0,
+      bg: bg === "white" ? "white" : "transparent",
     };
 
     sponsors.push(newSponsor);
@@ -107,7 +109,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, name, tier, url, logo, fit, scale } = body;
+    const { id, name, tier, url, logo, fit, scale, bg } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Sponsor-ID fehlt." }, { status: 400 });
@@ -126,8 +128,9 @@ export async function PUT(req: NextRequest) {
       tier: tier !== undefined ? tier : sponsors[index].tier,
       url: url !== undefined ? url.trim() : sponsors[index].url,
       logo: logo !== undefined ? logo.trim() : sponsors[index].logo,
-      fit: fit !== undefined ? fit : sponsors[index].fit || (logo && !logo.endsWith(".svg") ? "cover" : "contain"),
+      fit: fit !== undefined ? fit : sponsors[index].fit || "contain",
       scale: scale !== undefined ? scale : sponsors[index].scale || 1.0,
+      bg: bg !== undefined ? bg : sponsors[index].bg || "transparent",
     };
 
     sponsors[index] = updated;

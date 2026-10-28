@@ -127,6 +127,7 @@ export interface Sponsor {
   logo?: string;
   fit?: "cover" | "contain";
   scale?: number;
+  bg?: "white" | "dark" | "transparent";
 }
 
 export interface ContactCategory {
@@ -375,13 +376,15 @@ export default function AdminPage() {
     logo: string;
     fit?: "cover" | "contain";
     scale?: number;
+    bg?: "white" | "dark" | "transparent";
   }>({
     name: "",
     tier: "partner",
     url: "",
     logo: "",
-    fit: "cover",
+    fit: "contain",
     scale: 1.0,
+    bg: "transparent",
   });
   const sponsorFormDataRef = React.useRef(sponsorFormData);
   useEffect(() => {
@@ -400,7 +403,7 @@ export default function AdminPage() {
   const [cropTargetFolder, setCropTargetFolder] = useState<string>("sponsors");
   const [cropAspectRatio, setCropAspectRatio] = useState<number>(2.4);
   const [cropTitle, setCropTitle] = useState<string>("Logo zuschneiden & positionieren");
-  const [cropCallback, setCropCallback] = useState<((url: string) => void | Promise<void>) | null>(null);
+  const [cropCallback, setCropCallback] = useState<((url: string, bgMode?: "checker" | "dark" | "light") => void | Promise<void>) | null>(null);
 
   // ==========================================
   // CONTACT & FORM STATE
@@ -582,6 +585,7 @@ export default function AdminPage() {
                     fit: cached.fit || server.fit,
                     scale: cached.scale !== undefined ? cached.scale : server.scale,
                     url: cached.url !== undefined ? cached.url : server.url,
+                    bg: cached.bg !== undefined ? cached.bg : server.bg,
                   };
                 });
                 validCachedArr.forEach((c) => {
@@ -1307,8 +1311,9 @@ export default function AdminPage() {
       tier: "partner",
       url: "",
       logo: "",
-      fit: "cover",
+      fit: "contain",
       scale: 1.0,
+      bg: "transparent",
     });
     setSponsorFormError("");
     setSponsorModalOpen(true);
@@ -1316,24 +1321,25 @@ export default function AdminPage() {
 
   const openEditSponsorModal = (sponsor: Sponsor) => {
     setEditingSponsor(sponsor);
-    const initialFit = sponsor.fit || (sponsor.logo && !sponsor.logo.toLowerCase().endsWith(".svg") ? "cover" : "contain");
     setSponsorFormData({
       name: sponsor.name,
       tier: sponsor.tier,
       url: sponsor.url || "",
       logo: sponsor.logo || "",
-      fit: initialFit,
+      fit: sponsor.fit || "contain",
       scale: sponsor.scale !== undefined ? sponsor.scale : 1.0,
+      bg: sponsor.bg || "transparent",
     });
     setSponsorFormError("");
     setSponsorModalOpen(true);
   };
 
-  const persistSponsorLogo = async (newUrl: string) => {
+  const persistSponsorLogo = async (newUrl: string, bgMode?: "checker" | "dark" | "light") => {
     const currentForm = sponsorFormDataRef.current;
-    const determinedFit = currentForm.fit || (newUrl.toLowerCase().endsWith(".svg") ? "contain" : "cover");
+    const determinedFit = currentForm.fit || "contain";
     const determinedScale = currentForm.scale || 1.0;
-    setSponsorFormData((prev) => ({ ...prev, logo: newUrl, fit: determinedFit, scale: determinedScale }));
+    const determinedBg = bgMode === "light" ? "white" : (currentForm.bg || "transparent");
+    setSponsorFormData((prev) => ({ ...prev, logo: newUrl, fit: determinedFit, scale: determinedScale, bg: determinedBg }));
     if (editingSponsor) {
       const payload = {
         id: editingSponsor.id,
@@ -1343,6 +1349,7 @@ export default function AdminPage() {
         logo: newUrl,
         fit: determinedFit,
         scale: determinedScale,
+        bg: determinedBg,
       };
 
       try {
@@ -1423,8 +1430,8 @@ export default function AdminPage() {
     setCropTargetFolder("sponsors");
     setCropAspectRatio(2.4);
     setCropTitle("Sponsor-Logo zuschneiden & positionieren");
-    setCropCallback(() => async (newUrl: string) => {
-      await persistSponsorLogo(newUrl);
+    setCropCallback(() => async (newUrl: string, bgMode?: "checker" | "dark" | "light") => {
+      await persistSponsorLogo(newUrl, bgMode);
     });
     setCropModalOpen(true);
     e.target.value = "";
@@ -1437,8 +1444,8 @@ export default function AdminPage() {
     setCropTargetFolder("sponsors");
     setCropAspectRatio(2.4);
     setCropTitle("Sponsor-Logo zuschneiden & positionieren");
-    setCropCallback(() => async (newUrl: string) => {
-      await persistSponsorLogo(newUrl);
+    setCropCallback(() => async (newUrl: string, bgMode?: "checker" | "dark" | "light") => {
+      await persistSponsorLogo(newUrl, bgMode);
     });
     setCropModalOpen(true);
   };
@@ -1476,8 +1483,9 @@ export default function AdminPage() {
           tier: sponsorFormData.tier,
           url: sponsorFormData.url || "",
           logo: sponsorFormData.logo || "",
-          fit: sponsorFormData.fit || (sponsorFormData.logo?.toLowerCase().endsWith(".svg") ? "contain" : "cover"),
+          fit: sponsorFormData.fit || "contain",
           scale: sponsorFormData.scale !== undefined ? sponsorFormData.scale : 1.0,
+          bg: sponsorFormData.bg || "transparent",
         };
 
         try {
@@ -1520,8 +1528,9 @@ export default function AdminPage() {
           tier: sponsorFormData.tier,
           url: sponsorFormData.url || "",
           logo: sponsorFormData.logo || "",
-          fit: sponsorFormData.fit || (sponsorFormData.logo?.toLowerCase().endsWith(".svg") ? "contain" : "cover"),
+          fit: sponsorFormData.fit || "contain",
           scale: sponsorFormData.scale !== undefined ? sponsorFormData.scale : 1.0,
+          bg: sponsorFormData.bg || "transparent",
         };
 
         try {
@@ -8400,12 +8409,12 @@ export default function AdminPage() {
                       width: "160px",
                       height: "72px",
                       borderRadius: "10px",
-                      background: "rgba(0, 0, 0, 0.6)",
+                      background: sponsorFormData.bg === "white" ? "#FFFFFF" : "rgba(0, 0, 0, 0.6)",
                       border: "1px solid rgba(255, 255, 255, 0.14)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      padding: sponsorFormData.fit === "cover" ? "0" : "8px",
+                      padding: sponsorFormData.bg === "white" ? "6px 12px" : (sponsorFormData.fit === "cover" ? "0" : "8px"),
                       overflow: "hidden",
                       flexShrink: 0,
                     }}
@@ -8610,6 +8619,49 @@ export default function AdminPage() {
                         </div>
                       </div>
                     )}
+
+                    {/* Background selector for Logo Tile */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", marginTop: "6px", paddingTop: "8px", borderTop: "1px solid rgba(255, 255, 255, 0.08)" }}>
+                      <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#FFFFFF" }}>
+                        Kachel-Hintergrund für Logo:
+                      </span>
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        <button
+                          type="button"
+                          onClick={() => setSponsorFormData((prev) => ({ ...prev, bg: "transparent" }))}
+                          style={{
+                            padding: "4px 10px",
+                            borderRadius: "6px",
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            border: "1px solid",
+                            borderColor: sponsorFormData.bg !== "white" ? "#F59E0B" : "rgba(255, 255, 255, 0.15)",
+                            background: sponsorFormData.bg !== "white" ? "rgba(245, 158, 11, 0.25)" : "rgba(255, 255, 255, 0.04)",
+                            color: sponsorFormData.bg !== "white" ? "#FBBF24" : "#94A3B8",
+                          }}
+                        >
+                          Dunkel / Transparent
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSponsorFormData((prev) => ({ ...prev, bg: "white" }))}
+                          style={{
+                            padding: "4px 10px",
+                            borderRadius: "6px",
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            border: "1px solid",
+                            borderColor: sponsorFormData.bg === "white" ? "#F59E0B" : "rgba(255, 255, 255, 0.15)",
+                            background: sponsorFormData.bg === "white" ? "rgba(245, 158, 11, 0.25)" : "rgba(255, 255, 255, 0.04)",
+                            color: sponsorFormData.bg === "white" ? "#FBBF24" : "#94A3B8",
+                          }}
+                        >
+                          ☀️ Weiß (#FFFFFF)
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

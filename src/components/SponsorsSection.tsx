@@ -12,79 +12,25 @@ interface Sponsor {
   logo?: string;
   fit?: "cover" | "contain";
   scale?: number;
+  bg?: "white" | "dark" | "transparent";
 }
 
 const initialSponsors: Sponsor[] = [
   {
-    id: "sp-1",
-    name: "Stadtwerke Dachau",
-    tier: "gold",
-    url: "https://www.stadtwerke-dachau.de",
-    logo: "/sponsors/stadtwerke-dachau.svg",
-  },
-  {
-    id: "sp-2",
-    name: "Sparkasse Dachau",
-    tier: "gold",
-    url: "https://www.sparkasse-dachau.de",
-    logo: "/sponsors/sparkasse-dachau.svg",
-  },
-  {
-    id: "sp-3",
-    name: "Autohaus Demmler",
-    tier: "silver",
-    url: "https://www.autohaus-demmler.de",
-    logo: "/sponsors/autohaus-demmler.svg",
-  },
-  {
-    id: "sp-4",
-    name: "Dachauer Sportzentren",
-    tier: "silver",
-    url: "https://www.dachau.de",
-    logo: "/sponsors/sportzentren-dachau.svg",
-  },
-  {
-    id: "sp-5",
-    name: "Physio Karlsfeld",
-    tier: "partner",
-    url: "https://www.physiotherapie-karlsfeld.de",
-    logo: "/sponsors/physio-karlsfeld.svg",
-  },
-  {
-    id: "sp-6",
-    name: "Metzgerei Huber",
-    tier: "partner",
-    url: "https://www.metzgerei-huber.de",
-    logo: "/sponsors/metzgerei-huber.svg",
-  },
-  {
-    id: "sp-7",
-    name: "Bäckerei Lang",
-    tier: "gold",
-    url: "https://www.baeckerei-lang.de",
-    logo: "/uploads/sponsors/b-ckerei-lang-cropped-1789139269756.png",
+    id: "sp-1793178042353",
+    name: "Farbenpracht",
+    tier: "none",
+    url: "https://www.farbenpracht-malermeister.de",
+    logo: "https://jewlvukxdkqemydsnxnk.supabase.co/storage/v1/object/public/uploads/1793178030290-sponsors-image001-1-cropped-1793178030290.png",
     fit: "contain",
-  },
-  {
-    id: "sp-8",
-    name: "IT-Service Müller",
-    tier: "partner",
-    url: "https://www.it-service-mueller.de",
-    logo: "/sponsors/it-service-mueller.svg",
-    fit: "contain",
-  },
-  {
-    id: "sp-1788952714718",
-    name: "Dachau Sports Nutrition",
-    tier: "gold",
-    url: "https://dachau-sports.de",
-    logo: "/sponsors/dachau-sports-nutrition.svg",
-    fit: "contain",
+    bg: "white",
+    scale: 1.0,
   },
 ];
 
 export default function SponsorsSection() {
   const [sponsorsList, setSponsorsList] = useState<Sponsor[]>(initialSponsors);
+  const [isHovered, setIsHovered] = useState(false);
   const { ref: sectionRef, isRevealed } = useScrollReveal({ threshold: 0.1 });
 
   useEffect(() => {
@@ -133,45 +79,9 @@ export default function SponsorsSection() {
           if (Array.isArray(data)) {
             const deletedList = getDeletedSponsors();
             const validData = data.filter((s: Sponsor) => !isDeleted(s, deletedList));
-            let merged = validData;
+            setSponsorsList(validData);
             try {
-              const cachedRaw = localStorage.getItem("edk_sponsors_cache");
-              if (cachedRaw) {
-                const cachedArr: Sponsor[] = JSON.parse(cachedRaw);
-                if (Array.isArray(cachedArr) && cachedArr.length > 0) {
-                  const validCachedArr = cachedArr.filter((c: Sponsor) => !isDeleted(c, deletedList));
-                  const cachedMap = new Map<string, Sponsor>();
-                  validCachedArr.forEach((c) => {
-                    if (c.id) cachedMap.set(c.id, c);
-                    else if (c.name) cachedMap.set(c.name.toLowerCase().trim(), c);
-                  });
-                  merged = validData.map((server) => {
-                    const cached = cachedMap.get(server.id) || cachedMap.get(server.name.toLowerCase().trim());
-                    if (!cached) return server;
-                    return {
-                      ...server,
-                      tier: cached.tier || server.tier,
-                      logo: cached.logo || server.logo,
-                      fit: cached.fit || server.fit,
-                      scale: cached.scale !== undefined ? cached.scale : server.scale,
-                      url: cached.url !== undefined ? cached.url : server.url,
-                    };
-                  });
-                  validCachedArr.forEach((c) => {
-                    const exists = merged.some(
-                      (m) =>
-                        (m.id && c.id && m.id === c.id) ||
-                        (m.name && c.name && m.name.toLowerCase().trim() === c.name.toLowerCase().trim())
-                    );
-                    if (!exists && !isDeleted(c, deletedList)) merged.push(c);
-                  });
-                }
-              }
-            } catch {}
-
-            setSponsorsList(merged);
-            try {
-              localStorage.setItem("edk_sponsors_cache", JSON.stringify(merged));
+              localStorage.setItem("edk_sponsors_cache", JSON.stringify(validData));
             } catch {}
           }
         })
@@ -199,8 +109,191 @@ export default function SponsorsSection() {
     };
   }, []);
 
-  // Duplicate for seamless infinite marquee loop
-  const marqueeSponsors = [...sponsorsList, ...sponsorsList];
+  const isSingleSponsor = sponsorsList.length === 1;
+
+  // For 1 sponsor: exactly 1 card that glides across without duplication
+  // For 2+ sponsors: repeat to fill widescreen displays seamlessly
+  const marqueeSponsors = React.useMemo(() => {
+    if (sponsorsList.length === 0) return [];
+    if (sponsorsList.length === 1) return sponsorsList;
+
+    const minCardsPerHalf = 8;
+    const multiplier = Math.max(1, Math.ceil(minCardsPerHalf / sponsorsList.length));
+
+    const oneSet: Sponsor[] = [];
+    for (let i = 0; i < multiplier; i++) {
+      oneSet.push(...sponsorsList);
+    }
+
+    // Duplicate oneSet for seamless 50% translateX loop
+    return [...oneSet, ...oneSet];
+  }, [sponsorsList]);
+
+  const tierColors: Record<string, { bg: string; border: string; hoverBorder: string; glow: string; text: string; label: string }> = {
+    gold: {
+      bg: "rgba(245, 158, 11, 0.06)",
+      border: "rgba(245, 158, 11, 0.25)",
+      hoverBorder: "rgba(245, 158, 11, 0.8)",
+      glow: "rgba(245, 158, 11, 0.35)",
+      text: "#FBBF24",
+      label: "Gold-Partner",
+    },
+    silver: {
+      bg: "rgba(148, 163, 184, 0.06)",
+      border: "rgba(148, 163, 184, 0.2)",
+      hoverBorder: "rgba(203, 213, 225, 0.7)",
+      glow: "rgba(148, 163, 184, 0.25)",
+      text: "#CBD5E1",
+      label: "Silber-Partner",
+    },
+    partner: {
+      bg: "rgba(72, 156, 216, 0.04)",
+      border: "rgba(72, 156, 216, 0.18)",
+      hoverBorder: "rgba(94, 178, 238, 0.7)",
+      glow: "rgba(72, 156, 216, 0.25)",
+      text: "#5EB2EE",
+      label: "Förderer",
+    },
+    none: {
+      bg: "rgba(255, 255, 255, 0.03)",
+      border: "rgba(255, 255, 255, 0.12)",
+      hoverBorder: "rgba(255, 255, 255, 0.6)",
+      glow: "rgba(255, 255, 255, 0.2)",
+      text: "transparent",
+      label: "",
+    },
+  };
+
+  const renderSponsorCard = (sponsor: Sponsor, key: string, isStatic?: boolean) => {
+    const currentTier = sponsor.tier && tierColors[sponsor.tier] ? sponsor.tier : "none";
+    const colors = tierColors[currentTier];
+    const isWhiteBg = sponsor.bg === "white";
+
+    return (
+      <a
+        key={key}
+        href={sponsor.url || "#partner"}
+        target={sponsor.url ? "_blank" : undefined}
+        rel={sponsor.url ? "noopener noreferrer" : undefined}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={`sponsor-card ${isWhiteBg ? "has-white-bg" : ""} ${isSingleSponsor ? "single-runner-card" : ""} ${isStatic ? "is-static-card" : ""}`}
+        title={sponsor.url ? `${sponsor.name} – Website besuchen` : sponsor.name}
+        style={
+          {
+            "--card-bg": colors.bg,
+            "--card-border": colors.border,
+            "--hover-border": colors.hoverBorder,
+            "--hover-glow": colors.glow,
+            display: "flex",
+            flexDirection: "column",
+            minWidth: isStatic ? "280px" : "250px",
+            maxWidth: isStatic ? "360px" : "320px",
+            height: "124px",
+            padding: "8px 12px 10px 12px",
+            borderRadius: "12px",
+            border: `1px solid ${colors.border}`,
+            background: colors.bg,
+            textDecoration: "none",
+            position: "relative",
+            overflow: "hidden",
+            boxSizing: "border-box",
+            cursor: "pointer",
+            ...(isHovered ? { animationPlayState: "paused" } : {}),
+          } as React.CSSProperties
+        }
+      >
+        {/* Dedicated Top Bar: Tier Badge on left/center & External Link indicator on right */}
+        <div
+          className="sponsor-card-topbar"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            height: "20px",
+            marginBottom: "4px",
+            flexShrink: 0,
+          }}
+        >
+          {colors.label ? (
+            <span
+              className="sponsor-tier-pill"
+              style={{
+                color: colors.text,
+                borderColor: colors.border,
+                background: colors.border.replace("0.25", "0.15").replace("0.2", "0.15").replace("0.18", "0.15"),
+              }}
+            >
+              {colors.label}
+            </span>
+          ) : (
+            <span />
+          )}
+          {sponsor.url && (
+            <span
+              className="sponsor-external-icon"
+              style={{
+                color: "rgba(255, 255, 255, 0.35)",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <ExternalLink size={11} />
+            </span>
+          )}
+        </div>
+
+        {/* Sponsor Logo Container: Completely separated from the top bar */}
+        {sponsor.logo ? (
+          <div
+            className={`sponsor-logo-container ${
+              sponsor.fit === "cover" ? "is-cover" : "is-contain"
+            } ${isWhiteBg ? "is-white-bg" : ""}`}
+            style={{
+              flex: 1,
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+              borderRadius: "8px",
+              background: isWhiteBg ? "#FFFFFF" : sponsor.fit === "cover" ? "rgba(0,0,0,0.2)" : "transparent",
+              padding: isWhiteBg ? "8px 16px" : sponsor.fit === "cover" ? "0" : "4px 10px",
+              boxShadow: isWhiteBg ? "0 4px 14px rgba(0, 0, 0, 0.45)" : "none",
+              boxSizing: "border-box",
+            }}
+          >
+            <img
+              src={sponsor.logo}
+              alt={sponsor.name}
+              className="sponsor-logo"
+              style={{
+                width: sponsor.fit === "cover" ? "100%" : "auto",
+                height: sponsor.fit === "cover" ? "100%" : "auto",
+                maxWidth: "100%",
+                maxHeight: isWhiteBg ? "64px" : "68px",
+                objectFit: sponsor.fit === "cover" ? "cover" : "contain",
+                objectPosition: "center",
+                filter: isWhiteBg ? "none" : "drop-shadow(0 2px 8px rgba(0,0,0,0.45))",
+                ...(sponsor.fit !== "cover" && sponsor.scale && sponsor.scale !== 1
+                  ? { transform: `scale(${sponsor.scale})` }
+                  : {}),
+              }}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "/logo-dark.png";
+              }}
+            />
+          </div>
+        ) : (
+          /* Fallback when no logo is uploaded */
+          <div className="sponsor-fallback-wrapper">
+            <span className="sponsor-name">{sponsor.name}</span>
+          </div>
+        )}
+      </a>
+    );
+  };
 
   return (
     <section
@@ -271,158 +364,69 @@ export default function SponsorsSection() {
         </a>
       </div>
 
-      {/* Marquee Container */}
-      <div
-        className={`reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
-        style={{
-          overflow: "hidden",
-          position: "relative",
-          transitionDelay: "0.2s",
-        }}
-      >
-        {/* Left / Right Fade Edges */}
+      {/* Sponsors Content */}
+      {sponsorsList.length === 0 ? (
         <div
-          className="sponsor-fade-edge sponsor-fade-left"
+          className={`reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
           style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            bottom: 0,
-            background: "linear-gradient(to right, rgba(7,9,13,1), transparent)",
-            zIndex: 2,
-            pointerEvents: "none",
+            textAlign: "center",
+            padding: "48px 24px",
+            color: "#94A3B8",
+            fontSize: "0.95rem",
           }}
-        />
-        <div
-          className="sponsor-fade-edge sponsor-fade-right"
-          style={{
-            position: "absolute",
-            right: 0,
-            top: 0,
-            bottom: 0,
-            background: "linear-gradient(to left, rgba(7,9,13,1), transparent)",
-            zIndex: 2,
-            pointerEvents: "none",
-          }}
-        />
-
-        {/* Scrolling Track */}
-        <div className="sponsor-marquee-track">
-          {marqueeSponsors.map((sponsor, idx) => {
-            const tierColors: Record<string, { bg: string; border: string; hoverBorder: string; glow: string; text: string; label: string }> = {
-              gold: {
-                bg: "rgba(245, 158, 11, 0.06)",
-                border: "rgba(245, 158, 11, 0.25)",
-                hoverBorder: "rgba(245, 158, 11, 0.8)",
-                glow: "rgba(245, 158, 11, 0.35)",
-                text: "#FBBF24",
-                label: "Gold-Partner",
-              },
-              silver: {
-                bg: "rgba(148, 163, 184, 0.06)",
-                border: "rgba(148, 163, 184, 0.2)",
-                hoverBorder: "rgba(203, 213, 225, 0.7)",
-                glow: "rgba(148, 163, 184, 0.25)",
-                text: "#CBD5E1",
-                label: "Silber-Partner",
-              },
-              partner: {
-                bg: "rgba(72, 156, 216, 0.04)",
-                border: "rgba(72, 156, 216, 0.18)",
-                hoverBorder: "rgba(94, 178, 238, 0.7)",
-                glow: "rgba(72, 156, 216, 0.25)",
-                text: "#5EB2EE",
-                label: "Förderer",
-              },
-              none: {
-                bg: "rgba(255, 255, 255, 0.03)",
-                border: "rgba(255, 255, 255, 0.12)",
-                hoverBorder: "rgba(255, 255, 255, 0.6)",
-                glow: "rgba(255, 255, 255, 0.2)",
-                text: "transparent",
-                label: "",
-              },
-            };
-            const currentTier = sponsor.tier && tierColors[sponsor.tier] ? sponsor.tier : "none";
-            const colors = tierColors[currentTier];
-
-            return (
-              <a
-                key={`${sponsor.id || sponsor.name}-${idx}`}
-                href={sponsor.url || "#partner"}
-                target={sponsor.url ? "_blank" : undefined}
-                rel={sponsor.url ? "noopener noreferrer" : undefined}
-                className="sponsor-card"
-                title={sponsor.url ? `${sponsor.name} – Website besuchen` : sponsor.name}
-                style={
-                  {
-                    "--card-bg": colors.bg,
-                    "--card-border": colors.border,
-                    "--hover-border": colors.hoverBorder,
-                    "--hover-glow": colors.glow,
-                  } as React.CSSProperties
-                }
-              >
-                {/* Dedicated Top Bar: Tier Badge on left/center & External Link indicator on right */}
-                <div className="sponsor-card-topbar">
-                  {colors.label ? (
-                    <span
-                      className="sponsor-tier-pill"
-                      style={{
-                        color: colors.text,
-                        borderColor: colors.border,
-                        background: colors.border.replace("0.25", "0.15").replace("0.2", "0.15").replace("0.18", "0.15"),
-                      }}
-                    >
-                      {colors.label}
-                    </span>
-                  ) : (
-                    <span />
-                  )}
-                  {sponsor.url && (
-                    <span className="sponsor-external-icon">
-                      <ExternalLink size={11} />
-                    </span>
-                  )}
-                </div>
-
-                {/* Sponsor Logo Container: Completely separated from the top bar - zero overlap possible! */}
-                {sponsor.logo ? (
-                  <div
-                    className={`sponsor-logo-container ${
-                      sponsor.fit === "cover" ? "is-cover" : "is-contain"
-                    }`}
-                  >
-                    <img
-                      src={sponsor.logo}
-                      alt={sponsor.name}
-                      className="sponsor-logo"
-                      style={
-                        sponsor.fit !== "cover" && sponsor.scale && sponsor.scale !== 1
-                          ? {
-                              transform: `scale(${sponsor.scale})`,
-                              maxHeight: `${Math.min(84, Math.round(72 * sponsor.scale))}px`,
-                            }
-                          : undefined
-                      }
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = "/logo-dark.png";
-                      }}
-                    />
-                  </div>
-                ) : (
-                  /* Fallback when no logo is uploaded */
-                  <div className="sponsor-fallback-wrapper">
-                    <span className="sponsor-name">{sponsor.name}</span>
-                  </div>
-                )}
-              </a>
-            );
-          })}
+        >
+          Werden Sie jetzt Partner der Eintracht Dachau-Karlsfeld und unterstützen Sie unsere Teams!
         </div>
-      </div>
+      ) : (
+        /* Marquee Container (Laufband) */
+        <div
+          className={`reveal-3d-card ${isRevealed ? "is-revealed" : ""}`}
+          style={{
+            overflow: "hidden",
+            position: "relative",
+            transitionDelay: "0.2s",
+            width: "100%",
+          }}
+        >
+          {/* Left / Right Fade Edges */}
+          <div
+            className="sponsor-fade-edge sponsor-fade-left"
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              background: "linear-gradient(to right, rgba(7,9,13,1), transparent)",
+              zIndex: 2,
+              pointerEvents: "none",
+            }}
+          />
+          <div
+            className="sponsor-fade-edge sponsor-fade-right"
+            style={{
+              position: "absolute",
+              right: 0,
+              top: 0,
+              bottom: 0,
+              background: "linear-gradient(to left, rgba(7,9,13,1), transparent)",
+              zIndex: 2,
+              pointerEvents: "none",
+            }}
+          />
 
-      <style jsx>{`
+          {/* Scrolling Track */}
+          <div
+            className={`sponsor-marquee-track ${isSingleSponsor ? "is-single-runner" : ""} ${isHovered ? "is-paused" : ""}`}
+            style={isHovered ? { animationPlayState: "paused" } : undefined}
+          >
+            {marqueeSponsors.map((sponsor, idx) =>
+              renderSponsorCard(sponsor, `${sponsor.id || sponsor.name}-${idx}`)
+            )}
+          </div>
+        </div>
+      )}
+
+      <style jsx global>{`
         .sponsor-fade-edge {
           width: 80px;
         }
@@ -435,8 +439,11 @@ export default function SponsorsSection() {
           padding: 12px 0;
         }
 
-        .sponsor-marquee-track:hover {
-          animation-play-state: paused;
+        .sponsor-marquee-track:hover,
+        .sponsor-marquee-track.is-single-runner:hover,
+        .sponsor-marquee-track:has(.sponsor-card:hover),
+        .sponsor-marquee-track.is-paused {
+          animation-play-state: paused !important;
         }
 
         .sponsor-card {
@@ -516,6 +523,11 @@ export default function SponsorsSection() {
           position: relative;
         }
 
+        .is-static-card {
+          min-width: 280px;
+          max-width: 360px;
+        }
+
         .sponsor-logo-container.is-cover {
           padding: 0;
           background: rgba(0, 0, 0, 0.2);
@@ -523,6 +535,16 @@ export default function SponsorsSection() {
 
         .sponsor-logo-container.is-contain {
           padding: 4px 10px;
+        }
+
+        .sponsor-logo-container.is-white-bg {
+          background: #FFFFFF !important;
+          border-radius: 8px;
+          padding: 8px 16px !important;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .sponsor-logo {
@@ -551,12 +573,23 @@ export default function SponsorsSection() {
           object-fit: contain !important;
         }
 
+        .sponsor-logo-container.is-white-bg .sponsor-logo {
+          filter: none !important;
+          max-height: 64px !important;
+          max-width: 100% !important;
+          object-fit: contain !important;
+        }
+
         .sponsor-card:hover .sponsor-logo {
           transform: scale(1.05);
         }
 
         .sponsor-card:hover .sponsor-logo-container.is-cover .sponsor-logo {
           transform: scale(1.04);
+        }
+
+        .sponsor-card:hover .sponsor-logo-container.is-white-bg {
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55), 0 0 16px rgba(255, 255, 255, 0.3);
         }
 
         @media (max-width: 640px) {
@@ -638,12 +671,37 @@ export default function SponsorsSection() {
           transform: translateX(-50%) translateY(0);
         }
 
+        .single-runner-card {
+          animation: singleSponsorMarquee 22s linear infinite;
+          will-change: transform;
+        }
+
+        .single-runner-card:hover {
+          animation-play-state: paused !important;
+        }
+
+        .sponsor-marquee-track.is-single-runner {
+          animation: none !important;
+          width: 100%;
+          display: flex;
+          justify-content: flex-start;
+        }
+
         @keyframes sponsorMarquee {
           0% {
             transform: translateX(0);
           }
           100% {
             transform: translateX(-50%);
+          }
+        }
+
+        @keyframes singleSponsorMarquee {
+          0% {
+            transform: translateX(100vw);
+          }
+          100% {
+            transform: translateX(calc(-100% - 100px));
           }
         }
       `}</style>

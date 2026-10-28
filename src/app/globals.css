@@ -415,3 +415,203 @@ table,
   }
 }
 
+/* ==========================================================================
+   Sponsor Cards & Logo Styling (Universal)
+   ========================================================================== */
+.sponsor-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 10px 12px;
+  background: var(--card-bg, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--card-border, rgba(255, 255, 255, 0.12));
+  border-radius: 12px;
+  min-width: 250px;
+  height: 124px;
+  flex-shrink: 0;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.sponsor-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--hover-border, rgba(255, 255, 255, 0.6)) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 28px var(--hover-glow, rgba(255, 255, 255, 0.2));
+  background: rgba(16, 22, 34, 0.96);
+}
+
+.sponsor-card.is-static-card {
+  min-width: 280px;
+  max-width: 360px;
+}
+
+.sponsor-card-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 20px;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.sponsor-tier-pill {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  border: 1px solid;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s ease;
+}
+
+.sponsor-external-icon {
+  color: rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.sponsor-card:hover .sponsor-external-icon {
+  color: #38BDF8;
+  transform: translate(1px, -1px);
+}
+
+.sponsor-logo-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.sponsor-logo-container.is-cover {
+  padding: 0;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.sponsor-logo-container.is-contain {
+  padding: 4px 10px;
+}
+
+.sponsor-logo-container.is-white-bg {
+  background: #FFFFFF !important;
+  border-radius: 8px;
+  padding: 8px 16px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sponsor-logo {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 72px;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.45));
+}
+
+.sponsor-logo-container.is-cover .sponsor-logo {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 6px;
+}
+
+.sponsor-logo-container.is-contain .sponsor-logo {
+  max-width: 100%;
+  max-height: 68px;
+  object-fit: contain !important;
+}
+
+.sponsor-logo-container.is-white-bg .sponsor-logo {
+  filter: none !important;
+  max-height: 64px !important;
+}
+
+.sponsor-fallback-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.sponsor-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #F8FAFC;
+}
+
+.sponsor-fade-edge {
+  width: 80px;
+}
+
+.sponsor-marquee-track {
+  display: flex;
+  gap: 24px;
+  animation: sponsorMarquee 38s linear infinite;
+  width: max-content;
+  padding: 12px 0;
+}
+
+.sponsor-marquee-track:hover,
+.sponsor-marquee-track.is-single-runner:hover,
+.sponsor-marquee-track:has(.sponsor-card:hover),
+.sponsor-marquee-track.is-paused,
+.sponsor-card:hover,
+.single-runner-card:hover {
+  animation-play-state: paused !important;
+}
+
+.single-runner-card {
+  animation: singleSponsorMarquee 22s linear infinite;
+  will-change: transform;
+}
+
+.single-runner-card:hover {
+  animation-play-state: paused !important;
+}
+
+.sponsor-marquee-track.is-single-runner {
+  animation: none !important;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+@keyframes sponsorMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes singleSponsorMarquee {
+  0% {
+    transform: translateX(100vw);
+  }
+  100% {
+    transform: translateX(calc(-100% - 100px));
+  }
+}

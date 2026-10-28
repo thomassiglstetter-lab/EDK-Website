@@ -2,7 +2,7 @@
   "clubId": "105665",
   "clubName": "Eintracht Dachau-Karlsfeld",
   "federation": "BHV",
-  "lastSynced": "2026-10-16T15:50:31.985Z",
+  "lastSynced": "2026-10-28T10:06:29.772Z",
   "nuLigaUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/clubInfoDisplay?club=105665",
   "halls": [
     {
@@ -693,10 +693,10 @@
       "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
       "hallNr": "260181",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=43209",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "result": "33:20",
+      "homeScore": 33,
+      "guestScore": 20,
+      "outcome": "win"
     },
     {
       "id": "20620108",
@@ -712,10 +712,10 @@
       "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
       "hallNr": "260181",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=43209",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "result": "38:36",
+      "homeScore": 38,
+      "guestScore": 36,
+      "outcome": "win"
     },
     {
       "id": "12",
@@ -737,25 +737,6 @@
       "outcome": null
     },
     {
-      "id": "26014015",
-      "matchNr": "26014015",
-      "day": "Termin offen",
-      "date": "Termin offen",
-      "time": "",
-      "league": "BZK M",
-      "home": "Eintracht Dachau-Karlsfeld II",
-      "guest": "HSG Schwabkirchen II (a.K.)",
-      "isHome": true,
-      "category": "Herren 2",
-      "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
-      "hallNr": "260181",
-      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=43209",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
-    },
-    {
       "id": "20341912",
       "matchNr": "20341912",
       "day": "So",
@@ -769,10 +750,10 @@
       "hallName": "Garching, Business-Campus-Sportpark",
       "hallNr": "280120",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=5309",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "result": "30:36",
+      "homeScore": 30,
+      "guestScore": 36,
+      "outcome": "win"
     },
     {
       "id": "26013013",
@@ -788,10 +769,10 @@
       "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
       "hallNr": "260181",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=43209",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "result": "27:30",
+      "homeScore": 27,
+      "guestScore": 30,
+      "outcome": "loss"
     },
     {
       "id": "26022022",
@@ -807,10 +788,10 @@
       "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
       "hallNr": "260181",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=43209",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "result": "39:17",
+      "homeScore": 39,
+      "guestScore": 17,
+      "outcome": "win"
     },
     {
       "id": "26014019",
@@ -823,6 +804,25 @@
       "guest": "Eintracht Dachau-Karlsfeld II",
       "isHome": false,
       "category": "Herren 2",
+      "hallName": "Freising, Luitpoldhalle",
+      "hallNr": "260100",
+      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=4862",
+      "result": null,
+      "homeScore": null,
+      "guestScore": null,
+      "outcome": null
+    },
+    {
+      "id": "26022027",
+      "matchNr": "26022027",
+      "day": "Sa",
+      "date": "24.10.2026",
+      "time": "00:00",
+      "league": "BOL F",
+      "home": "spielfrei",
+      "guest": "Eintracht Dachau-Karlsfeld",
+      "isHome": false,
+      "category": "Damen 1",
       "hallName": "Freising, Luitpoldhalle",
       "hallNr": "260100",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=4862",
@@ -883,10 +883,10 @@
       "hallName": "Indersdorf, Dreifachturnhalle Gymnasium",
       "hallNr": "260160",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=5247",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "result": "9:14",
+      "homeScore": 9,
+      "guestScore": 14,
+      "outcome": "win"
     },
     {
       "id": "26013017",
@@ -902,10 +902,10 @@
       "hallName": "Erdweg, Schulsporthalle",
       "hallNr": "260086",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=4951",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "result": "21:29",
+      "homeScore": 21,
+      "guestScore": 29,
+      "outcome": "win"
     },
     {
       "id": "23",
@@ -940,10 +940,10 @@
       "hallName": "Ingolstadt, Bezirkssportanlage Mitte",
       "hallNr": "260162",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=5249",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "result": "11:10",
+      "homeScore": 11,
+      "guestScore": 10,
+      "outcome": "loss"
     },
     {
       "id": "20541213",
@@ -956,13 +956,13 @@
       "guest": "TSV München-Allach II",
       "isHome": true,
       "category": "wB-Jugend",
-      "hallName": "Dachau, Dr. Josef Schwalber Realschule",
-      "hallNr": "260068",
-      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=16006",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "hallName": "Dachau, Sporthalle Augustenfeld",
+      "hallNr": "260069",
+      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=17707",
+      "result": "31:16",
+      "homeScore": 31,
+      "guestScore": 16,
+      "outcome": "win"
     },
     {
       "id": "20342117",
@@ -978,10 +978,10 @@
       "hallName": "München, Städt. Sporthalle Eversbuschstr.",
       "hallNr": "280224",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=5324",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "result": "17:30",
+      "homeScore": 17,
+      "guestScore": 30,
+      "outcome": "win"
     },
     {
       "id": "26058006",
@@ -994,13 +994,13 @@
       "guest": "ASV Dachau",
       "isHome": true,
       "category": "D-Jugend",
-      "hallName": "Dachau, Dr. Josef Schwalber Realschule",
-      "hallNr": "260068",
-      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=16006",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "hallName": "Dachau, Sporthalle Augustenfeld",
+      "hallNr": "260069",
+      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=17707",
+      "result": "13:41",
+      "homeScore": 13,
+      "guestScore": 41,
+      "outcome": "loss"
     },
     {
       "id": "20620140",
@@ -1013,32 +1013,13 @@
       "guest": "HSG Pleichach",
       "isHome": true,
       "category": "wC-Jugend",
-      "hallName": "Dachau, Dr. Josef Schwalber Realschule",
-      "hallNr": "260068",
-      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=16006",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
-    },
-    {
-      "id": "26022027",
-      "matchNr": "26022027",
-      "day": "So",
-      "date": "25.10.2026",
-      "time": "14:30",
-      "league": "BOL F",
-      "home": "SC Freising",
-      "guest": "Eintracht Dachau-Karlsfeld",
-      "isHome": false,
-      "category": "Damen 1",
-      "hallName": "Freising, Luitpoldhalle",
-      "hallNr": "260100",
-      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=4862",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "hallName": "Dachau, Sporthalle Augustenfeld",
+      "hallNr": "260069",
+      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=17707",
+      "result": "33:37",
+      "homeScore": 33,
+      "guestScore": 37,
+      "outcome": "loss"
     },
     {
       "id": "20341917",
@@ -1051,13 +1032,13 @@
       "guest": "TSV Schleißheim II (a.K.)",
       "isHome": true,
       "category": "mC-Jugend",
-      "hallName": "Dachau, Dr. Josef Schwalber Realschule",
-      "hallNr": "260068",
-      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=16006",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
+      "hallName": "Dachau, Sporthalle Augustenfeld",
+      "hallNr": "260069",
+      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=17707",
+      "result": "24:25",
+      "homeScore": 24,
+      "guestScore": 25,
+      "outcome": "loss"
     },
     {
       "id": "31",
@@ -1165,6 +1146,25 @@
       "guest": "HC Donau/Paar",
       "isHome": true,
       "category": "Damen 1",
+      "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
+      "hallNr": "260181",
+      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=43209",
+      "result": null,
+      "homeScore": null,
+      "guestScore": null,
+      "outcome": null
+    },
+    {
+      "id": "26014015",
+      "matchNr": "26014015",
+      "day": "Do",
+      "date": "12.11.2026",
+      "time": "20:30",
+      "league": "BZK M",
+      "home": "Eintracht Dachau-Karlsfeld II",
+      "guest": "HSG Schwabkirchen II (a.K.)",
+      "isHome": true,
+      "category": "Herren 2",
       "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
       "hallNr": "260181",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=43209",
@@ -2713,6 +2713,25 @@
       "outcome": null
     },
     {
+      "id": "m-141",
+      "matchNr": "",
+      "day": "So",
+      "date": "21.02.2027",
+      "time": "00:00",
+      "league": "BOL F",
+      "home": "Eintracht Dachau-Karlsfeld",
+      "guest": "spielfrei",
+      "isHome": true,
+      "category": "Damen 1",
+      "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
+      "hallNr": "260181",
+      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=43209",
+      "result": null,
+      "homeScore": null,
+      "guestScore": null,
+      "outcome": null
+    },
+    {
       "id": "20620112",
       "matchNr": "20620112",
       "day": "So",
@@ -2745,25 +2764,6 @@
       "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
       "hallNr": "260181",
       "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=BHV+2026%2F27&location=43209",
-      "result": null,
-      "homeScore": null,
-      "guestScore": null,
-      "outcome": null
-    },
-    {
-      "id": "26022074",
-      "matchNr": "26022074",
-      "day": "So",
-      "date": "21.02.2027",
-      "time": "16:30",
-      "league": "BOL F",
-      "home": "Eintracht Dachau-Karlsfeld",
-      "guest": "SC Freising",
-      "isHome": true,
-      "category": "Damen 1",
-      "hallName": "Karlsfeld, Sporthalle Grundschule (GSK)",
-      "hallNr": "260181",
-      "courtUrl": "https://bhv-handball.liga.nu/cgi-bin/WebObjects/nuLigaHBDE.woa/wa/courtInfo?federation=BHV&roundTyp=0&championship=AB+2026%2F27&location=43209",
       "result": null,
       "homeScore": null,
       "guestScore": null,

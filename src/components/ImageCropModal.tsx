@@ -22,7 +22,7 @@ interface ImageCropModalProps {
   targetFolder: string;
   aspectRatio?: number;
   title?: string;
-  onSuccess: (url: string) => void | Promise<void>;
+  onSuccess: (url: string, bgMode?: "checker" | "dark" | "light") => void | Promise<void>;
 }
 
 export default function ImageCropModal({
@@ -293,8 +293,16 @@ export default function ImageCropModal({
 
       if (!ctx) throw new Error("Canvas context could not be created");
 
-      // Transparent background
-      ctx.clearRect(0, 0, exportW, exportH);
+      // Draw background according to selected bgMode
+      if (bgMode === "light") {
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 0, exportW, exportH);
+      } else if (bgMode === "dark") {
+        ctx.fillStyle = "#0C111A";
+        ctx.fillRect(0, 0, exportW, exportH);
+      } else {
+        ctx.clearRect(0, 0, exportW, exportH);
+      }
 
       // Scaling relative to editor canvas (editor width is ~460px)
       const editorW = 460;
@@ -336,7 +344,7 @@ export default function ImageCropModal({
           const json = await res.json();
           if (json.success && json.url) {
             try {
-              await Promise.resolve(onSuccess(json.url));
+              await Promise.resolve(onSuccess(json.url, bgMode));
             } catch (callbackErr) {
               console.error("onSuccess callback error:", callbackErr);
             }
@@ -353,7 +361,7 @@ export default function ImageCropModal({
         try {
           const fallbackDataUrl = exportCanvas.toDataURL("image/png");
           if (fallbackDataUrl && fallbackDataUrl.length > 50) {
-            await Promise.resolve(onSuccess(fallbackDataUrl));
+            await Promise.resolve(onSuccess(fallbackDataUrl, bgMode));
             onClose();
             setSaving(false);
             return;
